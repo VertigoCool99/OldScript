@@ -159,14 +159,14 @@ LocalPlayer.PlayerGui.ScreenGui.StatsFrame2.Inventory.Amount.Changed:Connect(fun
 			local ggg;
 			ggg = game.Players.LocalPlayer.Character.HumanoidRootPart:GetPropertyChangedSignal("CFrame"):connect(function()
 				game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(41.96064, 13.7, -1239.64648, 1, 0, 0, 0, 1, 0, 0, 0, 1)
-				wait(getgenv().SellTime)
-                if game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame == CFrame.new(41.96064, 13.7, -1239.64648, 1, 0, 0, 0, 1, 0, 0, 0, 1) then
+				task.wait(getgenv().SellTime + .3)
+                if game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame == CFrame.new(41.96064, 13.7, -1239.64648, 1, 0, 0, 0, 1, 0, 0, 0, 1) or  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame == CFrame.new(41.96064, 13.3, -1239.64648, 1, 0, 0, 0, 1, 0, 0, 0, 1) then
                     ggg:Disconnect()
-                    wait(getgenv().SellTime - .4)
+                    task.wait(getgenv().SellTime - .2)
                     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(41.96064, 13.3, -1239.64648, 1, 0, 0, 0, 1, 0, 0, 0, 1)
                 end
 				ggg:Disconnect()
-				wait(getgenv().SellTime - .4)
+				task.wait(getgenv().SellTime - .2)
 				game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(41.96064, 13.3, -1239.64648, 1, 0, 0, 0, 1, 0, 0, 0, 1)
 			end)
 		end
