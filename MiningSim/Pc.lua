@@ -62,6 +62,13 @@ end
 getgenv().Name = "Hidden" --Name above head
 
 task.wait(6)
+
+local virtual = game:GetService("VirtualUser")
+game:GetService("Players").LocalPlayer.Idled:Connect(function()
+    virtual:CaptureController()
+    virtual:ClickButton2(Vector2.new())
+end)
+
 local LocalPlayer = game.Players.LocalPlayer
 local Character = LocalPlayer.Character
 local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
