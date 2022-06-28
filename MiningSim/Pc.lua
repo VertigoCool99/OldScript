@@ -1,6 +1,6 @@
 local UI = loadstring(game:HttpGetAsync("https://pastebin.com/raw/QAwr1iuM"))()
 local Window = UI:Window("Mining Simulator")
-UI:Notification("Scrpt By:", "VertigoCool#1636", "Okay!")
+UI:Notification("OUTDATED", "JOIN: https://discord.gg/sS8efKrQdu", "Okay!")
 local FarmingTab = Window:Tab("Rebirthing")
 local NoobTab = Window:Tab("Item Buying")
 local AdvancedTab = Window:Tab("Advanced")
