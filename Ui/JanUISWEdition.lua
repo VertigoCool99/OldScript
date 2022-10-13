@@ -1131,10 +1131,10 @@ local function createList(option, parent)
 					selected.TextLabel.Visible = false
 				end
 			end
-			if self.labels[self.value] then
+			if self.labels[self.value] and selected then
 				selected = self.labels[self.value]
 				selected.TextTransparency = 1
-				if selected:FindFirstChild"TextLabel" then
+				if selected:FindFirstChild("TextLabel") then
 					selected.TextLabel.Visible = true
 				end
 			end
