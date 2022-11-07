@@ -1,3 +1,4 @@
+--Put your own usernames!
 getgenv().Accounts = {
 	["Host"] = "VertigoCool",
 	["Alts"] = {
