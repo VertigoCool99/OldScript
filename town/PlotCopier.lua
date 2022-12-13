@@ -192,7 +192,7 @@ function CreatePart(Table)
         if Table.Children[1] and Table.Children[1].Type == "Mesh" then
             Mesh(Table.Children[1],Part)
         end
-        if Table.Children[1] and Tasle.Children[1].Type == "Decal" or Table.Children[1] and Tasle.Children[1].Type == "Texture" then
+        if Table.Children[1] and Table.Children[1].Type == "Decal" or Table.Children[1] and Table.Children[1].Type == "Texture" then
             Decal(Part,Table.Children[1])
         end
     end
