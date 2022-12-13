@@ -5,7 +5,7 @@ local Material = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinl
 local Settings = {Target="",FileName="",BuildSpeed="Normal",RantimeReset=150}
 local Window = Material.Load({Title = "Town",Style = 3,SizeX = 360,SizeY = 300,Theme = "Dark"})
 local PlotTab = Window.New({Title = "Plot"})
-local speeds = {Normal=.3,Fast=.25555,Slow=1}
+local speeds = {Normal=.3,Fast=.22,Slow=1}
 
 makefolder("townPlots")
 function SaveBase(Player)
