@@ -5,7 +5,7 @@ local Material = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinl
 local Settings = {Target="",FileName="",BuildSpeed="Normal",RantimeReset=150}
 local Window = Material.Load({Title = "Town",Style = 3,SizeX = 360,SizeY = 300,Theme = "Dark"})
 local PlotTab = Window.New({Title = "Plot"})
-local speeds = {Normal=.3,Fast=.22,Slow=1}
+local speeds = {Normal=.3,Fast=.27,Slow=1}
 
 makefolder("townPlots")
 function SaveBase(Player)
@@ -213,7 +213,7 @@ function LoadBase(Table)
     if Settings.BuildSpeed == ("Normal" or "Slow") then
         Settings.RantimeReset = 80
     else
-        Settings.RantimeReset = 20
+        Settings.RantimeReset = 15
     end
     local oldtick = tick()
     local MyPlot = game:GetService("Workspace")["Private Building Areas"][game.Players.LocalPlayer.Name.."BuildArea"].Build
