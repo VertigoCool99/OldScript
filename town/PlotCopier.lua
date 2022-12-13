@@ -220,6 +220,7 @@ function LoadBase(Table)
     local oldtick = tick()
     local MyPlot = game:GetService("Workspace")["Private Building Areas"][game.Players.LocalPlayer.Name.."BuildArea"].Build
     for i,v in pairs(Table) do
+        game:GetService("StarterGui"):SetCore("SendNotification",{Text = "Parts: "..tonumber(#Table);Duration = 2;})
         Rantimes = Rantimes + 1
         if Rantimes >= Settings.RantimeReset then
             Rantimes = 0
