@@ -211,7 +211,7 @@ function LoadBase(Table)
     Rantimes = 0
     Settings.RantimeReset = 0
     if Settings.BuildSpeed == ("Normal" or "Slow") then
-        Settings.RantimeReset = 150
+        Settings.RantimeReset = 80
     else
         Settings.RantimeReset = 20
     end
