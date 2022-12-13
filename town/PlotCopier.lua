@@ -2,7 +2,7 @@ game:GetService("Players").LocalPlayer.PlayerGui.Chat.Frame.ChatBarParentFrame.F
 firesignal(game:GetService("Players").LocalPlayer.PlayerGui.Chat.Frame.ChatBarParentFrame.Frame.BoxFrame.Frame.ChatBar.FocusLost,true)
     
 local Material = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/MaterialLua/master/Module.lua"))()
-local Settings = {Target="",FileName="",BuildSpeed="Normal",RantimeReset=150}
+local Settings = {Target="",FileName="",BuildSpeed="Normal",RantimeReset=150,ForceBtools=false,IsBuilding=false}
 local Window = Material.Load({Title = "Town",Style = 3,SizeX = 360,SizeY = 300,Theme = "Dark"})
 local PlotTab = Window.New({Title = "Plot"})
 local speeds = {Normal=.3,Fast=.27,Slow=1}
@@ -217,6 +217,14 @@ function LoadBase(Table)
     end
     local oldtick = tick()
     local MyPlot = game:GetService("Workspace")["Private Building Areas"][game.Players.LocalPlayer.Name.."BuildArea"].Build
+    Settings.IsBuilding = true
+    if Settings.ForceBtools == true and Settings.IsBuilding == true then
+        task.spawn(function()
+            while Settings.IsBuilding == true and not game.Players.LocalPlayer.Character:FindFirstChild("Building Tools") do task.wait()
+               game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:FindFirstChild("Building Tools"))
+            end
+        end)
+    end
     for i,v in pairs(Table) do
         game:GetService("StarterGui"):SetCore("SendNotification",{Text = "Parts: "..tonumber(#Table);Duration = 2;})
         Rantimes = Rantimes + 1
@@ -226,9 +234,6 @@ function LoadBase(Table)
             SaveInGame(Settings.FileName)
             task.wait(4.5)
         else
-            if table.find(speeds,Settings.BuildSpeed) then
-                
-            end
             task.wait(speeds[Settings.BuildSpeed])
             if not game.Players.LocalPlayer.Character:FindFirstChild("Building Tools") then
                 game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Character:FindFirstChild("Building Tools"))
