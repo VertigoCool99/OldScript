@@ -2,7 +2,7 @@ game:GetService("Players").LocalPlayer.PlayerGui.Chat.Frame.ChatBarParentFrame.F
 firesignal(game:GetService("Players").LocalPlayer.PlayerGui.Chat.Frame.ChatBarParentFrame.Frame.BoxFrame.Frame.ChatBar.FocusLost,true)
     
 local Material = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/MaterialLua/master/Module.lua"))()
-local Settings = {Target="",FileName="",BuildSpeed="Normal",RantimeReset=150,ForceBtools=false,IsBuilding=false}
+local Settings = {Target="",FileName="",BuildSpeed="Normal",RantimeReset=150,ForceBtools=true,IsBuilding=false}
 local Window = Material.Load({Title = "Town",Style = 3,SizeX = 360,SizeY = 300,Theme = "Dark"})
 local PlotTab = Window.New({Title = "Plot"})
 local speeds = {Normal=.3,Fast=.27,Slow=1}
