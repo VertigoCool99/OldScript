@@ -33,8 +33,9 @@ function SaveBase(Player)
                table.insert(childs,{Type=v.SpotLight.Name,Color={R=v.SpotLight.Color.R,G=v.SpotLight.Color.G,B=v.SpotLight.Color.B},Brightness=tonumber(v.SpotLight.Brightness),Range=tonumber(v.SpotLight.Range),Angle=tonumber(v.SpotLight.Angle),Side=tostring(v.SpotLight.Face),Shadows=v.SpotLight.Shadows})
             end
             if v:FindFirstChild("SurfaceLight") then
-                table.insert(childs,{Type=v.SurfaceLight.Name,Color={R=v.SurfaceLight.Color.R,G=v.SurfaceLight.Color.G,B=v.SurfaceLight.Color.B},Range=tonumber(v.SurfaceLight.Range),Brightness=tonumber(v.SurfaceLight.Brightness),Shadows=v.SurfaceLight.Shadows})
-            elseif v:FindFirstChild("PointLight") then
+                table.insert(childs,{Type=v.SurfaceLight.Name,Color={R=v.SurfaceLight.Color.R,G=v.SurfaceLight.Color.G,B=v.SurfaceLight.Color.B},Brightness=tonumber(v.SurfaceLight.Brightness),Range=tonumber(v.SurfaceLight.Range),Angle=tonumber(v.SurfaceLight.Angle),Side=tostring(v.SurfaceLight.Face),Shadows=v.SurfaceLight.Shadows})
+            end
+            if v:FindFirstChild("PointLight") then
                 table.insert(childs,{Type=v.PointLight.Name,Color={R=v.PointLight.Color.R,G=v.PointLight.Color.G,B=v.PointLight.Color.B},Range=tonumber(v.PointLight.Range),Brightness=tonumber(v.PointLight.Brightness),Shadows=v.PointLight.Shadows})
             elseif v:FindFirstChild("Mesh") then
                 table.insert(childs,{Type=v.Mesh.Name,MeshType=tostring(v.Mesh.MeshType),MeshId=v.Mesh.MeshId,Scale={X=v.Mesh.Scale.X,Y=v.Mesh.Scale.Y,Z=v.Mesh.Scale.Z},Offset={X=v.Mesh.Offset.X,Y=v.Mesh.Offset.Y,Z=v.Mesh.Offset.Z},TextureId=tostring(v.Mesh.TextureId),Tint={X=v.Mesh.VertexColor.X,Y=v.Mesh.VertexColor.Y,Z=v.Mesh.VertexColor.Z}})
@@ -50,7 +51,11 @@ function SaveBase(Player)
 end
 
 function Light(Table,Part)
+    table.foreach(Table,print)
     if Part and Table and Table.Type == "SpotLight" or Part and Table and Table.Type == "SurfaceLight" then
+        if Table.Side == nil then
+           Table.Side = "Enum.NormalId.Front"
+        end
         game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("CreateLights",{[1]={["Part"]=Part,["LightType"]=tostring(Table.Type)}})
         task.wait(.02)
         game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncLighting",{[1]={["Part"]=Part,["LightType"]=tostring(Table.Type),["Range"]=Table.Range}})
@@ -88,10 +93,10 @@ function Mesh(Table,Part)
     else
         game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("CreateMeshes",{[1]={["Part"]=Part}})
         task.wait(.02)
-        game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncMesh",{[1]={["Part"]=Part,["MeshType"]=Enum.MeshType[Table.MeshType:reverse():split(".")[1]:reverse()]}}
-        game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncMesh",{[1]={["Part"]=Part,["Scale"]=["Scale"]=Vector3.new(Table.Scale.X,Table.Scale.Y,Table.Scale.Z)}})
+        game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncMesh",{[1]={["Part"]=Part,["MeshType"]=Enum.MeshType[Table.MeshType:reverse():split(".")[1]:reverse()]}})
+        game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncMesh",{[1]={["Part"]=Part,["Scale"]=Vector3.new(Table.Scale.X,Table.Scale.Y,Table.Scale.Z)}})
         task.wait(.02)
-        game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncMesh",{[1]={["Part"]=Part,["Scale"]=["Offset"]=Vector3.new(Table.Offset.X,Table.Offset.Y,Table.Offset.Z)}})
+        game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncMesh",{[1]={["Part"]=Part,["Offset"]=Vector3.new(Table.Offset.X,Table.Offset.Y,Table.Offset.Z)}})
     end   
 end
 
@@ -182,7 +187,7 @@ function CreatePart(Table)
         game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncCollision",{[1]={["Part"]=Part,["CanCollide"]=Table.CanCollide}})
         game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncRotate",{[1]={["Part"]=Part,["CFrame"]=newCFrame*CFrame.Angles(Table.Angle.X,Table.Angle.Y,Table.Angle.Z)}})
         if Table.Children[1] and Table.Children[1].Type == "PointLight" or Table.Children[1] and Table.Children[1].Type == "SpotLight" or Table.Children[1] and Table.Children[1].Type == "SurfaceLight" then
-            Light(Table.Children,Part)
+            Light(Table.Children[1],Part)
         end
         if Table.Children[1] and Table.Children[1].Type == "Mesh" then
             Mesh(Table.Children[1],Part)
@@ -199,7 +204,7 @@ function CreatePart(Table)
         game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncCollision",{[1]={["Part"]=Part,["CanCollide"]=Table.CanCollide}})
         game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncRotate",{[1]={["Part"]=Part,["CFrame"]=newCFrame*CFrame.Angles(Table.Angle.X,Table.Angle.Y,Table.Angle.Z)}})
         if Table.Children[1] and Table.Children[1].Type == "PointLight" or Table.Children[1] and Table.Children[1].Type == "SpotLight" or Table.Children[1] and Table.Children[1].Type == "SurfaceLight" then
-            Light(Table.Children,Part)
+            Light(Table.Children[1],Part)
         end
         if Table.Children[1] and Table.Children[1].Type == "Mesh" then
             Mesh(Table.Children[1],Part)
