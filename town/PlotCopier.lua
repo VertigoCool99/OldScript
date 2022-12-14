@@ -78,7 +78,11 @@ function Mesh(Table,Part)
         game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncMesh",{[1]={["Part"]=Part,["VertexColor"]=Vector3.new(Table.Tint.X,Table.Tint.Y,Table.Tint.Z)}})
     else
         game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("CreateMeshes",{[1]={["Part"]=Part}})
-        game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncMesh",{[1]={["Part"]=Part,["MeshType"]=Enum.MeshType[Table.MeshType:reverse():split(".")[1]:reverse()],["Scale"]=Vector3.new(Table.Scale.X,Table.Scale.Y,Table.Scale.Z),["Offset"]=Vector3.new(Table.Offset.X,Table.Offset.Y,Table.Offset.Z)}})
+        task.wait(.02)
+        game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncMesh",{[1]={["Part"]=Part,["MeshType"]=Enum.MeshType[Table.MeshType:reverse():split(".")[1]:reverse()]}}
+        game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncMesh",{[1]={["Part"]=Part,["Scale"]=["Scale"]=Vector3.new(Table.Scale.X,Table.Scale.Y,Table.Scale.Z)}})
+        task.wait(.02)
+        game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncMesh",{[1]={["Part"]=Part,["Scale"]=["Offset"]=Vector3.new(Table.Offset.X,Table.Offset.Y,Table.Offset.Z)}})
     end   
 end
 
