@@ -224,7 +224,7 @@ function LoadBase(Table)
             end
         end)
     end
-    for i,v in pairs(Table) do
+    for i,v in ipairs(Table) do
         game:GetService("StarterGui"):SetCore("SendNotification",{Text = "Parts: "..tonumber(#Table);Duration = 2;})
         Rantimes = Rantimes + 1
         if Rantimes >= Settings.RantimeReset then
