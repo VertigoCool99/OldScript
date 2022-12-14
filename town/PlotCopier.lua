@@ -13,18 +13,17 @@ function SaveBase(Player)
     table.clear(Saved)
     local MyPlot = game:GetService("Workspace")["Private Building Areas"][game.Players.LocalPlayer.Name.."BuildArea"].Build
     local Plot = game:GetService("Workspace")["Private Building Areas"][Player.."BuildArea"].Build
-    for i,v in pairs(Plot:GetChildren())do
-        if v:IsA("Folder") then
-            for i2,v2 in pairs(v:GetChildren()) do
-               v2.Parent = Plot
-            end
+    for i3,v3 in pairs(Plot:GetChildren()) do
+        if v3:IsA("Folder") then
+            v3.Parent = Plot
         end
-        if v:IsA("Model") then
-            for i3,v3 in pairs(v:GetChildren()) do
-               v3.Parent = Plot
-            end
+    end
+    for i2,v2 in pairs(Plot:GetChildren()) do
+        if v2:IsA("Model") then
+           v2.Parent = Plot
         end
-        
+    end
+    for i,v in ipairs(Plot:GetChildren()) do
         if v:IsA("BasePart") then
             local childs = {}
             table.clear(childs)
