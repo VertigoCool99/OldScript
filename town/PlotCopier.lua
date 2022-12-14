@@ -52,14 +52,23 @@ end
 function Light(Table,Part)
     if Part and Table and Table.Type == "SpotLight" or Part and Table and Table.Type == "SurfaceLight" then
         game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("CreateLights",{[1]={["Part"]=Part,["LightType"]=tostring(Table.Type)}})
-        task.wait(.03)
-        game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncLighting",{[1]={["Part"]=Part,["LightType"]=tostring(Table.Type),["Color"]=Color3.new(Table.Color.R,Table.Color.B,Table.Color.B),["Range"]=Table.Range,["Angle"]=Table.Angle,["Side"]=Enum.NormalId[Table.Side:reverse():split(".")[1]:reverse()],["Shadows"]=Table.Shadows}})
+        task.wait(.02)
+        game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncLighting",{[1]={["Part"]=Part,["LightType"]=tostring(Table.Type),["Range"]=Table.Range}})
+        game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncLighting",{[1]={["Part"]=Part,["LightType"]=tostring(Table.Type),["Brightness"]=Table.Brightness}})
+        task.wait(.02)
+        game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncLighting",{[1]={["Part"]=Part,["LightType"]=tostring(Table.Type),["Angle"]=Table.Angle}})
+        game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncLighting",{[1]={["Part"]=Part,["Face"]=Enum.NormalId[Table.Side:reverse():split(".")[1]:reverse()],["LightType"]=tostring(Table.Type)}})
+        task.wait(.02)
+        game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncLighting",{[1]={["Part"]=Part,["LightType"]=tostring(Table.Type),["Shadows"]=Table.Shadows}})
+        game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncLighting",{[1]={["Part"]=Part,["LightType"]=tostring(Table.Type),["Color"]=Color3.new(Table.Color.R,Table.Color.G,Table.Color.B)}})
+        task.wait(.02)
     elseif Part and Table and Table.Type == "PointLight" then
         game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("CreateLights",{[1]={["Part"]=Part,["LightType"]=tostring(Table.Type)}})
-        task.wait(.03)
-        game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncLighting",{[1]={["Part"]=Part,["LightType"]=tostring(Table.Type),["Color"]=Color3.new(Table.Color.R,Table.Color.B,Table.Color.B),["Range"]=Table.Range,["Shadows"]=Table.Shadows}})
+        task.wait(.02)
+        game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncLighting",{[1]={["Part"]=Part,["LightType"]=tostring(Table.Type),["Color"]=Color3.new(Table.Color.R,Table.Color.G,Table.Color.B),["Range"]=Table.Range,["Shadows"]=Table.Shadows}})
     end
 end
+
 
 function Mesh(Table,Part)
     if Table.TextureId == "" then
