@@ -76,6 +76,8 @@ end
 
 
 function Mesh(Table,Part)
+    print("Mesh Function Ran! ,Args:")
+    table.foreach(Table,print)    
     if Table.TextureId == "" then
        Table.TextureId = "rbxassetid://0" 
     end
