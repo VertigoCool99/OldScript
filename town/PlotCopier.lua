@@ -51,7 +51,6 @@ function SaveBase(Player)
 end
 
 function Light(Table,Part)
-    table.foreach(Table,print)
     if Part and Table and Table.Type == "SpotLight" or Part and Table and Table.Type == "SurfaceLight" then
         if Table.Side == nil then
            Table.Side = "Enum.NormalId.Front"
