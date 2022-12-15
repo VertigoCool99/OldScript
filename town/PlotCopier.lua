@@ -81,6 +81,7 @@ function Mesh(Table,Part)
     if Table.MeshType == "Enum.MeshType.FileMesh" then
         table.foreach(Table,print)
         game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("CreateMeshes",{[1]={["Part"]=Part}})
+        task.wait(.05)
         game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncMesh",{[1]={["Part"]=Part,["MeshType"]=Enum.MeshType.FileMesh}})
         game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncMesh",{[1]={["Part"]=Part,["MeshId"]=Table.MeshId}})
         task.wait(.02)
