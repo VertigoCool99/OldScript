@@ -75,12 +75,10 @@ end
 
 
 function Mesh(Table,Part)
-    print("Mesh Function Ran! ,Args:")
-    table.foreach(Table,print)    
     if Table.TextureId == "" then
        Table.TextureId = "rbxassetid://0" 
     end
-    if Table.MeshId then
+    if Table.MeshType == "Enum.MeshType.FileMesh" then
         table.foreach(Table,print)
         game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("CreateMeshes",{[1]={["Part"]=Part}})
         game:GetService("Players").LocalPlayer.Character:FindFirstChild("Building Tools").SyncAPI.ServerEndpoint:InvokeServer("SyncMesh",{[1]={["Part"]=Part,["MeshType"]=Enum.MeshType.FileMesh}})
