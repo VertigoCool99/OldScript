@@ -1,9 +1,9 @@
 local hook
 hook = hookfunction(game.HttpGet,function(self,url,...)
     if tostring(url) == "https://raw.githubusercontent.com/StenDirt/Trash-Game/main/UI.lua" then
-        return g(self,"https://raw.githubusercontent.com/VertigoCool99/Script/main/BuildABoat/BackupLib.lua",...)
+        return hook(self,"https://raw.githubusercontent.com/VertigoCool99/Script/main/BuildABoat/BackupLib.lua",...)
     end
-    return g(self,url,...)
+    return hook(self,url,...)
 end)
 
 --[[
