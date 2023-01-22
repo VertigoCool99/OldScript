@@ -1,0 +1,24 @@
+function Farm()
+    local p=Instance.new("Part",game.Players.LocalPlayer.Character);p.Size=Vector3.new(5,1,5);p.Position=game.Players.LocalPlayer.Character.HumanoidRootPart.Position-Vector3.new(0,5,0);p.Anchored=true
+    task.spawn(function()
+        task.wait(3)
+        firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, workspace.BoatStages.NormalStages.TheEnd.GoldenChest.Trigger, 0)
+    end)
+    for i=1,10 do
+        game.Players.LocalPlayer.Character:PivotTo(game:GetService("Workspace").BoatStages.NormalStages["CaveStage"..i].DarknessPart.CFrame-Vector3.new(0,0,20))
+        task.wait(.2)
+        game.Players.LocalPlayer.Character:PivotTo(game:GetService("Workspace").BoatStages.NormalStages["CaveStage"..i].DarknessPart.CFrame)
+        task.wait(1.7)
+        if i+1 == 11 then
+            game.Players.LocalPlayer.Character:Destroy()
+        end
+    end
+end
+
+game.Players.LocalPlayer.CharacterAdded:Connect(function()
+    workspace.ClaimRiverResultsGold:FireServer()
+    task.wait(6)
+    Farm()
+end)
+
+Farm()
