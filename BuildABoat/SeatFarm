@@ -1,0 +1,72 @@
+--Seat Farm
+function GetTeam()
+    for i,v in pairs(game:GetService("Workspace"):GetChildren()) do
+        if v:FindFirstChild("Spawns") and v.Spawns.SpawnLocation.TeamColor == game.Players.LocalPlayer.TeamColor then
+            return v.Name
+        end
+    end
+end
+
+function PlaceChair()
+    local args
+    if GetTeam() == "CamoTeam" then
+        args = {[1] = "Seat",[2] = 1,[3] = workspace.CamoZone,[4] = CFrame.new(Vector3.new(-8, 5.600000381469727, -145), Vector3.new(-0, -0, 1)),[5] = true,[6] = 1,[7] = CFrame.new(Vector3.new(-473.9656677246094, -12.399991989135742, 293.8931579589844), Vector3.new(1, -0, -0)),[8] = false}
+    elseif GetTeam() == "Really blueTeam" then
+        args = {[1] = "Seat",[2] = 1,[3] = workspace:FindFirstChild("Really blueZone"),[4] = CFrame.new(Vector3.new(11, 5.600000381469727, -145), Vector3.new(-0, -0, 1)),[5] = true,[6] = 1,[7] = CFrame.new(Vector3.new(366.8343200683594, -12.399991989135742, 300.4931945800781), Vector3.new(-1, -0, -0)),[8] = false}
+    elseif GetTeam() == "WhiteTeam" then
+        args = {[1] = "Seat",[2] = 1,[3] = workspace.WhiteZone,[4] = CFrame.new(Vector3.new(3, 5.600000381469727, -145), Vector3.new(-0, -0, 1)),[5] = true,[6] = 1,[7] = CFrame.new(Vector3.new(-50.56568908691406, -12.399991989135742, -490.5068664550781), Vector3.new(-0, -0, 1)),[8] = false}
+    elseif GetTeam() == "Really redTeam" then
+        args = {[1] = "Seat",[2] = 1,[3] = workspace:FindFirstChild("Really redZone"),[4] = CFrame.new(Vector3.new(5, 5.600000381469727, -147), Vector3.new(-0, -0, 1)),[5] = true,[6] = 1,[7] = CFrame.new(Vector3.new(368.8343200683594, -12.399991989135742, -63.706787109375), Vector3.new(-1, -0, -0)),[8] = false}
+    elseif GetTeam() == "MagentaTeam" then
+        args = {[1] = "Seat",[2] = 1,[3] = workspace.MagentaZone,[4] = CFrame.new(Vector3.new(-1, 5.600000381469727, -143), Vector3.new(-0, -0, 1)),[5] = true,[6] = 1,[7] = CFrame.new(Vector3.new(364.8343200683594, -12.399991989135742, 646.6931762695312), Vector3.new(-1, -0, -0)),[8] = false}
+    elseif GetTeam() == "BlackTeam" then
+        args = {[1] = "Seat",[2] = 1,[3] = workspace.BlackZone,[4] = CFrame.new(Vector3.new(-2, 5.600000381469727, -141), Vector3.new(-0, -0, 1)),[5] = true,[6] = 1,[7] = CFrame.new(Vector3.new(-469.9656677246094, -12.399991989135742, -70.10684967041016), Vector3.new(1, -0, -0)),[8] = false}
+    else
+        args = {[1] = "Seat",[2] = 1,[3] = workspace:FindFirstChild("New YellerZone"),[4] = CFrame.new(Vector3.new(4, 5.600000381469727, -145), Vector3.new(-0, -0, 1)),[5] = true,[6] = 1,[7] = CFrame.new(Vector3.new(-473.9656677246094, -12.399991989135742, 639.8931884765625), Vector3.new(1, -0, -0)),[8] = false}
+    end
+    game:GetService("Players").LocalPlayer.Backpack.BuildingTool.RF:InvokeServer(unpack(args))
+end
+
+function Move(goal,speed)
+    for i, v in pairs(game:GetService("Workspace"):GetChildren()) do
+        if v:IsA("Model") and v.Name == "Seat" and v.Tag.Value == game:GetService("Players").LocalPlayer.Name then
+            local seat = v
+            local CFrameValue = Instance.new("CFrameValue")
+            CFrameValue.Value = seat:GetPivot()
+            CFrameValue:GetPropertyChangedSignal("Value"):connect(function()
+                seat:PivotTo(CFrameValue.Value)
+            end)
+            local tween = game:GetService("TweenService"):Create(CFrameValue, TweenInfo.new(speed, Enum.EasingStyle.Linear), {Value = goal})
+            tween:Play()
+            tween.Completed:connect(function()
+                CFrameValue:Destroy()
+            end)
+        end
+    end
+end
+
+function Farm()
+    PlaceChair()
+    task.wait(.1)
+    for i,v in pairs(workspace:GetChildren()) do
+        if v.Name == "Seat" and v.Tag.Value == game.Players.LocalPlayer.Name then
+            game.Players.LocalPlayer.Character:PivotTo(v.Seat.CFrame)
+            task.wait(.5)
+            game.Players.LocalPlayer.Character:PivotTo(v.Seat.CFrame+Vector3.new(0,1,0))
+            v.Seat:Sit(game.Players.LocalPlayer.Character.Humanoid)
+            game.Players.LocalPlayer.Character:PivotTo(v.Seat.CFrame)
+        end
+    end
+    task.wait(1)
+    firesignal(game:GetService("Players").LocalPlayer.PlayerGui.LaunchBoatGui.LaunchFrame.LaunchBoat.MouseButton1Click)
+    task.wait(.1)
+    firesignal(game:GetService("Players").LocalPlayer.PlayerGui.LaunchBoatGui.PromptLaunch.Yes.MouseButton1Click)
+    task.wait()
+    Move(game:GetService("Workspace").Water:GetPivot()+Vector3.new(0,50,0),.1)
+    task.wait(.1)
+    Move(game:GetService("Workspace").BoatStages.NormalStages["CaveStage10"].DarknessPart:GetPivot()+Vector3.new(0,0,50),17)
+    task.wait(17)
+    Move(workspace.BoatStages.NormalStages.TheEnd.GoldenChest.Trigger:GetPivot(),.5)
+end
+
+Farm()
