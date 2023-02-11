@@ -1917,84 +1917,44 @@ function Library:SetWatermark(Text)
     Library.WatermarkText.Text = Text;
 end;
 
-function Library:Notify(Text, Time)
-    local MaxSize = Library:GetTextBounds(Text, Enum.Font.Code, 14);
-
-    local NotifyOuter = Library:Create('Frame', {
-        BorderColor3 = Color3.new(0, 0, 0);
-        Position = UDim2.new(0, 100, 0, 10);
-        Size = UDim2.new(0, 0, 0, 20);
-        ClipsDescendants = true;
-        ZIndex = 100;
-        Parent = Library.NotificationArea;
-    });
-
-    local NotifyInner = Library:Create('Frame', {
-        BackgroundColor3 = Library.MainColor;
-        BorderColor3 = Library.OutlineColor;
-        BorderMode = Enum.BorderMode.Inset;
-        Size = UDim2.new(1, 0, 1, 0);
-        ZIndex = 101;
-        Parent = NotifyOuter;
-    });
-
-    Library:AddToRegistry(NotifyInner, {
-        BackgroundColor3 = 'MainColor';
-        BorderColor3 = 'OutlineColor';
-    }, true);
-
-    local InnerFrame = Library:Create('Frame', {
-        BackgroundColor3 = Color3.new(1, 1, 1);
-        BorderSizePixel = 0;
-        Position = UDim2.new(0, 1, 0, 1);
-        Size = UDim2.new(1, -2, 1, -2);
-        ZIndex = 102;
-        Parent = NotifyInner;
-    });
-
-    Library:Create('UIGradient', {
-        Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, Color3.fromRGB(27, 27, 27)),
-            ColorSequenceKeypoint.new(1, Color3.fromRGB(52, 52, 52))
-        });
-        Rotation = -90;
-        Parent = InnerFrame;
-    });
-
-    local NotifyLabel = Library:CreateLabel({
-        Position = UDim2.new(0, 4, 0, 0);
-        Size = UDim2.new(1, -4, 1, 0);
-        Text = Text;
-        TextXAlignment = Enum.TextXAlignment.Left;
-        TextSize = 14;
-        ZIndex = 103;
-        Parent = InnerFrame;
-    });
-
-    local LeftColor = Library:Create('Frame', {
-        BackgroundColor3 = Library.AccentColor;
-        BorderSizePixel = 0;
-        Position = UDim2.new(0, -1, 0, -1);
-        Size = UDim2.new(0, 3, 1, 2);
-        ZIndex = 104;
-        Parent = NotifyOuter;
-    });
-
-    Library:AddToRegistry(LeftColor, {
-        BackgroundColor3 = 'AccentColor';
-    }, true);
-
-    NotifyOuter:TweenSize(UDim2.new(0, MaxSize + 8 + 4, 0, 20), 'Out', 'Quad', 0.4, true);
-
+function Library:Notify(NotiText,duration)
+    local drawings = {}
+    table.insert(Notifications,NotiText)
+    drawings.backbox = draw("Square",{Thickness=1,Filled=true,Color =Library.BackgroundColor,ZIndex = -10})
+    drawings.boxout = draw("Square",{Thickness=1,Filled=false,Color = Library.AccentColor,ZIndex = -9})
+    drawings.text = draw("Text",{Text ="",Font=2,Size=13,Center=false,Outline=false,Color = Library.FontColor,ZIndex = -9})
+    
+    drawings.backbox.Position = Vector2.new(camera.ViewportSize.X / camera.ViewportSize.X,camera.ViewportSize.Y / 8)
+    drawings.backbox.Position = Vector2.new(drawings.backbox.Position.X,drawings.backbox.Position.Y+#Notifications*drawings.backbox.Size.Y*1.75)
+    drawings.boxout.Position = Vector2.new(drawings.backbox.Position.X+2,drawings.backbox.Position.Y+2)
+    drawings.text.Position = Vector2.new(drawings.boxout.Position.X+4,drawings.boxout.Position.Y+4)
+    drawings.text.Text = NotiText
+    
+    drawings.backbox.Size = Vector2.new(drawings.text.TextBounds.X+drawings.text.TextBounds.Y,26)
+    drawings.boxout.Size = Vector2.new(drawings.backbox.Size.X-4,drawings.backbox.Size.Y-4)
+    
+    drawings.backbox.Visible = true
+    drawings.boxout.Visible = true
+    drawings.text.Visible = true
+    
     task.spawn(function()
-        wait(5 or Time);
-
-        NotifyOuter:TweenSize(UDim2.new(0, 0, 0, 20), 'Out', 'Quad', 0.4, true);
-
-        wait(0.4);
-
-        NotifyOuter:Destroy();
-    end);
+        task.wait(duration)
+        local Number = Instance.new("NumberValue",game:GetService("CoreGui"));Number.Value = drawings.backbox.Position.X
+        local tween = game:GetService("TweenService"):Create(Number,TweenInfo.new(.1, Enum.EasingStyle.Linear),{Value = drawings.backbox.Position.X+(drawings.backbox.Position.X*drawings.backbox.Size.X)})
+        tween:Play()
+        Number:GetPropertyChangedSignal("Value"):Connect(function()
+            drawings.backbox.Position = Vector2.new(drawings.backbox.Position.X-Number.Value,drawings.backbox.Position.Y)
+            drawings.boxout.Position = Vector2.new(drawings.boxout.Position.X-Number.Value,drawings.boxout.Position.Y)
+            drawings.text.Position = Vector2.new(drawings.text.Position.X-Number.Value,drawings.text.Position.Y)
+        end)
+        tween.Completed:Connect(function()
+            table.remove(Notifications,GetIndexTable(NotiText))
+            Number:Destroy()
+            for i,v in pairs(drawings) do
+               v:Remove() 
+            end
+        end)
+    end)
 end;
 
 function Library:CreateWindow(WindowTitle)
