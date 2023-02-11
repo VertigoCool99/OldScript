@@ -1917,6 +1917,26 @@ function Library:SetWatermark(Text)
     Library.WatermarkText.Text = Text;
 end;
 
+function Librarylocal camera = game:GetService("Workspace").CurrentCamera
+
+local Notifications = {}
+
+function draw(type,propities)
+    local new = Drawing.new(type)
+	for i,v in pairs(propities) do
+		new[i] = v
+	end
+	return new
+end
+
+function GetIndexTable(Text)
+    for i,v in next, Notifications do
+        if v == Text then
+            return i 
+        end
+    end
+end
+
 function Library:Notify(NotiText,duration)
     local drawings = {}
     table.insert(Notifications,NotiText)
@@ -2026,7 +2046,7 @@ function Library:CreateWindow(WindowTitle)
         BackgroundColor3 = 'BackgroundColor';
     });
 
-    local TabArea = Library:Create("Frame", {
+    local TabArea = Library:Create('Frame', {
         BackgroundTransparency = 1;
         Position = UDim2.new(0, 8, 0, 8);
         Size = UDim2.new(1, -16, 0, 21);
