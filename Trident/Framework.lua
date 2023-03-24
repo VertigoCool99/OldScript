@@ -1,0 +1,382 @@
+--TODO:
+--Make FovFunction | Make Dynamic And Static*-
+--Make Snaplines for fov
+--GetClosest In fov (With/Without fov)
+--Visible Check - Iffy
+--HighlightTarget
+--Chams
+--Item Esp
+
+--Backup Player Method
+--[[for i,v in pairs(getgc(true)) do
+    if type(v) == "table" and rawget(v,"PlayerHit") then
+        for i2,v2 in pairs(getupvalues(getupvalues(v.PlayerHit)[1].Name)[1]) do
+            table.foreach(v2,print)
+            print("----")
+        end
+    end
+end
+]]
+
+--Locals
+local Camera = game:GetService("Workspace").CurrentCamera
+local CharcaterMiddle = game:GetService("Workspace").Ignore.LocalCharacter.Middle
+local Mouse = game.Players.LocalPlayer:GetMouse()
+local RunService = Game:GetService("RunService")
+
+--Tables
+local Framework = {}
+local Esp = {Settings={Boxes=true,Distances=true,Armor=true,ItemDistances=true,ItemNames=true,OreDistances=true,OreNames=true,PlayerRenderDistance=1000,ItemRenderDistance=1000,OreRenderDistance=1000,PlayerBoxColor=Color3.fromRGB(120,81,169),PlayerDistanceColor=Color3.fromRGB(120,81,169),PlayerArmorColor=Color3.fromRGB(120,81,169),LocalChamsColor=Color3.fromRGB(120,81,169),LocalChamsMaterial=Enum.Material.ForceField},Drawings={},Connections={}}
+local Crosshair = {Enabled=false,CrosshairThickness=2,CrosshairSize=8,CrosshairColor=Color3.fromRGB(255,0,255),X,Y}
+local AllowedOres = {"StoneOre","NitrateOre","IronOre"}
+local AllowedItems = {"PartsBox","MilitaryCrate","SnallBox","SnallBox","Backpack","VendingMachine"}
+
+--Functions
+function Framework:IsVisible(PlayerModel)
+    local Params = RaycastParams.new()
+    Params.FilterDescendantsInstances = {game:GetService("Workspace").Ignore}
+    Params.FilterType = Enum.RaycastFilterType.Blacklist
+
+    ray = game:GetService("Workspace"):Raycast(Camera.CFrame.p, PlayerModel:GetPivot().p, Params)
+    print(ray.Instance:IsDescendantOf(PlayerModel))
+end
+function Framework:GetCenterScreen()
+    return Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y/2)
+end
+function Framework:ReplaceSound(SoundName,NewId)
+    game:GetService("SoundService")[SoundName].SoundId = NewId
+end
+function Framework:CreateConnection(Object,Callback)
+    local Connection = Object:Connect(Callback)
+    table.insert(Esp.Connections, connection)
+    return Connection
+end
+function Framework:GetArmor(Model)
+    if Model.Armor:FindFirstChildOfClass("Model") then
+        return true
+    else
+        return false
+    end
+end
+function Framework:GetHoldingTool()
+    if getrenv()._G.modules.FPS.GetEquippedItem().id == nil then return "None" end
+    return getrenv()._G.modules.FPS.GetEquippedItem().id
+end
+function Framework:GetEntitys()
+    return getrenv()._G.modules.Entity.List
+end
+function Framework:GetPlayers()
+    return getupvalues(getrenv()._G.modules.Player.GetPlayerModel)[1]
+end
+function Framework:DistanceFromCharacter(Vector3)
+    return (CharcaterMiddle:GetPivot().p - Vector3).Magnitude
+end
+function Framework:IsOnScreen(Model)
+    local RandomVar, OnScreen = Camera:WorldToViewportPoint(Model:GetPivot().p)
+    return OnScreen
+end
+function Framework:PositionToVector2(Vector3)
+    local ViewportPosition, onscreen = Camera:WorldToViewportPoint(Vector3)
+    return Vector2.new(ViewportPosition.X,ViewportPosition.Y), onscreen
+end
+function Framework:MoveMouse(PositionX,PositionY,Smoothing) --Provide Characters X And Y As It Takes Off Mouse
+    NewPos = Vector2.new(Mouse.X-PositionX, Mouse.Y-PositionY)
+    mousemoverel((-NewPos.X*0.5)/Smoothing,(-NewPos.Y*0.5)/Smoothing)
+end
+function Framework:Draw(Type,Propities)
+    Object = Drawing.new(Type)
+    for i,v in next,Propities do
+        Object[i] = v
+    end
+    table.insert(Esp.Drawings, Object)
+    return Object
+end
+function Framework:ItemToColor(Item)
+    table = {}
+    table["PartsBox"] = Color3.new(0.929,0.973,0.796)
+    table["MilitaryCrate"] = Color3.new(0.075,0.353,0.086)
+    table["SnallBox"] = Color3.new(0.263,0.200,0.075)
+    table["MediumBox"] = Color3.new(0.404,0.302,0.094)
+    table["Backpack"] = Color3.new(0.404,0.302,0.094)
+    table["VendingMachine"] = Color3.new(0.192,0.478,0.988)
+    table["StoneOre"] = Color3.new(0.612,0.612,0.612)
+    table["IronOre"] = Color3.new(0.773,0.686,0.365)
+    table["NitrateOre"] = Color3.new(1,1,1)
+    return table[Item]
+end
+
+function Esp:LocalChams()
+    for i,v in pairs(game:GetService("Workspace").Ignore.FPSArms:GetChildren()) do
+        if v:IsA("MeshPart") then
+            v.Color = Esp.Settings.LocalChamsColor
+            v.Material = Esp.Settings.LocalChamsMaterial
+            Esp.Connections.UpdateLocalChams = Framework:CreateConnection(RunService.RenderStepped,function()
+                v.Color = Esp.Settings.LocalChamsColor
+                v.Material = Esp.Settings.LocalChamsMaterial
+            end)
+        end
+    end
+end
+
+function Esp:CreateCrosshair()
+    do
+        Crosshair.X = Framework:Draw("Line",{Thickness=Crosshair.CrosshairThickness,Color=Crosshair.CrosshairColor,ZIndex = -9})
+        Crosshair.Y = Framework:Draw("Line",{Thickness=Crosshair.CrosshairThickness,Color=Crosshair.CrosshairColor,ZIndex = -9})
+        Crosshair.X.From = Framework:GetCenterScreen() - Vector2.new(0,Crosshair.CrosshairSize)
+        Crosshair.X.To = Framework:GetCenterScreen() + Vector2.new(0,Crosshair.CrosshairSize)
+        Crosshair.Y.From = Framework:GetCenterScreen() - Vector2.new(Crosshair.CrosshairSize,0)
+        Crosshair.Y.To = Framework:GetCenterScreen() + Vector2.new(Crosshair.CrosshairSize,0)
+        Crosshair.X.Visible = Crosshair.Enabled
+        Crosshair.Y.Visible = Crosshair.Enabled
+        Esp.Connections.UpdateCrosshair = Framework:CreateConnection(RunService.RenderStepped,function()
+            Crosshair.X.Color=Crosshair.CrosshairColor
+            Crosshair.X.Thickness=Crosshair.CrosshairThickness
+            Crosshair.Y.Color=Crosshair.CrosshairColor
+            Crosshair.Y.Thickness=Crosshair.CrosshairThickness
+            Crosshair.X.From = Framework:GetCenterScreen() - Vector2.new(0,Crosshair.CrosshairSize)
+            Crosshair.X.To = Framework:GetCenterScreen() + Vector2.new(0,Crosshair.CrosshairSize)
+            Crosshair.Y.From = Framework:GetCenterScreen() - Vector2.new(Crosshair.CrosshairSize,0)
+            Crosshair.Y.To = Framework:GetCenterScreen() + Vector2.new(Crosshair.CrosshairSize,0)
+            Crosshair.X.Visible = Crosshair.Enabled
+            Crosshair.Y.Visible = Crosshair.Enabled
+        end)
+    end
+end
+
+--Esp Loops
+do
+    function Esp:AddOre(Item)
+        local e={Drawings={}}
+        e.Drawings.distance = Framework:Draw("Text",{Text ="",Font=2,Size=13,Center=true,Outline=true,Color=Color3.fromRGB(255,255,255),ZIndex = -9})
+        e.Drawings.name = Framework:Draw("Text",{Text = Type,Font=2,Size=13,Center=true,Outline=true,Color=Color3.fromRGB(255,255,255),ZIndex = -9})
+        function e:Clear()
+            Esp.Connections.OreUpdate:Disconnect()
+            for i,v in next, Drawings do
+                v:Remove()
+            end
+        end
+        Esp.Connections.OreUpdate = Framework:CreateConnection(RunService.RenderStepped,function()
+            if Item ~= nil then
+                if Item.model then
+                    local pos2 = Camera:WorldToViewportPoint(Item.model:GetPivot().p)
+                    pos = Vector2.new(pos2.X,pos2.Y)
+                    if Framework:IsOnScreen(Item.model) and Framework:DistanceFromCharacter(Item.model:GetPivot().p) <= Esp.Settings.OreRenderDistance then
+                        if Esp.Settings.OreDistances == true then
+                            e.Drawings.distance.Visible = true
+                            e.Drawings.distance.Color = Framework:ItemToColor(tostring(Item.typ))
+                            e.Drawings.distance.Text = tostring(math.floor(Framework:DistanceFromCharacter(Item.model:GetPivot().p))).." Studs"
+                            e.Drawings.distance.Position = pos-Vector2.new(0,e.Drawings.distance.TextBounds.Y)
+                        else
+                            e.Drawings.distance.Visible = false
+                        end
+                        if Esp.Settings.OreNames == true then
+                            e.Drawings.name.Visible = true
+                            e.Drawings.name.Color = Framework:ItemToColor(tostring(Item.typ))
+                            e.Drawings.name.Text = Item.typ
+                            e.Drawings.name.Position = pos
+                        else
+                            e.Drawings.name.Visible = false
+                        end
+                    else
+                        for i,v in next, e.Drawings do
+                            v.Visible = false
+                        end
+                    end
+                else
+                    for i,v in next, e.Drawings do
+                        v.Visible = false
+                    end
+                end
+            else
+                e:Clear()
+            end
+        end)
+    end
+end
+do
+    function Esp:AddItem(Item)
+        local e={Drawings={}}
+        e.Drawings.distance = Framework:Draw("Text",{Text ="",Font=2,Size=13,Center=true,Outline=true,Color=Color3.fromRGB(255,255,255),ZIndex = -9})
+        e.Drawings.name = Framework:Draw("Text",{Text = Type,Font=2,Size=13,Center=true,Outline=true,Color=Color3.fromRGB(255,255,255),ZIndex = -9})
+        function e:Clear()
+            Esp.Connections.ItemUpdate:Disconnect()
+            for i,v in next, Drawings do
+                v:Remove()
+            end
+        end
+        Esp.Connections.ItemUpdate = Framework:CreateConnection(RunService.RenderStepped,function()
+            if Item ~= nil then
+                if Item.model then
+                    local pos2 = Camera:WorldToViewportPoint(Item.model:GetPivot().p)
+                    pos = Vector2.new(pos2.X,pos2.Y)
+                    if Framework:IsOnScreen(Item.model) and Framework:DistanceFromCharacter(Item.model:GetPivot().p) <= Esp.Settings.ItemRenderDistance then
+                        if Esp.Settings.ItemDistances == true then
+                            e.Drawings.distance.Visible = true
+                            e.Drawings.distance.Color = Framework:ItemToColor(tostring(Item.typ))
+                            e.Drawings.distance.Text = tostring(math.floor(Framework:DistanceFromCharacter(Item.model:GetPivot().p))).." Studs"
+                            e.Drawings.distance.Position = pos-Vector2.new(0,e.Drawings.distance.TextBounds.Y)
+                        else
+                            e.Drawings.distance.Visible = false
+                        end
+                        if Esp.Settings.ItemNames == true then
+                            e.Drawings.name.Visible = true
+                            e.Drawings.name.Color = Framework:ItemToColor(tostring(Item.typ))
+                            e.Drawings.name.Text = Item.typ
+                            e.Drawings.name.Position = pos
+                        else
+                            e.Drawings.name.Visible = false
+                        end
+                    else
+                        for i,v in next, e.Drawings do
+                            v.Visible = false
+                        end
+                    end
+                else
+                    for i,v in next, e.Drawings do
+                        v.Visible = false
+                    end
+                end
+            else
+                e:Clear()
+            end
+        end)
+    end
+end
+do 
+    function Esp:AddPlayer(Player)
+        local e={Drawings={}}
+        e.Drawings.Box = Framework:Draw("Square",{Thickness=1,Filled=false,Color = Esp.Settings.PlayerBoxColor,ZIndex = -9})
+        e.Drawings.BoxOutline = Framework:Draw("Square",{Thickness=2,Filled=false,Color = Color3.fromRGB(0,0,0),ZIndex = -10})
+        e.Drawings.Distance = Framework:Draw("Text",{Text ="",Font=2,Size=13,Center=true,Outline=true,Color = Esp.Settings.PlayerDistanceColor,ZIndex = -9})
+        e.Drawings.Armor = Framework:Draw("Text",{Text = "Nil",Font=2,Size=13,Center=true,Outline=true,Color = Esp.Settings.PlayerArmorColor,ZIndex = -9})
+        function e:Clear()
+            Esp.Connections.Update:Disconnect()
+            for i,v in next, Drawings do
+                v:Remove()
+            end
+        end
+        Esp.Connections.Update = Framework:CreateConnection(RunService.RenderStepped,function()
+            if Player ~= nil then
+                if Player.model and Player.model:FindFirstChild("HumanoidRootPart") then
+                    if Framework:IsOnScreen(Player.model) and Framework:DistanceFromCharacter(Player.model:GetPivot().p) <= Esp.Settings.PlayerRenderDistance then
+                        local pos2, onscreen = Camera:WorldToViewportPoint(Player.model:GetPivot().p)
+                        local Size = (Camera:WorldToViewportPoint(Player.model:GetPivot().p - Vector3.new(0, 3, 0)).Y - Camera:WorldToViewportPoint(Player.model:GetPivot().p + Vector3.new(0, 2.6, 0)).Y) / 2
+                        local BoxSize = Vector2.new(math.floor(Size * 1.5), math.floor(Size * 1.9))
+                        local pos = Vector2.new(math.floor(pos2.X - Size * 1.5 / 2), math.floor(pos2.Y - Size * 1.6 / 2))
+
+                        --Esp.Settings.Boxes
+                        test = true
+
+                        if pos and BoxSize then
+                            do
+                                if test == true then
+                                    e.Drawings.Box.Position = pos
+                                    e.Drawings.Box.Size = BoxSize
+                                    e.Drawings.Box.Color = Esp.Settings.PlayerBoxColor
+                                    e.Drawings.BoxOutline.Position = e.Drawings.Box.Position
+                                    e.Drawings.BoxOutline.Size = e.Drawings.Box.Size
+                                    e.Drawings.Box.Visible = true
+                                    e.Drawings.BoxOutline.Visible = true
+                                else
+                                    e.Drawings.Box.Visible = false
+                                    e.Drawings.BoxOutline.Visible = false
+                                end
+                            end
+                            do
+                                if Esp.Settings.Distances == true then
+                                    e.Drawings.Distance.Visible = true
+                                    e.Drawings.Distance.Color = Esp.Settings.PlayerDistanceColor
+                                    e.Drawings.Distance.Text = tostring(math.floor(Framework:DistanceFromCharacter(Player.model:GetPivot().p))).." Studs"
+                                    e.Drawings.Distance.Position = e.Drawings.Box.Position + Vector2.new(BoxSize.X/2,e.Drawings.Box.Size.Y)
+                                else
+                                    e.Drawings.Distance.Visible = false
+                                end
+                            end
+                            do
+                                if Esp.Settings.Armor then
+                                    if Framework:GetArmor(Player.model) == true then e.Drawings.Armor.Text = "Has Armor" else e.Drawings.Armor.Text = "No Armor" end
+                                    e.Drawings.Armor.Visible = true
+                                    e.Drawings.Armor.Color = Esp.Settings.PlayerArmorColor
+                                    if e.Drawings.Box.Visible == true then
+                                        e.Drawings.Armor.Position = e.Drawings.Box.Position + Vector2.new(BoxSize.X/2, - e.Drawings.Armor.TextBounds.Y)
+                                    else
+                                        e.Drawings.Armor.Position = pos + Vector2.new(BoxSize.X/2, - Esp.Drawings.Armor.TextBounds.Y)
+                                    end
+                                else
+                                    e.Drawings.Armor.Visible = false
+                                end
+                            end
+                        else
+                            for i,v in next, e.Drawings do
+                                v.Visible = false
+                            end
+                        end
+                    else
+                        for i,v in next, e.Drawings do
+                            v.Visible = false
+                        end
+                    end
+                else
+                    for i,v in next, e.Drawings do
+                        v.Visible = false
+                    end
+                end
+            else
+                e:Clear()
+            end
+        end)
+    end
+end
+
+--return Framework, Esp, Crosshair
+Esp.Settings.Armor = true
+Esp.Settings.Distances = true
+Esp.Settings.Boxes = true
+Esp.ItemDistances = true
+Esp.ItemNames = true
+for i,v in pairs(Framework:GetPlayers()) do
+    Esp:AddPlayer(v)
+end
+
+for i,v in pairs(Framework:GetEntitys()) do
+    if table.find(AllowedItems,v.typ) then
+        Esp:AddItem(v) 
+    elseif table.find(AllowedOres,v.typ) then
+        Esp:AddOre(v) 
+    end
+end
+game.workspace.DescendantAdded:Connect(function(child)
+    if not child then return end 
+    if child:FindFirstChild("HumanoidRootPart") then
+        for i,v in pairs(Framework:GetPlayers()) do
+            Esp:AddPlayer(v)
+        end
+    end
+    --[[
+    if child:IsA("MeshPart") or child:IsA("Part") then
+        if child.BrickColor == BrickColor.new("Institutional white") or child.BrickColor == BrickColor.new("Institutional white") then
+            Esp:AddOre(child)
+        end
+        if #child:GetChildren()==1 then
+            Esp:AddOre(child)
+        end
+    end
+    ]]
+end)
+
+--[[
+task.spawn(function()
+    while true do task.wait(5)
+        for i,v in pairs(Framework:GetEntitys()) do
+            if table.find(AllowedItems,v.typ) then
+                Esp:AddItem(v)
+            end
+        end
+    end
+end)
+]]
+
+Crosshair.Enabled = true
+Esp:CreateCrosshair()
+
+Esp:LocalChams()
