@@ -282,7 +282,7 @@ do
                                     if e.Drawings.Box.Visible == true then
                                         e.Drawings.Armor.Position = e.Drawings.Box.Position + Vector2.new(BoxSize.X/2, - e.Drawings.Armor.TextBounds.Y)
                                     else
-                                        e.Drawings.Armor.Position = pos + Vector2.new(BoxSize.X/2, - Esp.Drawings.Armor.TextBounds.Y)
+                                        e.Drawings.Armor.Position = pos + Vector2.new(BoxSize.X/2, - e.Drawings.Armor.TextBounds.Y)
                                     end
                                 else
                                     e.Drawings.Armor.Visible = false
