@@ -1,3 +1,20 @@
+--TODO:
+--Visible Check - Iffy
+--HighlightTarget
+--Chams
+--Item Esp [Partly Done]
+
+--Backup Player Method
+--[[for i,v in pairs(getgc(true)) do
+    if type(v) == "table" and rawget(v,"PlayerHit") then
+        for i2,v2 in pairs(getupvalues(getupvalues(v.PlayerHit)[1].Name)[1]) do
+            table.foreach(v2,print)
+            print("----")
+        end
+    end
+end
+]]
+
 --Locals
 local Camera = game:GetService("Workspace").CurrentCamera
 local CharcaterMiddle = game:GetService("Workspace").Ignore.LocalCharacter.Middle
@@ -248,7 +265,7 @@ do
                         local Size = (Camera:WorldToViewportPoint(Player.model:GetPivot().p - Vector3.new(0, 3, 0)).Y - Camera:WorldToViewportPoint(Player.model:GetPivot().p + Vector3.new(0, 2.6, 0)).Y) / 2
                         local BoxSize = Vector2.new(math.floor(Size * 1.5), math.floor(Size * 1.9))
                         local pos = Vector2.new(math.floor(pos2.X - Size * 1.5 / 2), math.floor(pos2.Y - Size * 1.6 / 2))
-                            
+
                         if pos and BoxSize then
                             do
                                 if Esp.Settings.Boxes == true then
@@ -269,7 +286,11 @@ do
                                     e.Drawings.Distance.Visible = true
                                     e.Drawings.Distance.Color = Esp.Settings.PlayerDistanceColor
                                     e.Drawings.Distance.Text = tostring(math.floor(Framework:DistanceFromCharacter(Player.model:GetPivot().p))).." Studs"
-                                    e.Drawings.Distance.Position = e.Drawings.Box.Position + Vector2.new(BoxSize.X/2,e.Drawings.Box.Size.Y)
+                                    if e.Drawings.Box.Visible = true
+                                        e.Drawings.Distance.Position = e.Drawings.Box.Position + Vector2.new(BoxSize.X/2,e.Drawings.Box.Size.Y)
+                                    else
+                                        e.Drawings.Distance.Position = e.Drawings.Box.Position + Vector2.new(BoxSize.X/2,-e.Drawings.Armor.TextBounds.Y)
+                                    end
                                 else
                                     e.Drawings.Distance.Visible = false
                                 end
@@ -280,7 +301,7 @@ do
                                     e.Drawings.Armor.Visible = true
                                     e.Drawings.Armor.Color = Esp.Settings.PlayerArmorColor
                                     if e.Drawings.Box.Visible == true then
-                                        e.Drawings.Armor.Position = e.Drawings.Box.Position + Vector2.new(BoxSize.X/2, - e.Drawings.Armor.TextBounds.Y)
+                                        e.Drawings.Armor.Position = e.Drawings.Box.Position + Vector2.new(BoxSize.X/2, -e.Drawings.Armor.TextBounds.Y)
                                     else
                                         e.Drawings.Armor.Position = pos + Vector2.new(BoxSize.X/2, - e.Drawings.Armor.TextBounds.Y)
                                     end
@@ -371,4 +392,44 @@ function Aimbot:GetClosest(Type)
     end
 end
 
-return Framework, Esp, Aimbot, Crosshair
+--return Framework, Esp, Aimbot, Crosshair
+Esp.Settings.Armor = true
+Esp.Settings.Distances = true
+Esp.Settings.Boxes = true
+Esp.ItemDistances = true
+Esp.ItemNames = true
+for i,v in pairs(Framework:GetPlayers()) do
+    Esp:AddPlayer(v)
+end
+
+for i,v in pairs(Framework:GetEntitys()) do
+    if table.find(AllowedItems,v.typ) then
+        --Esp:AddItem(v) 
+    elseif table.find(AllowedOres,v.typ) then
+        Esp:AddOre(v) 
+    end
+end
+game.workspace.ChildAdded:Connect(function(child)
+    if not child then return end 
+    if child:FindFirstChild("HumanoidRootPart") then
+        for i,v in pairs(Framework:GetPlayers()) do
+            Esp:AddPlayer(v)
+        end
+    end
+    if child:IsA("MeshPart") or child:IsA("Part") then
+        if child.BrickColor == BrickColor.new("Institutional white") or child.BrickColor == BrickColor.new("Institutional white") then
+            Esp:AddOre(child)
+        end
+        if #child:GetChildren()==1 then
+            Esp:AddOre(child)
+        end
+    end
+end)
+
+Crosshair.Enabled = true
+Esp:CreateCrosshair()
+
+Esp:LocalChams()
+
+Aimbot.Settings.FovEnabled = true
+Aimbot:CreateFov()
