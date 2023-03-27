@@ -248,13 +248,10 @@ do
                         local Size = (Camera:WorldToViewportPoint(Player.model:GetPivot().p - Vector3.new(0, 3, 0)).Y - Camera:WorldToViewportPoint(Player.model:GetPivot().p + Vector3.new(0, 2.6, 0)).Y) / 2
                         local BoxSize = Vector2.new(math.floor(Size * 1.5), math.floor(Size * 1.9))
                         local pos = Vector2.new(math.floor(pos2.X - Size * 1.5 / 2), math.floor(pos2.Y - Size * 1.6 / 2))
-
-                        --Esp.Settings.Boxes
-                        test = true
-
+                            
                         if pos and BoxSize then
                             do
-                                if test == true then
+                                if Esp.Settings.Boxes == true then
                                     e.Drawings.Box.Position = pos
                                     e.Drawings.Box.Size = BoxSize
                                     e.Drawings.Box.Color = Esp.Settings.PlayerBoxColor
