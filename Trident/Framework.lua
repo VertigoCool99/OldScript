@@ -270,7 +270,7 @@ do
                                     e.Drawings.Distance.Visible = true
                                     e.Drawings.Distance.Color = Esp.Settings.PlayerDistanceColor
                                     e.Drawings.Distance.Text = tostring(math.floor(Framework:DistanceFromCharacter(Player.model:GetPivot().p))).." Studs"
-                                    if e.Drawings.Box.Visible = true
+                                    if e.Drawings.Box.Visible == true then
                                         e.Drawings.Distance.Position = e.Drawings.Box.Position + Vector2.new(BoxSize.X/2,e.Drawings.Box.Size.Y)
                                     else
                                         e.Drawings.Distance.Position = e.Drawings.Box.Position + Vector2.new(BoxSize.X/2,-e.Drawings.Armor.TextBounds.Y)
