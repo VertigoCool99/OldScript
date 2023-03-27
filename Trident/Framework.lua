@@ -1,22 +1,3 @@
---TODO:
---Make FovFunction | Make Dynamic And Static*-
---Make Snaplines for fov
---GetClosest In fov (With/Without fov)
---Visible Check - Iffy
---HighlightTarget
---Chams
---Item Esp
-
---Backup Player Method
---[[for i,v in pairs(getgc(true)) do
-    if type(v) == "table" and rawget(v,"PlayerHit") then
-        for i2,v2 in pairs(getupvalues(getupvalues(v.PlayerHit)[1].Name)[1]) do
-            table.foreach(v2,print)
-            print("----")
-        end
-    end
-end
-]]
 
 --Locals
 local Camera = game:GetService("Workspace").CurrentCamera
@@ -28,6 +9,7 @@ local RunService = Game:GetService("RunService")
 local Framework = {}
 local Esp = {Settings={Boxes=true,Distances=true,Armor=true,ItemDistances=true,ItemNames=true,OreDistances=true,OreNames=true,PlayerRenderDistance=1000,ItemRenderDistance=1000,OreRenderDistance=1000,PlayerBoxColor=Color3.fromRGB(120,81,169),PlayerDistanceColor=Color3.fromRGB(120,81,169),PlayerArmorColor=Color3.fromRGB(120,81,169),LocalChamsColor=Color3.fromRGB(120,81,169),LocalChamsMaterial=Enum.Material.ForceField},Drawings={},Connections={}}
 local Crosshair = {Enabled=false,CrosshairThickness=2,CrosshairSize=8,CrosshairColor=Color3.fromRGB(255,0,255),X,Y}
+local Aimbot = {Settings={FovEnabled=false,FovTransparency=1,FovSize=90,FovFilled=false,FovColor=Color3.fromRGB(120,81,169)},Fov={},FovCircleDrawing=nil,AimbotHitpart="Head"}
 local AllowedOres = {"StoneOre","NitrateOre","IronOre"}
 local AllowedItems = {"PartsBox","MilitaryCrate","SnallBox","SnallBox","Backpack","VendingMachine"}
 
@@ -38,7 +20,11 @@ function Framework:IsVisible(PlayerModel)
     Params.FilterType = Enum.RaycastFilterType.Blacklist
 
     ray = game:GetService("Workspace"):Raycast(Camera.CFrame.p, PlayerModel:GetPivot().p, Params)
-    print(ray.Instance:IsDescendantOf(PlayerModel))
+    if ray.Instance:IsDescendantOf(PlayerModel) then
+        return true
+    else
+        return
+    end
 end
 function Framework:GetCenterScreen()
     return Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y/2)
@@ -328,4 +314,65 @@ do
     end
 end
 
-return Framework, Esp, Crosshair
+function Aimbot:GetProjectileInfo()
+    if getrenv()._G.modules.FPS.GetEquippedItem() == nil then return false end
+    local mod = require(game:GetService("ReplicatedStorage").ItemConfigs[getrenv()._G.modules.FPS.GetEquippedItem().id])
+    if table.find(mod, "ProjectileSpeed") then
+        PS,PD = mod.projectileSpeed, mod.projectileDrop        
+        return PS,PD
+    end
+    return nil
+end
+function Aimbot:CreateFov()
+    FovCircle = Framework:Draw("Circle",{Visible=Aimbot.Settings.FovEnabled,Transparency=Aimbot.Settings.FovTransparency})
+    FovCircle.Visible = Aimbot.Settings.FovEnabled
+    FovCircle.Transparency=Aimbot.Settings.FovTransparency
+    FovCircle.Thickness=2
+    FovCircle.NumSides=120
+    FovCircle.Radius=Aimbot.Settings.FovSize
+    FovCircle.Filled=Aimbot.Settings.FovFilled
+    FovCircle.Color=Aimbot.Settings.FovColor
+    FovCircle.Position=Framework:GetCenterScreen()
+    Aimbot.FovCircleDrawing = FovCircle
+end
+function Aimbot:InFov(Model)
+    if not Model then return false end
+    local playerpos = Camera:WorldToViewportPoint(Model:GetPivot().p)
+    local distance = (Aimbot.FovCircleDrawing.Position - Vector2.new(playerpos.X,playerpos.Y)).magnitude
+    if distance <= Aimbot.FovCircleDrawing.Radius then
+        return true
+    end
+    return false
+end
+function Aimbot:GetClosest(Type)
+    if not Type then Type = "Character" end
+    if Type == "Fov" then
+        local closest, distance = nil,math.huge
+        for i, v in pairs(Framework:GetPlayers()) do
+            if v and v.model and v.model:FindFirstChild(Aimbot.AimbotHitpart) and Aimbot:InFov(v.model) == true then
+                local playerpos = Camera:WorldToViewportPoint(v.model:GetPivot().p)
+                local magnitude = (Vector2.new(playerpos.X, playerpos.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude
+                if magnitude < distance then
+                    closest = v.model
+                    distance = magnitude
+                end
+            end
+        end
+        return closest
+    elseif Type == "Character" then
+        local nearestPlayer, nearestDistance
+        local dist = math.huge
+        for i,v in pairs(Framework:GetPlayers()) do 
+            if v and v.model and v.model:FindFirstChild(Aimbot.AimbotHitpart) then
+                local newdist = Framework:DistanceFromCharacter(v.model:GetPivot().p)
+                if newdist < dist then
+                    dist = newdist
+                end
+            end
+            nearestPlayer = v.model
+        end
+        return nearestPlayer
+    end
+end
+
+return Framework, Esp, Aimbot, Crosshair
