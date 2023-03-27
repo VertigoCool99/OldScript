@@ -1,4 +1,5 @@
-print("Loaded Framework")
+local oldtick = tick()
+print("Loading")
 --Locals
 local Camera = game:GetService("Workspace").CurrentCamera
 local CharcaterMiddle = game:GetService("Workspace").Ignore.LocalCharacter.Middle
@@ -375,5 +376,6 @@ function Aimbot:GetClosest(Type)
         return nearestPlayer
     end
 end
+print("Loaded In: "..tick()-oldtick)
 
 return Framework, Esp, Aimbot, Crosshair
