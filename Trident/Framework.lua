@@ -1,3 +1,4 @@
+print("Loaded Framework")
 --Locals
 local Camera = game:GetService("Workspace").CurrentCamera
 local CharcaterMiddle = game:GetService("Workspace").Ignore.LocalCharacter.Middle
