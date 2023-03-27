@@ -1,20 +1,3 @@
---TODO:
---Visible Check - Iffy
---HighlightTarget
---Chams
---Item Esp [Partly Done]
-
---Backup Player Method
---[[for i,v in pairs(getgc(true)) do
-    if type(v) == "table" and rawget(v,"PlayerHit") then
-        for i2,v2 in pairs(getupvalues(getupvalues(v.PlayerHit)[1].Name)[1]) do
-            table.foreach(v2,print)
-            print("----")
-        end
-    end
-end
-]]
-
 --Locals
 local Camera = game:GetService("Workspace").CurrentCamera
 local CharcaterMiddle = game:GetService("Workspace").Ignore.LocalCharacter.Middle
@@ -392,44 +375,4 @@ function Aimbot:GetClosest(Type)
     end
 end
 
---return Framework, Esp, Aimbot, Crosshair
-Esp.Settings.Armor = true
-Esp.Settings.Distances = true
-Esp.Settings.Boxes = true
-Esp.ItemDistances = true
-Esp.ItemNames = true
-for i,v in pairs(Framework:GetPlayers()) do
-    Esp:AddPlayer(v)
-end
-
-for i,v in pairs(Framework:GetEntitys()) do
-    if table.find(AllowedItems,v.typ) then
-        --Esp:AddItem(v) 
-    elseif table.find(AllowedOres,v.typ) then
-        Esp:AddOre(v) 
-    end
-end
-game.workspace.ChildAdded:Connect(function(child)
-    if not child then return end 
-    if child:FindFirstChild("HumanoidRootPart") then
-        for i,v in pairs(Framework:GetPlayers()) do
-            Esp:AddPlayer(v)
-        end
-    end
-    if child:IsA("MeshPart") or child:IsA("Part") then
-        if child.BrickColor == BrickColor.new("Institutional white") or child.BrickColor == BrickColor.new("Institutional white") then
-            Esp:AddOre(child)
-        end
-        if #child:GetChildren()==1 then
-            Esp:AddOre(child)
-        end
-    end
-end)
-
-Crosshair.Enabled = true
-Esp:CreateCrosshair()
-
-Esp:LocalChams()
-
-Aimbot.Settings.FovEnabled = true
-Aimbot:CreateFov()
+return Framework, Esp, Aimbot, Crosshair
