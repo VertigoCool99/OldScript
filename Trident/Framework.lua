@@ -148,8 +148,6 @@ do
                     local pos2 = Camera:WorldToViewportPoint(Item.model:GetPivot().p)
                     pos = Vector2.new(pos2.X,pos2.Y)
                     if Framework:IsOnScreen(Item.model) and Framework:DistanceFromCharacter(Item.model:GetPivot().p) <= Esp.Settings.OreRenderDistance then
-                        Esp.Settings.OreDistances = true
-                        Esp.Settings.OreNames = true
                         if Esp.Settings.OreDistances == true then
                             e.Drawings.distance.Visible = true
                             e.Drawings.distance.Color = Framework:ItemToColor(tostring(Item.typ))
