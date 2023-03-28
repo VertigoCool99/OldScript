@@ -1,6 +1,6 @@
 print("Framework Version: v1.02\nLoading")
-local oldtick = tick()
 --Locals
+local oldtick = tick()
 local Camera = game:GetService("Workspace").CurrentCamera
 local CharcaterMiddle = game:GetService("Workspace").Ignore.LocalCharacter.Middle
 local Mouse = game.Players.LocalPlayer:GetMouse()
