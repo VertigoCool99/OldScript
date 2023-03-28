@@ -136,9 +136,9 @@ do
         local e={Drawings={}}
         e.Drawings.distance = Framework:Draw("Text",{Text ="",Font=2,Size=13,Center=true,Outline=true,Color=Color3.fromRGB(255,255,255),ZIndex = -9})
         e.Drawings.name = Framework:Draw("Text",{Text="",Font=2,Size=13,Center=true,Outline=true,Color=Color3.fromRGB(255,255,255),ZIndex = -9})
-        function e:Clear()
+        function e:ClearTables()
             Esp.Connections.OreUpdate:Disconnect()
-            for i,v in next, Drawings do
+            for i,v in next, e.Drawings do
                 v:Remove()
             end
         end
@@ -148,7 +148,8 @@ do
                     local pos2 = Camera:WorldToViewportPoint(Item.model:GetPivot().p)
                     pos = Vector2.new(pos2.X,pos2.Y)
                     if Framework:IsOnScreen(Item.model) and Framework:DistanceFromCharacter(Item.model:GetPivot().p) <= Esp.Settings.OreRenderDistance then
-                        print(Esp.Settings.OreDistances)
+                        Esp.Settings.OreDistances = true
+                        Esp.Settings.OreNames = true
                         if Esp.Settings.OreDistances == true then
                             e.Drawings.distance.Visible = true
                             e.Drawings.distance.Color = Framework:ItemToColor(tostring(Item.typ))
@@ -176,7 +177,7 @@ do
                     end
                 end
             else
-                e:Clear()
+                e:ClearTables()
             end
         end)
     end
@@ -186,9 +187,9 @@ do
         local e={Drawings={}}
         e.Drawings.distance = Framework:Draw("Text",{Text ="",Font=2,Size=13,Center=true,Outline=true,Color=Color3.fromRGB(255,255,255),ZIndex = -9})
         e.Drawings.name = Framework:Draw("Text",{Text = Type,Font=2,Size=13,Center=true,Outline=true,Color=Color3.fromRGB(255,255,255),ZIndex = -9})
-        function e:Clear()
+        function e:ClearTables()
             Esp.Connections.ItemUpdate:Disconnect()
-            for i,v in next, Drawings do
+            for i,v in next, e.Drawings do
                 v:Remove()
             end
         end
@@ -225,7 +226,7 @@ do
                     end
                 end
             else
-                e:Clear()
+                e:ClearTables()
             end
         end)
     end
@@ -237,9 +238,9 @@ do
         e.Drawings.BoxOutline = Framework:Draw("Square",{Thickness=2,Filled=false,Color = Color3.fromRGB(0,0,0),ZIndex = -10})
         e.Drawings.Distance = Framework:Draw("Text",{Text ="",Font=2,Size=13,Center=true,Outline=true,Color = Esp.Settings.PlayerDistanceColor,ZIndex = -9})
         e.Drawings.Armor = Framework:Draw("Text",{Text = "Nil",Font=2,Size=13,Center=true,Outline=true,Color = Esp.Settings.PlayerArmorColor,ZIndex = -9})
-        function e:Clear()
+        function e:ClearTables()
             Esp.Connections.Update:Disconnect()
-            for i,v in next, Drawings do
+            for i,v in next, e.Drawings do
                 v:Remove()
             end
         end
@@ -254,7 +255,7 @@ do
                         
                         if pos and BoxSize then
                             do
-                                if Esp.Settings.Boxes == true then
+                                if Esp.Settings.Boxes == true and e.Drawings.Box then
                                     e.Drawings.Box.Position = pos
                                     e.Drawings.Box.Size = BoxSize
                                     e.Drawings.Box.Color = Esp.Settings.PlayerBoxColor
@@ -268,7 +269,7 @@ do
                                 end
                             end
                             do
-                                if Esp.Settings.Distances == true then
+                                if Esp.Settings.Distances == true and e.Drawings.Distance then
                                     e.Drawings.Distance.Visible = true
                                     e.Drawings.Distance.Color = Esp.Settings.PlayerDistanceColor
                                     e.Drawings.Distance.Text = tostring(math.floor(Framework:DistanceFromCharacter(Player.model:GetPivot().p))).." Studs"
@@ -282,7 +283,7 @@ do
                                 end
                             end
                             do
-                                if Esp.Settings.Armor then
+                                if Esp.Settings.Armor and e.Drawings.Armor then
                                     if Framework:GetArmor(Player.model) == true then e.Drawings.Armor.Text = "Has Armor" else e.Drawings.Armor.Text = "No Armor" end
                                     e.Drawings.Armor.Visible = true
                                     e.Drawings.Armor.Color = Esp.Settings.PlayerArmorColor
@@ -311,7 +312,7 @@ do
                     end
                 end
             else
-                e:Clear()
+                e:ClearTables()
             end
         end)
     end
