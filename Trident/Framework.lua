@@ -1,3 +1,4 @@
+print("Framework Version: v1.02")
 local oldtick = tick()
 print("Loading")
 --Locals
