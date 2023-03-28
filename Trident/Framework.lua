@@ -135,7 +135,7 @@ do
     function Esp:AddOre(Item)
         local e={Drawings={}}
         e.Drawings.distance = Framework:Draw("Text",{Text ="",Font=2,Size=13,Center=true,Outline=true,Color=Color3.fromRGB(255,255,255),ZIndex = -9})
-        e.Drawings.name = Framework:Draw("Text",{Text = Type,Font=2,Size=13,Center=true,Outline=true,Color=Color3.fromRGB(255,255,255),ZIndex = -9})
+        e.Drawings.name = Framework:Draw("Text",{Text="",Font=2,Size=13,Center=true,Outline=true,Color=Color3.fromRGB(255,255,255),ZIndex = -9})
         function e:Clear()
             Esp.Connections.OreUpdate:Disconnect()
             for i,v in next, Drawings do
@@ -148,6 +148,7 @@ do
                     local pos2 = Camera:WorldToViewportPoint(Item.model:GetPivot().p)
                     pos = Vector2.new(pos2.X,pos2.Y)
                     if Framework:IsOnScreen(Item.model) and Framework:DistanceFromCharacter(Item.model:GetPivot().p) <= Esp.Settings.OreRenderDistance then
+                        print(Esp.Settings.OreDistances)
                         if Esp.Settings.OreDistances == true then
                             e.Drawings.distance.Visible = true
                             e.Drawings.distance.Color = Framework:ItemToColor(tostring(Item.typ))
@@ -250,7 +251,7 @@ do
                         local Size = (Camera:WorldToViewportPoint(Player.model:GetPivot().p - Vector3.new(0, 3, 0)).Y - Camera:WorldToViewportPoint(Player.model:GetPivot().p + Vector3.new(0, 2.6, 0)).Y) / 2
                         local BoxSize = Vector2.new(math.floor(Size * 1.5), math.floor(Size * 1.9))
                         local pos = Vector2.new(math.floor(pos2.X - Size * 1.5 / 2), math.floor(pos2.Y - Size * 1.6 / 2))
-
+                        
                         if pos and BoxSize then
                             do
                                 if Esp.Settings.Boxes == true then
