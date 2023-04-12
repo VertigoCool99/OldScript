@@ -1,6 +1,22 @@
 print("Framework Version: v1.02\nLoading")
+--TODO:
+--Visible Check - Iffy
+--HighlightTarget
+--Chams
+--Item Esp [Partly Done]
+
+--Backup Player Method
+--[[for i,v in pairs(getgc(true)) do
+    if type(v) == "table" and rawget(v,"PlayerHit") then
+        for i2,v2 in pairs(getupvalues(getupvalues(v.PlayerHit)[1].Name)[1]) do
+            table.foreach(v2,print)
+            print("----")
+        end
+    end
+end
+]]
+
 --Locals
-local oldtick = tick()
 local Camera = game:GetService("Workspace").CurrentCamera
 local CharcaterMiddle = game:GetService("Workspace").Ignore.LocalCharacter.Middle
 local Mouse = game.Players.LocalPlayer:GetMouse()
@@ -8,13 +24,24 @@ local RunService = Game:GetService("RunService")
 
 --Tables
 local Framework = {}
-local Esp = {Settings={Boxes=false,Distances=false,Armor=false,ItemDistances=false,ItemNames=false,OreDistances=false,OreNames=false,PlayerRenderDistance=1000,ItemRenderDistance=1000,OreRenderDistance=1000,PlayerBoxColor=Color3.fromRGB(120,81,169),PlayerDistanceColor=Color3.fromRGB(120,81,169),PlayerArmorColor=Color3.fromRGB(120,81,169),LocalChamsColor=Color3.fromRGB(120,81,169),LocalChamsMaterial=Enum.Material.ForceField},Drawings={},Connections={}}
+local Esp = {Settings={Boxes=false,Distances=false,Armor=false,ItemDistances=false,ItemNames=false,OreDistances=false,OreNames=false,PlayerRenderDistance=1000,ItemRenderDistance=1000,OreRenderDistance=1000,PlayerBoxColor=Color3.fromRGB(120,81,169),PlayerDistanceColor=Color3.fromRGB(120,81,169),PlayerArmorColor=Color3.fromRGB(120,81,169),Sleeping=false,PlayerSleepingColor=Color3.fromRGB(120,81,169),LocalChamsColor=Color3.fromRGB(120,81,169),LocalChamsMaterial=Enum.Material.ForceField},Drawings={},Connections={}}
 local Crosshair = {Enabled=false,CrosshairThickness=2,CrosshairSize=8,CrosshairColor=Color3.fromRGB(255,0,255),X,Y}
 local Aimbot = {Settings={FovEnabled=false,FovTransparency=1,FovSize=90,FovFilled=false,FovColor=Color3.fromRGB(120,81,169)},Fov={},FovCircleDrawing=nil,AimbotHitpart="Head"}
 local AllowedOres = {"StoneOre","NitrateOre","IronOre"}
 local AllowedItems = {"PartsBox","MilitaryCrate","SnallBox","SnallBox","Backpack","VendingMachine"}
 
 --Functions
+function Framework:IsSleeping(Model)
+    if Model and Model:FindFirstChild("AnimationController") and Model.AnimationController:FindFirstChild("Animator") then
+        for i,v in pairs(Model.AnimationController.Animator:GetPlayingAnimationTracks()) do
+            if v.Animation.AnimationId == "rbxassetid://12501841745" then
+                return true
+            else
+                return false
+            end
+        end
+    end
+end
 function Framework:IsVisible(PlayerModel)
     local Params = RaycastParams.new()
     Params.FilterDescendantsInstances = {game:GetService("Workspace").Ignore}
@@ -35,11 +62,11 @@ function Framework:ReplaceSound(SoundName,NewId)
 end
 function Framework:CreateConnection(Object,Callback)
     local Connection = Object:Connect(Callback)
-    table.insert(Esp.Connections, connection)
+    table.insert(Esp.Connections, Connection)
     return Connection
 end
 function Framework:GetArmor(Model)
-    if Model.Armor:FindFirstChildOfClass("Model") then
+    if Model.Armor:FindFirstChildOfClass("Folder") then
         return true
     else
         return false
@@ -75,8 +102,10 @@ function Framework:Draw(Type,Propities)
     for i,v in next,Propities do
         Object[i] = v
     end
-    table.insert(Esp.Drawings, Object)
-    return Object
+    if Object then
+        table.insert(Esp.Drawings, Object)
+        return Object
+    end
 end
 function Framework:ItemToColor(Item)
     table = {}
@@ -129,188 +158,118 @@ function Esp:CreateCrosshair()
         end)
     end
 end
+function Esp:GetBoxPosAndSize(Object)
+    cf,size = Object:GetBoundingBox()
+    corners = {cf * CFrame.new(size.x/2,size.y/2,size.z/2),cf * CFrame.new(size.x/2,size.y/2,-size.z/2),cf * CFrame.new(-size.x/2,size.y/2,size.z/2),cf * CFrame.new(-size.x/2,size.y/2,-size.z/2),cf * CFrame.new(size.x/2,-size.y/2,size.z/2),cf * CFrame.new(size.x/2,-size.y/2,-size.z/2),cf * CFrame.new(-size.x/2,-size.y/2,size.z/2),cf * CFrame.new(-size.x/2,-size.y/2,-size.z/2),}
+    local left,top = Vector2.new(math.huge,0),Vector2.new(0,math.huge)
+    local right,bottom = Vector2.new(-math.huge,0),Vector2.new(0,-math.huge)
+    for i, v in pairs(corners) do
+        local point = Camera:WorldToViewportPoint(v.Position)
+        if point.Y < top.Y then top = point end
+        if point.Y > bottom.Y then bottom = point end
+        if point.X > right.X then right = point end
+        if point.X < left.X then left = point end
+    end
+    if left and right and top and bottom then
+       return math.floor(left.X),math.floor(right.X),math.floor(top.Y),math.floor(bottom.Y)
+    end
+end
 
 --Esp Loops
 do
-    function Esp:AddOre(Item)
-        local e={Drawings={}}
-        e.Drawings.distance = Framework:Draw("Text",{Text ="",Font=2,Size=13,Center=true,Outline=true,Color=Color3.fromRGB(255,255,255),ZIndex = -9})
-        e.Drawings.name = Framework:Draw("Text",{Text="",Font=2,Size=13,Center=true,Outline=true,Color=Color3.fromRGB(255,255,255),ZIndex = -9})
-        function e:ClearTables()
-            Esp.Connections.OreUpdate:Disconnect()
-            for i,v in next, e.Drawings do
-                v:Remove()
-            end
-        end
-        Esp.Connections.OreUpdate = Framework:CreateConnection(RunService.RenderStepped,function()
-            if Item ~= nil then
-                if Item.model then
-                    local pos2 = Camera:WorldToViewportPoint(Item.model:GetPivot().p)
-                    pos = Vector2.new(pos2.X,pos2.Y)
-                    if Framework:IsOnScreen(Item.model) and Framework:DistanceFromCharacter(Item.model:GetPivot().p) <= Esp.Settings.OreRenderDistance then
-                        if Esp.Settings.OreDistances == true then
-                            e.Drawings.distance.Visible = true
-                            e.Drawings.distance.Color = Framework:ItemToColor(tostring(Item.typ))
-                            e.Drawings.distance.Text = tostring(math.floor(Framework:DistanceFromCharacter(Item.model:GetPivot().p))).." Studs"
-                            e.Drawings.distance.Position = pos-Vector2.new(0,e.Drawings.distance.TextBounds.Y)
-                        else
-                            e.Drawings.distance.Visible = false
-                        end
-                        if Esp.Settings.OreNames == true then
-                            e.Drawings.name.Visible = true
-                            e.Drawings.name.Color = Framework:ItemToColor(tostring(Item.typ))
-                            e.Drawings.name.Text = Item.typ
-                            e.Drawings.name.Position = pos
-                        else
-                            e.Drawings.name.Visible = false
-                        end
-                    else
-                        for i,v in next, e.Drawings do
-                            v.Visible = false
-                        end
-                    end
+    function Esp:AddPlayer(Model)
+        local Box,BoxOutline,ArmorText,DistanceText,SleepingText = Framework:Draw("Square",{Thickness=1,Filled=false,Color = Esp.Settings.PlayerBoxColor,ZIndex = -9}),Framework:Draw("Square",{Thickness=2,Filled=false,Color = Color3.fromRGB(0,0,0),ZIndex = -10}),Framework:Draw("Text",{Text = "Nil",Font=2,Size=13,Center=true,Outline=true,Color = Esp.Settings.PlayerArmorColor,ZIndex = -9}),Framework:Draw("Text",{Text ="",Font=2,Size=13,Center=true,Outline=true,Color = Esp.Settings.PlayerDistanceColor,ZIndex = -9}),Framework:Draw("Text",{Text ="",Font=2,Size=13,Center=true,Outline=true,Color = Esp.Settings.PlayerSleepingColor,ZIndex = -9})
+        local Render = game:GetService("RunService").RenderStepped:Connect(function()
+            if Model and Model:FindFirstChild("HumanoidRootPart") then
+                local Pos,Visible = workspace.CurrentCamera:WorldToViewportPoint(Model:GetPivot().p)
+                left,right,top,bottom = Esp:GetBoxPosAndSize(Model)
+                if Visible == true and Esp.Settings.Boxes == true and Framework:DistanceFromCharacter(Model:GetPivot().p) <= Esp.Settings.PlayerRenderDistance then
+                    Box.Color = Esp.Settings.PlayerBoxColor
+                    BoxOutline.Visible = true
+                    Box.Visible = true
+                    BoxOutline.Position = Vector2.new(left,top)
+                    BoxOutline.Size = Vector2.new(right-left,bottom-top)
+                    Box.Position = Vector2.new(left,top)
+                    Box.Size = Vector2.new(right-left,bottom-top)
                 else
-                    for i,v in next, e.Drawings do
-                        v.Visible = false
-                    end
+                    BoxOutline.Visible = false
+                    Box.Visible = false
+                end
+                if Visible == true and Esp.Settings.Distances == true and Framework:DistanceFromCharacter(Model:GetPivot().p) <= Esp.Settings.PlayerRenderDistance then
+                    DistanceText.Visible = true
+                    DistanceText.Position = Vector2.new((left+right)/2,bottom)
+                    DistanceText.Color = Esp.Settings.PlayerDistanceColor
+                    DistanceText.Text = tostring(math.floor(Framework:DistanceFromCharacter(Model:GetPivot().p))).." Studs"
+                else
+                    DistanceText.Visible = false
+                end
+                if Visible == true and Esp.Settings.Sleeping == true and Framework:DistanceFromCharacter(Model:GetPivot().p) <= Esp.Settings.PlayerRenderDistance then
+                    if Framework:IsSleeping(Model) == true then SleepingText.Text = "Sleeping" else SleepingText.Text = "Awake" end
+                    SleepingText.Visible = true
+                    SleepingText.Color = Esp.Settings.PlayerSleepingColor
+                    SleepingText.Position = Vector2.new((left+right)/2,top-SleepingText.TextBounds.Y)
+                else
+                    SleepingText.Visible = false
+                end
+                if Visible == true and Esp.Settings.Armor == true and Framework:DistanceFromCharacter(Model:GetPivot().p) <= Esp.Settings.PlayerRenderDistance then
+                    if Framework:GetArmor(Model) == true then ArmorText.Text = "Armored" else ArmorText.Text = "No Armor" end
+                    ArmorText.Visible = true
+                    ArmorText.Color = Esp.Settings.PlayerArmorColor
+                    ArmorText.Position = Vector2.new(left-(ArmorText.TextBounds.X/2),top)
+                else
+                    ArmorText.Visible = false
                 end
             else
-                e:ClearTables()
+                Box.Visible = false
+                BoxOutline.Visible = false
+                ArmorText.Visible = false
+                DistanceText.Visible = false
+                SleepingText.Visible = false
+                if not Model then
+                    SleepingText:Remove()
+                    Box:Remove()
+                    DistanceText:Remove()
+                    BoxOutline:Remove()
+                    ArmorText:Remove()
+                    Render:Disconnect()
+                end
             end
         end)
     end
 end
 do
-    function Esp:AddItem(Item)
-        local e={Drawings={}}
-        e.Drawings.distance = Framework:Draw("Text",{Text ="",Font=2,Size=13,Center=true,Outline=true,Color=Color3.fromRGB(255,255,255),ZIndex = -9})
-        e.Drawings.name = Framework:Draw("Text",{Text = Type,Font=2,Size=13,Center=true,Outline=true,Color=Color3.fromRGB(255,255,255),ZIndex = -9})
-        function e:ClearTables()
-            Esp.Connections.ItemUpdate:Disconnect()
-            for i,v in next, e.Drawings do
-                v:Remove()
-            end
-        end
-        Esp.Connections.ItemUpdate = Framework:CreateConnection(RunService.RenderStepped,function()
-            if Item ~= nil then
-                if Item.model then
-                    local pos2 = Camera:WorldToViewportPoint(Item.model:GetPivot().p)
-                    pos = Vector2.new(pos2.X,pos2.Y)
-                    if Framework:IsOnScreen(Item.model) and Framework:DistanceFromCharacter(Item.model:GetPivot().p) <= Esp.Settings.ItemRenderDistance then
-                        if Esp.Settings.ItemDistances == true then
-                            e.Drawings.distance.Visible = true
-                            e.Drawings.distance.Color = Framework:ItemToColor(tostring(Item.typ))
-                            e.Drawings.distance.Text = tostring(math.floor(Framework:DistanceFromCharacter(Item.model:GetPivot().p))).." Studs"
-                            e.Drawings.distance.Position = pos-Vector2.new(0,e.Drawings.distance.TextBounds.Y)
-                        else
-                            e.Drawings.distance.Visible = false
-                        end
-                        if Esp.Settings.ItemNames == true then
-                            e.Drawings.name.Visible = true
-                            e.Drawings.name.Color = Framework:ItemToColor(tostring(Item.typ))
-                            e.Drawings.name.Text = Item.typ
-                            e.Drawings.name.Position = pos
-                        else
-                            e.Drawings.name.Visible = false
-                        end
-                    else
-                        for i,v in next, e.Drawings do
-                            v.Visible = false
-                        end
-                    end
+    function Esp:AddOre(Item)
+        local Model = Item.model
+        local Distance,Name = Framework:Draw("Text",{Text ="",Font=2,Size=13,Center=true,Outline=true,Color=Color3.fromRGB(255,255,255),ZIndex = -9}),Framework:Draw("Text",{Text="",Font=2,Size=13,Center=true,Outline=true,Color=Color3.fromRGB(255,255,255),ZIndex = -9})
+        local Render = game:GetService("RunService").RenderStepped:Connect(function()
+            if Model and Model:FindFirstChild("Part") then
+                local Pos,Visible = workspace.CurrentCamera:WorldToViewportPoint(Model:GetPivot().p)
+                local pos2 = Camera:WorldToViewportPoint(Item.model:GetPivot().p)
+                local pos = Vector2.new(pos2.X,pos2.Y)
+                if Esp.Settings.OreDistances == true and Visible == true and Framework:DistanceFromCharacter(Item.model:GetPivot().p) <= Esp.Settings.OreRenderDistance then
+                    Distance.Visible = true
+                    Distance.Position = Vector2.new(pos.X,pos.Y + Distance.TextBounds.Y)
+                    Distance.Color = Framework:ItemToColor(Item.typ)
+                    Distance.Text = tostring(math.floor(Framework:DistanceFromCharacter(Item.model:GetPivot().p))).." Studs"
                 else
-                    for i,v in next, e.Drawings do
-                        v.Visible = false
-                    end
+                    Distance.Visible = false
+                end
+                if Esp.Settings.OreNames == true and Visible == true and Framework:DistanceFromCharacter(Item.model:GetPivot().p) <= Esp.Settings.OreRenderDistance then
+                    Name.Visible = true
+                    Name.Position = pos
+                    Name.Color = Framework:ItemToColor(tostring(Item.typ))
+                    Name.Text = Item.typ
+                else
+                    Name.Visible = false
                 end
             else
-                e:ClearTables()
-            end
-        end)
-    end
-end
-do 
-    function Esp:AddPlayer(Player)
-        local e={Drawings={}}
-        e.Drawings.Box = Framework:Draw("Square",{Thickness=1,Filled=false,Color = Esp.Settings.PlayerBoxColor,ZIndex = -9})
-        e.Drawings.BoxOutline = Framework:Draw("Square",{Thickness=2,Filled=false,Color = Color3.fromRGB(0,0,0),ZIndex = -10})
-        e.Drawings.Distance = Framework:Draw("Text",{Text ="",Font=2,Size=13,Center=true,Outline=true,Color = Esp.Settings.PlayerDistanceColor,ZIndex = -9})
-        e.Drawings.Armor = Framework:Draw("Text",{Text = "Nil",Font=2,Size=13,Center=true,Outline=true,Color = Esp.Settings.PlayerArmorColor,ZIndex = -9})
-        function e:ClearTables()
-            Esp.Connections.Update:Disconnect()
-            for i,v in next, e.Drawings do
-                v:Remove()
-            end
-        end
-        Esp.Connections.Update = Framework:CreateConnection(RunService.RenderStepped,function()
-            if Player ~= nil then
-                if Player.model and Player.model:FindFirstChild("HumanoidRootPart") then
-                    if Framework:IsOnScreen(Player.model) and Framework:DistanceFromCharacter(Player.model:GetPivot().p) <= Esp.Settings.PlayerRenderDistance then
-                        local pos2, onscreen = Camera:WorldToViewportPoint(Player.model:GetPivot().p)
-                        local Size = (Camera:WorldToViewportPoint(Player.model:GetPivot().p - Vector3.new(0, 3, 0)).Y - Camera:WorldToViewportPoint(Player.model:GetPivot().p + Vector3.new(0, 2.6, 0)).Y) / 2
-                        local BoxSize = Vector2.new(math.floor(Size * 1.5), math.floor(Size * 1.9))
-                        local pos = Vector2.new(math.floor(pos2.X - Size * 1.5 / 2), math.floor(pos2.Y - Size * 1.6 / 2))
-                        
-                        if pos and BoxSize then
-                            do
-                                if Esp.Settings.Boxes == true and e.Drawings.Box then
-                                    e.Drawings.Box.Position = pos
-                                    e.Drawings.Box.Size = BoxSize
-                                    e.Drawings.Box.Color = Esp.Settings.PlayerBoxColor
-                                    e.Drawings.BoxOutline.Position = e.Drawings.Box.Position
-                                    e.Drawings.BoxOutline.Size = e.Drawings.Box.Size
-                                    e.Drawings.Box.Visible = true
-                                    e.Drawings.BoxOutline.Visible = true
-                                else
-                                    e.Drawings.Box.Visible = false
-                                    e.Drawings.BoxOutline.Visible = false
-                                end
-                            end
-                            do
-                                if Esp.Settings.Distances == true and e.Drawings.Distance then
-                                    e.Drawings.Distance.Visible = true
-                                    e.Drawings.Distance.Color = Esp.Settings.PlayerDistanceColor
-                                    e.Drawings.Distance.Text = tostring(math.floor(Framework:DistanceFromCharacter(Player.model:GetPivot().p))).." Studs"
-                                    if e.Drawings.Box.Visible == true then
-                                        e.Drawings.Distance.Position = e.Drawings.Box.Position + Vector2.new(BoxSize.X/2,e.Drawings.Box.Size.Y)
-                                    else
-                                        e.Drawings.Distance.Position = e.Drawings.Box.Position + Vector2.new(BoxSize.X/2,-e.Drawings.Armor.TextBounds.Y)
-                                    end
-                                else
-                                    e.Drawings.Distance.Visible = false
-                                end
-                            end
-                            do
-                                if Esp.Settings.Armor and e.Drawings.Armor then
-                                    if Framework:GetArmor(Player.model) == true then e.Drawings.Armor.Text = "Has Armor" else e.Drawings.Armor.Text = "No Armor" end
-                                    e.Drawings.Armor.Visible = true
-                                    e.Drawings.Armor.Color = Esp.Settings.PlayerArmorColor
-                                    if e.Drawings.Box.Visible == true then
-                                        e.Drawings.Armor.Position = e.Drawings.Box.Position + Vector2.new(BoxSize.X/2, -e.Drawings.Armor.TextBounds.Y)
-                                    else
-                                        e.Drawings.Armor.Position = pos + Vector2.new(BoxSize.X/2, - e.Drawings.Armor.TextBounds.Y)
-                                    end
-                                else
-                                    e.Drawings.Armor.Visible = false
-                                end
-                            end
-                        else
-                            for i,v in next, e.Drawings do
-                                v.Visible = false
-                            end
-                        end
-                    else
-                        for i,v in next, e.Drawings do
-                            v.Visible = false
-                        end
-                    end
-                else
-                    for i,v in next, e.Drawings do
-                        v.Visible = false
-                    end
+                Distance.Visible = false
+                Name.Visible = false
+                if not Model and not Model:FindFirstChild("Part") then
+                    Distance:Remove()
+                    Name:Remove()
+                    Render:Disconnect()
                 end
-            else
-                e:ClearTables()
             end
         end)
     end
@@ -346,36 +305,21 @@ function Aimbot:InFov(Model)
     end
     return false
 end
-function Aimbot:GetClosest(Type)
-    if not Type then Type = "Character" end
-    if Type == "Fov" then
-        local closest, distance = nil,math.huge
-        for i, v in pairs(Framework:GetPlayers()) do
-            if v and v.model and v.model:FindFirstChild(Aimbot.AimbotHitpart) and Aimbot:InFov(v.model) == true then
-                local playerpos = Camera:WorldToViewportPoint(v.model:GetPivot().p)
-                local magnitude = (Vector2.new(playerpos.X, playerpos.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude
-                if magnitude < distance then
-                    closest = v.model
-                    distance = magnitude
-                end
+function Aimbot:GetClosest()
+    local closest, distance = nil,math.huge
+    for i, v in pairs(Framework:GetPlayers()) do
+        if v and v.model and v.model:FindFirstChild(Aimbot.AimbotHitpart) and Aimbot:InFov(v.model) == true and Framework:IsSleeping(v.model) == false then
+            local playerpos = Camera:WorldToViewportPoint(v.model:GetPivot().p)
+            local magnitude = (Vector2.new(playerpos.X, playerpos.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude
+            if magnitude < distance then
+                closest = v.model
+                distance = magnitude
             end
         end
-        return closest
-    elseif Type == "Character" then
-        local nearestPlayer, nearestDistance
-        local dist = math.huge
-        for i,v in pairs(Framework:GetPlayers()) do 
-            if v and v.model and v.model:FindFirstChild(Aimbot.AimbotHitpart) then
-                local newdist = Framework:DistanceFromCharacter(v.model:GetPivot().p)
-                if newdist < dist then
-                    dist = newdist
-                end
-            end
-            nearestPlayer = v.model
-        end
-        return nearestPlayer
     end
+    return closest
 end
+
 print("Loaded In: "..tick()-oldtick)
 
 return Framework, Esp, Aimbot, Crosshair
