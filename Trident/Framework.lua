@@ -1,4 +1,3 @@
-
 print("Framework Version: v1.03\nLoading")
 
 --Locals
@@ -281,6 +280,13 @@ function Aimbot:CreateFov()
     FovCircle.Color=Aimbot.Settings.FovColor
     FovCircle.Position=Framework:GetCenterScreen()
     Aimbot.FovCircleDrawing = FovCircle
+    game:GetService("RunService").RenderStepped:Connect(function()
+        FovCircle.Visible = Aimbot.Settings.FovEnabled
+        FovCircle.Transparency=Aimbot.Settings.FovTransparency
+        FovCircle.Radius=Aimbot.Settings.FovSize
+        FovCircle.Filled=Aimbot.Settings.FovFilled
+        FovCircle.Color=Aimbot.Settings.FovColor
+    end)
 end
 function Aimbot:InFov(Model)
     if not Model then return false end
