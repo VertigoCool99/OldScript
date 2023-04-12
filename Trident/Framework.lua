@@ -1,20 +1,4 @@
-print("Framework Version: v1.02\nLoading")
---TODO:
---Visible Check - Iffy
---HighlightTarget
---Chams
---Item Esp [Partly Done]
-
---Backup Player Method
---[[for i,v in pairs(getgc(true)) do
-    if type(v) == "table" and rawget(v,"PlayerHit") then
-        for i2,v2 in pairs(getupvalues(getupvalues(v.PlayerHit)[1].Name)[1]) do
-            table.foreach(v2,print)
-            print("----")
-        end
-    end
-end
-]]
+print("Framework Version: v1.03\nLoading")
 
 --Locals
 local Camera = game:GetService("Workspace").CurrentCamera
