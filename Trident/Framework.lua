@@ -261,14 +261,15 @@ do
 end
 
 function Aimbot:GetProjectileInfo()
-    if getrenv()._G.modules.FPS.GetEquippedItem() == nil then return false end
+    if getrenv()._G.modules.FPS.GetEquippedItem() == nil then return 0,0 end
     local mod = require(game:GetService("ReplicatedStorage").ItemConfigs[getrenv()._G.modules.FPS.GetEquippedItem().id])
     if table.find(mod, "ProjectileSpeed") then
-        PS,PD = mod.projectileSpeed, mod.projectileDrop        
+        PS,PD = mod.ProjectileSpeed, mod.ProjectileDrop
         return PS,PD
     end
-    return nil
+    return 0,0
 end
+
 function Aimbot:CreateFov()
     FovCircle = Framework:Draw("Circle",{Visible=Aimbot.Settings.FovEnabled,Transparency=Aimbot.Settings.FovTransparency})
     FovCircle.Visible = Aimbot.Settings.FovEnabled
