@@ -1,4 +1,4 @@
-print("Framework Version: v1.03\nLoading")
+print("Framework Version: v1.04\nLoading")
 
 --Locals
 local oldtick = tick()
@@ -173,9 +173,9 @@ do
                     BoxOutline.Visible = true
                     Box.Visible = true
                     BoxOutline.Position = Vector2.new(left,top)
-                    BoxOutline.Size = Vector2.new(right-left,bottom-top)
+                    BoxOutline.Size = Vector2.new(math.abs(right-left),math.abs(bottom-top))
                     Box.Position = Vector2.new(left,top)
-                    Box.Size = Vector2.new(right-left,bottom-top)
+                    Box.Size = Vector2.new(math.abs(right-left),math.abs(bottom-top))
                 else
                     BoxOutline.Visible = false
                     Box.Visible = false
@@ -297,6 +297,7 @@ function Aimbot:InFov(Model)
     end
     return false
 end
+
 function Aimbot:GetClosest()
     local closest, distance = nil,math.huge
     for i, v in pairs(Framework:GetPlayers()) do
@@ -310,6 +311,31 @@ function Aimbot:GetClosest()
         end
     end
     return closest
+end
+
+function Aimbot:GetVelocity(Model)
+    local old = Model:GetPivot().p
+    task.wait(.1)
+    local new = Model:GetPivot().p
+    local diff = new - old
+    return diff / 0.1
+end
+
+function Aimbot:Predict(Model,Prediction)
+    if Model then
+        local Velocity = Aimbot:GetVelocity(Model)
+        if Velocity == nil then Velocity = Model.HumanoidRootPart.Velocity end
+        local PS,PD = Aimbot:GetProjectileInfo()
+        local Dist = (Model.HumanoidRootPart.Position - Camera.CFrame.Position).Magnitude
+        if PS == 0 then PS = 100 end
+        local Time = Dist / PS
+        local Predicted = Model.HumanoidRootPart.CFrame.Position + (Velocity * Time)
+        local delta = (Predicted - Model.HumanoidRootPart.CFrame.Position).Magnitude
+        local finalSpeed = PS * PS ^ 2 * Time ^ 2
+        Time += (delta / finalSpeed)
+        Prediction = Model.HumanoidRootPart.CFrame.Position + (Velocity * Time)
+    end
+    return Prediction
 end
 
 print("Loaded In: "..tick()-oldtick)
