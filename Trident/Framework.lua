@@ -333,7 +333,7 @@ function Aimbot:Predict(Model,Prediction)
         local Predicted = Model.HumanoidRootPart.CFrame.Position + (Velocity * Time)
         local delta = (Predicted - Model.HumanoidRootPart.CFrame.Position).Magnitude
         local finalSpeed = PS * PS ^ 2 * Time ^ 2
-        Time += (delta / finalSpeed)
+        Time += (delta / finalSpeed+50)
         Prediction = Model.HumanoidRootPart.CFrame.Position + (Velocity * Time)
     end
     return Prediction
