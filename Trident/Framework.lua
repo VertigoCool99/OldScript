@@ -334,9 +334,9 @@ function Aimbot:GetVelocity(Model,delta)
 	return velocity
 end
 
-function Aimbot:Predict(Model,Prediction)
+function Aimbot:Predict(Model,Prediction,delta)
     if Model then
-        local Velocity = Aimbot:GetVelocity(Model)
+        local Velocity = Aimbot:GetVelocity(Model,delta)
         local PS,PD = Aimbot:GetProjectileInfo()
         local Dist = (Model.HumanoidRootPart.Position - Camera.CFrame.Position).Magnitude
         if Velocity == nil then Velocity = Model.HumanoidRootPart.Velocity end
