@@ -297,7 +297,7 @@ function Aimbot:InFov(Model)
     if not Model then return false end
     local playerpos = Camera:WorldToViewportPoint(Model:GetPivot().p)
     local distance = (Vector2.new(Mouse.X,Mouse.Y) - Vector2.new(playerpos.X,playerpos.Y)).Magnitude
-    if distance <= Aimbot.FovCircleDrawing.Radius+5 then
+    if distance <= Aimbot.FovCircleDrawing.Radius+15 then
         return true
     end
     return false
