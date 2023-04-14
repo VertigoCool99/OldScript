@@ -312,7 +312,7 @@ function Aimbot:GetClosest()
                 closest = v.model
                 distance = magnitude
             end
-        elseif v and v.model and v.model:FindFirstChild(Aimbot.AimbotHitpart) and Aimbot:InFov(v.model) == true and Aimbot.Settings.TargetSleepers == false then
+        elseif v and v.model and v.model:FindFirstChild(Aimbot.AimbotHitpart) and Aimbot:InFov(v.model) == true and Aimbot.Settings.TargetSleepers == true then
             local playerpos = Camera:WorldToViewportPoint(v.model:GetPivot().p)
             local magnitude = (Vector2.new(playerpos.X, playerpos.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude
             if magnitude < distance then
