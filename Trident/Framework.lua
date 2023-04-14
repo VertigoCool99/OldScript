@@ -328,7 +328,7 @@ function Aimbot:Predict(Model,Prediction)
         local PS,PD = Aimbot:GetProjectileInfo()
         local Dist = (Model.HumanoidRootPart.Position - Camera.CFrame.Position).Magnitude
         if Velocity == nil then Velocity = Model.HumanoidRootPart.Velocity end
-        if PS == 0 then PS = 100 end
+        if PS == 0 then PS = 10000 end
         local TimeToTarget = Dist / PS
         Prediction = Model.HumanoidRootPart.Position + (Velocity * TimeToTarget)
     end
