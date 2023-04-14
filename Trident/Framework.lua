@@ -325,18 +325,18 @@ function Aimbot:GetClosest()
     return closest
 end
 
-function Aimbot:GetVelocity(Model,delta)
-	old = Model:GetPivot().p
-	wait(.1)
-	current = Model:GetPivot().p
-    	local diffrence = (current - old)
-	local velocity = diffrence / delta
-	return velocity
+function Aimbot:GetVelocity(Model)
+   local currentPosition = Model:GetPivot().Position
+   wait(0.1)
+   local newPosition = Model:GetPivot().Position
+   local positionDifference = newPosition - currentPosition
+
+   return positionDifference / 0.1
 end
 
-function Aimbot:Predict(Model,Prediction,delta)
+function Aimbot:Predict(Model,Prediction)
     if Model then
-        local Velocity = Aimbot:GetVelocity(Model,delta)
+        local Velocity = Aimbot:GetVelocity(Model)
         local PS,PD = Aimbot:GetProjectileInfo()
         local Dist = (Model.HumanoidRootPart.Position - Camera.CFrame.Position).Magnitude
         if Velocity == nil then Velocity = Model.HumanoidRootPart.Velocity end
