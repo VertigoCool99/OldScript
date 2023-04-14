@@ -333,7 +333,7 @@ function Aimbot:Predict(Model,Prediction)
         if Velocity == nil then Velocity = Model.HumanoidRootPart.Velocity end
         if PS == 0 then PS = 800 end
         local TimeToTarget = Dist / PS
-        Prediction = Model.HumanoidRootPart.Position + (Velocity * TimeToTarget)
+        Prediction = Model[Aimbot.AimbotHitpart].Position + (Velocity * TimeToTarget)
     end
     return Prediction
 end
