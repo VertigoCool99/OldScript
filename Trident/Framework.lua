@@ -305,14 +305,14 @@ end
 function Aimbot:GetClosest()
     local closest, distance = nil,math.huge
     for i, v in pairs(Framework:GetPlayers()) do
-        if v and v.model and v.model:FindFirstChild(Aimbot.AimbotHitpart) and Aimbot:InFov(v.model) == true and Aimbot.Settings.TargetSleepers == false and Framework:IsSleeping(v.model) == false then
+        if v and v.model and v.model:FindFirstChild(Aimbot.AimbotHitpart) and Aimbot:InFov(v.model) == true and Aimbot.Settings.TargetSleepers == false and Framework:IsSleeping(v.model) == false and Framework:DistanceFromCharacter(v.model:GetPivot().p) <= Esp.Settings.PlayerRenderDistance then
             local playerpos = Camera:WorldToViewportPoint(v.model:GetPivot().p)
             local magnitude = (Vector2.new(playerpos.X, playerpos.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude
             if magnitude < distance then
                 closest = v.model
                 distance = magnitude
             end
-        elseif v and v.model and v.model:FindFirstChild(Aimbot.AimbotHitpart) and Aimbot:InFov(v.model) == true then
+        elseif v and v.model and v.model:FindFirstChild(Aimbot.AimbotHitpart) and Aimbot:InFov(v.model) == true and Framework:DistanceFromCharacter(v.model:GetPivot().p) <= Esp.Settings.PlayerRenderDistance then
             local playerpos = Camera:WorldToViewportPoint(v.model:GetPivot().p)
             local magnitude = (Vector2.new(playerpos.X, playerpos.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude
             if magnitude < distance then
