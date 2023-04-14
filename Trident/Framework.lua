@@ -325,8 +325,11 @@ function Aimbot:GetClosest()
     return closest
 end
 
-function Aimbot:GetVelocity(old,current,delta)
-    local diffrence = (current - old)
+function Aimbot:GetVelocity(Model,delta)
+	old = Model:GetPivot().p
+	wait(.1)
+	current = Model:GetPivot().p
+    	local diffrence = (current - old)
 	local velocity = diffrence / delta
 	return velocity
 end
