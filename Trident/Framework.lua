@@ -325,16 +325,12 @@ end
 function Aimbot:Predict(Model,Prediction)
     if Model then
         local Velocity = Aimbot:GetVelocity(Model)
-        if Velocity == nil then Velocity = Model.HumanoidRootPart.Velocity end
         local PS,PD = Aimbot:GetProjectileInfo()
         local Dist = (Model.HumanoidRootPart.Position - Camera.CFrame.Position).Magnitude
+        if Velocity == nil then Velocity = Model.HumanoidRootPart.Velocity end
         if PS == 0 then PS = 100 end
-        local Time = Dist / PS
-        local Predicted = Model.HumanoidRootPart.CFrame.Position + (Velocity * Time)
-        local delta = (Predicted - Model.HumanoidRootPart.CFrame.Position).Magnitude
-        local finalSpeed = PS * PS ^ 2 * Time ^ 2
-        Time += (delta / finalSpeed+100)
-        Prediction = Model.HumanoidRootPart.CFrame.Position + (Velocity * Time)
+        local TimeToTarget = Dist / PS
+        Prediction = Velocity * TimeToTarget
     end
     return Prediction
 end
