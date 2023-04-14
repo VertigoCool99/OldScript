@@ -292,10 +292,11 @@ function Aimbot:CreateFov()
         FovCircle.Color=Aimbot.Settings.FovColor
     end)
 end
+
 function Aimbot:InFov(Model)
     if not Model then return false end
     local playerpos = Camera:WorldToViewportPoint(Model:GetPivot().p)
-    local distance = (Aimbot.FovCircleDrawing.Position - Vector2.new(playerpos.X,playerpos.Y)).magnitude
+    local distance = (Vector2.new(Mouse.X,Mouse.Y) - Vector2.new(playerpos.X,playerpos.Y)).Magnitude
     if distance <= Aimbot.FovCircleDrawing.Radius then
         return true
     end
