@@ -166,23 +166,26 @@ do
         local Box,BoxOutline,ArmorText,DistanceText,SleepingText = Framework:Draw("Square",{Thickness=1,Filled=false,Color = Esp.Settings.PlayerBoxColor,ZIndex = -9}),Framework:Draw("Square",{Thickness=2,Filled=false,Color = Color3.fromRGB(0,0,0),ZIndex = -10}),Framework:Draw("Text",{Text = "Nil",Font=2,Size=13,Center=true,Outline=true,Color = Esp.Settings.PlayerArmorColor,ZIndex = -9}),Framework:Draw("Text",{Text ="",Font=2,Size=13,Center=true,Outline=true,Color = Esp.Settings.PlayerDistanceColor,ZIndex = -9}),Framework:Draw("Text",{Text ="",Font=2,Size=13,Center=true,Outline=true,Color = Esp.Settings.PlayerSleepingColor,ZIndex = -9})
         local Render = game:GetService("RunService").RenderStepped:Connect(function()
             if Model and Model:FindFirstChild("HumanoidRootPart") then
-                local Pos,Visible = workspace.CurrentCamera:WorldToViewportPoint(Model:GetPivot().p)
-                left,right,top,bottom = Esp:GetBoxPosAndSize(Model)
+                local Position,Visible = Camera:WorldToViewportPoint(Model:GetPivot().p)
+                local scale = 1 / (Position.Z * math.tan(math.rad(Camera.FieldOfView * 0.5)) * 2) * 100;
+                local w,h = math.floor(35 * scale), math.floor(50 * scale);
+                local x,y = math.floor(Position.X), math.floor(Position.Y);
+
                 if Visible == true and Esp.Settings.Boxes == true and Framework:DistanceFromCharacter(Model:GetPivot().p) <= Esp.Settings.PlayerRenderDistance then
                     Box.Color = Esp.Settings.PlayerBoxColor
                     BoxOutline.Visible = true
                     Box.Visible = true
-                    BoxOutline.Position = Vector2.new(left,top)
-                    BoxOutline.Size = Vector2.new(math.abs(right-left),math.abs(bottom-top))
-                    Box.Position = Vector2.new(left,top)
-                    Box.Size = Vector2.new(math.abs(right-left),math.abs(bottom-top))
+                    BoxOutline.Position = Vector2.new(math.floor(x-w* 0.5),math.floor(y-h*0.5))
+                    BoxOutline.Size = Vector2.new(w,h)
+                    Box.Position = Vector2.new(math.floor(x-w* 0.5),math.floor(y-h*0.5))
+                    Box.Size = Vector2.new(w,h)
                 else
                     BoxOutline.Visible = false
                     Box.Visible = false
                 end
                 if Visible == true and Esp.Settings.Distances == true and Framework:DistanceFromCharacter(Model:GetPivot().p) <= Esp.Settings.PlayerRenderDistance then
                     DistanceText.Visible = true
-                    DistanceText.Position = Vector2.new((left+right)/2,bottom)
+                    DistanceText.Position = Vector2.new(x, math.floor(y+h*0.5))
                     DistanceText.Color = Esp.Settings.PlayerDistanceColor
                     DistanceText.Text = tostring(math.floor(Framework:DistanceFromCharacter(Model:GetPivot().p))).." Studs"
                 else
@@ -192,7 +195,7 @@ do
                     if Framework:IsSleeping(Model) == true then SleepingText.Text = "Sleeping" else SleepingText.Text = "Awake" end
                     SleepingText.Visible = true
                     SleepingText.Color = Esp.Settings.PlayerSleepingColor
-                    SleepingText.Position = Vector2.new((left+right)/2,top-SleepingText.TextBounds.Y)
+                    SleepingText.Position = Vector2.new(x, math.floor(y-h*0.5-SleepingText.TextBounds.Y))
                 else
                     SleepingText.Visible = false
                 end
@@ -200,7 +203,7 @@ do
                     if Framework:GetArmor(Model) == true then ArmorText.Text = "Armored" else ArmorText.Text = "No Armor" end
                     ArmorText.Visible = true
                     ArmorText.Color = Esp.Settings.PlayerArmorColor
-                    ArmorText.Position = Vector2.new(left-(ArmorText.TextBounds.X/2),top)
+                    ArmorText.Position = Vector2.new(x, math.floor(y+h*0.5+ArmorText.TextBounds.Y))
                 else
                     ArmorText.Visible = false
                 end
