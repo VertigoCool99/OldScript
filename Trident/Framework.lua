@@ -1,4 +1,4 @@
-print("Framework Version: v1.06\nLoading")
+print("Framework Version: v1.07\nLoading")
 
 --Locals
 local oldtick = tick()
@@ -345,6 +345,23 @@ function Aimbot:Predict(Model,Prediction)
         Prediction = Model[Aimbot.AimbotHitpart].Position + (Velocity * TimeToTarget)
     end
     return Prediction
+end
+
+Aimbot:PredictDrop(Model)
+    if Model then
+        local Velocity = Aimbot:GetVelocity(Model)
+        local PS,PD = Aimbot:GetProjectileInfo()
+        local Dist = (Model.HumanoidRootPart.Position - Camera.CFrame.Position).Magnitude
+        if Velocity == nil then Velocity = Model.HumanoidRootPart.Velocity end
+        if PS == 0 then PS = 800 end
+        local TimeToTarget = Dist / PS
+        local DropTime = PD * TimeToTarget ^ 2
+        if not tostring(DropTime):find("nan") then
+            return DropTime
+        end
+        return 0
+    end
+    return 0
 end
 
 print("Loaded In: "..tick()-oldtick)
