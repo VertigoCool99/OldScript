@@ -347,7 +347,7 @@ function Aimbot:Predict(Model,Prediction)
     return Prediction
 end
 
-Aimbot:PredictDrop(Model)
+function Aimbot:PredictDrop(Model)
     if Model then
         local Velocity = Aimbot:GetVelocity(Model)
         local PS,PD = Aimbot:GetProjectileInfo()
