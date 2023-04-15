@@ -28,12 +28,7 @@ function Framework:IsSleeping(Model)
     end
 end
 function Framework:IsVisible(PlayerModel)
-    for i,v in pairs(Camera:GetPartsObscuringTarget({PlayerModel:GetPivot().Position},game:GetService("Workspace").Ignore:GetDescendants())) do
-        if i > 0 then
-            return false
-        end
-    end
-    return true
+    return Camera:GetPartsObscuringTarget({PlayerModel:GetPivot().Position},game:GetService("Workspace").Ignore:GetDescendants())
 end
 function Framework:GetCenterScreen()
     return Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y/2)
@@ -303,14 +298,14 @@ end
 function Aimbot:GetClosest()
     local closest, distance = nil,math.huge
     for i, v in pairs(Framework:GetPlayers()) do
-        if v and v.model and v.model:FindFirstChild(Aimbot.AimbotHitpart) and Aimbot:InFov(v.model) == true and Aimbot.Settings.TargetSleepers == false and Framework:IsSleeping(v.model) == false and Framework:IsVisible(v.model) == true then
+        if v and v.model and v.model:FindFirstChild(Aimbot.AimbotHitpart) and Aimbot:InFov(v.model) == true and Aimbot.Settings.TargetSleepers == false and Framework:IsSleeping(v.model) and Framework:IsVisible(v.model) then
             local playerpos = Camera:WorldToViewportPoint(v.model:GetPivot().p)
             local magnitude = (Vector2.new(playerpos.X, playerpos.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude
             if magnitude < distance then
                 closest = v.model
                 distance = magnitude
             end
-        elseif v and v.model and v.model:FindFirstChild(Aimbot.AimbotHitpart) and Aimbot:InFov(v.model) == true and Aimbot.Settings.TargetSleepers == true and Framework:IsVisible(v.model) == true then
+        elseif v and v.model and v.model:FindFirstChild(Aimbot.AimbotHitpart) and Aimbot:InFov(v.model) == true and Aimbot.Settings.TargetSleepers == true and Framework:IsVisible(v.model) then
             local playerpos = Camera:WorldToViewportPoint(v.model:GetPivot().p)
             local magnitude = (Vector2.new(playerpos.X, playerpos.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude
             if magnitude < distance then
