@@ -335,7 +335,7 @@ function Aimbot:Predict(Model,Prediction)
         if PS == 0 then 
             PS = 800
         else
-            PS = PS - 50
+            PS = PS + 50
         end
         local TimeToTarget = Dist / PS
         Prediction = Model[Aimbot.AimbotHitpart].Position + (Velocity * TimeToTarget)
@@ -352,7 +352,7 @@ function Aimbot:PredictDrop(Model)
         if PS == 0 then 
             PS = 800
         else
-            PS = PS - 50
+            PS = PS + 50
         end
         local TimeToTarget = Dist / PS
         local DropTime = PD * TimeToTarget ^ 2
