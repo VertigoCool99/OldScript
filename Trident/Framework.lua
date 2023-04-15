@@ -28,16 +28,7 @@ function Framework:IsSleeping(Model)
     end
 end
 function Framework:IsVisible(PlayerModel)
-    local Params = RaycastParams.new()
-    Params.FilterDescendantsInstances = {game:GetService("Workspace").Ignore}
-    Params.FilterType = Enum.RaycastFilterType.Blacklist
-
-    ray = game:GetService("Workspace"):Raycast(Camera.CFrame.p, PlayerModel:GetPivot().p, Params)
-    if ray.Instance:IsDescendantOf(PlayerModel) then
-        return true
-    else
-        return
-    end
+    return Camera:GetPartsObscuringTarget({PlayerModel:GetPivot().Position}, game:GetService("Workspace").Ignore:GetDescendants())
 end
 function Framework:GetCenterScreen()
     return Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y/2)
@@ -297,8 +288,8 @@ end
 function Aimbot:InFov(Model)
     if not Model then return false end
     local playerpos = Camera:WorldToViewportPoint(Model:GetPivot().p)
-    local distance = (Vector2.new(Mouse.X,Mouse.Y) - Vector2.new(playerpos.X,playerpos.Y)).Magnitude
-    if distance <= Aimbot.FovCircleDrawing.Radius+15 then
+    local distance = (Vector2.new(playerpos.X,playerpos.Y) - Vector2.new(Mouse.X,Mouse.Y)).Magnitude
+    if distance <= Aimbot.FovCircleDrawing.Radius then
         return true
     end
     return false
@@ -307,14 +298,14 @@ end
 function Aimbot:GetClosest()
     local closest, distance = nil,math.huge
     for i, v in pairs(Framework:GetPlayers()) do
-        if v and v.model and v.model:FindFirstChild(Aimbot.AimbotHitpart) and Aimbot:InFov(v.model) == true and Aimbot.Settings.TargetSleepers == false and Framework:IsSleeping(v.model) == false then
+        if v and v.model and v.model:FindFirstChild(Aimbot.AimbotHitpart) and Aimbot:InFov(v.model) == true and Aimbot.Settings.TargetSleepers == false and Framework:IsSleeping(v.model) == false and Framework:IsVisible(v.model) == true then
             local playerpos = Camera:WorldToViewportPoint(v.model:GetPivot().p)
             local magnitude = (Vector2.new(playerpos.X, playerpos.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude
             if magnitude < distance then
                 closest = v.model
                 distance = magnitude
             end
-        elseif v and v.model and v.model:FindFirstChild(Aimbot.AimbotHitpart) and Aimbot:InFov(v.model) == true and Aimbot.Settings.TargetSleepers == true then
+        elseif v and v.model and v.model:FindFirstChild(Aimbot.AimbotHitpart) and Aimbot:InFov(v.model) == true and Aimbot.Settings.TargetSleepers == true and Framework:IsVisible(v.model) == true then
             local playerpos = Camera:WorldToViewportPoint(v.model:GetPivot().p)
             local magnitude = (Vector2.new(playerpos.X, playerpos.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude
             if magnitude < distance then
