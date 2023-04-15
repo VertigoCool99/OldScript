@@ -27,7 +27,7 @@ function Framework:IsSleeping(Model)
         end
     end
 end
-function IsVisible(PlayerModel)
+function Framework:IsVisible(PlayerModel)
     for i,v in pairs(Camera:GetPartsObscuringTarget({PlayerModel:GetPivot().Position},game:GetService("Workspace").Ignore:GetDescendants())) do
         if i > 0 then
             return false
