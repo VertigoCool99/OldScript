@@ -358,7 +358,7 @@ function Aimbot:PredictDrop(Model)
         local TimeToTarget = Dist / PS
         local DropTime = PD * TimeToTarget ^ 2
         if not tostring(DropTime):find("nan") then
-            return DropTime
+            return DropTime*10
         end
         return 0
     end
