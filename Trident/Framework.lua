@@ -27,8 +27,13 @@ function Framework:IsSleeping(Model)
         end
     end
 end
-function Framework:IsVisible(PlayerModel)
-    return Camera:GetPartsObscuringTarget({PlayerModel:GetPivot().Position}, game:GetService("Workspace").Ignore:GetDescendants())
+function IsVisible(PlayerModel)
+    for i,v in pairs(Camera:GetPartsObscuringTarget({PlayerModel:GetPivot().Position},game:GetService("Workspace").Ignore:GetDescendants())) do
+        if i > 0 then
+            return false
+        end
+    end
+    return true
 end
 function Framework:GetCenterScreen()
     return Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y/2)
