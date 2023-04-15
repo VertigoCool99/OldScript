@@ -266,9 +266,10 @@ end
 function Aimbot:GetProjectileInfo()
     if getrenv()._G.modules.FPS.GetEquippedItem() == nil then return 0,0 end
     local mod = require(game:GetService("ReplicatedStorage").ItemConfigs[getrenv()._G.modules.FPS.GetEquippedItem().id])
-    if table.find(mod, "ProjectileSpeed") then
-        PS,PD = mod.ProjectileSpeed, mod.ProjectileDrop
-        return PS,PD
+    for i,v in pairs(mod) do
+        if i == "ProjectileSpeed" or i == "ProjectileDrop" then
+            return mod.ProjectileSpeed,mod.ProjectileDrop
+        end
     end
     return 0,0
 end
