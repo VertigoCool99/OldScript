@@ -332,7 +332,11 @@ function Aimbot:Predict(Model,Prediction)
         local PS,PD = Aimbot:GetProjectileInfo()
         local Dist = (Model.HumanoidRootPart.Position - Camera.CFrame.Position).Magnitude
         if Velocity == nil then Velocity = Model.HumanoidRootPart.Velocity end
-        if PS == 0 then PS = 800 end
+        if PS == 0 then 
+            PS = 800
+        else
+            PS = PS - 50
+        end
         local TimeToTarget = Dist / PS
         Prediction = Model[Aimbot.AimbotHitpart].Position + (Velocity * TimeToTarget)
     end
@@ -353,7 +357,7 @@ function Aimbot:PredictDrop(Model)
         local TimeToTarget = Dist / PS
         local DropTime = PD * TimeToTarget ^ 2
         if not tostring(DropTime):find("nan") then
-            return DropTime*1.5
+            return DropTime
         end
         return 0
     end
