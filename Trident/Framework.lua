@@ -299,16 +299,16 @@ function Aimbot:GetClosest()
     local closest, distance = nil,math.huge
     for i, v in pairs(Framework:GetPlayers()) do
         if v and v.model and v.model:FindFirstChild(Aimbot.AimbotHitpart) and Aimbot:InFov(v.model) == true and Aimbot.Settings.TargetSleepers == false and Framework:IsSleeping(v.model) == false and Framework:IsVisible(v.model) then
-            local playerpos = Camera:WorldToViewportPoint(v.model:GetPivot().p)
+            local playerpos,Visible = Camera:WorldToViewportPoint(v.model:GetPivot().p)
             local magnitude = (Vector2.new(playerpos.X, playerpos.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude
-            if magnitude < distance then
+            if magnitude < distance and Visible == true then
                 closest = v.model
                 distance = magnitude
             end
         elseif v and v.model and v.model:FindFirstChild(Aimbot.AimbotHitpart) and Aimbot:InFov(v.model) == true and Aimbot.Settings.TargetSleepers == true and Framework:IsVisible(v.model) then
             local playerpos = Camera:WorldToViewportPoint(v.model:GetPivot().p)
             local magnitude = (Vector2.new(playerpos.X, playerpos.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude
-            if magnitude < distance then
+            if magnitude < distance and Visible == true then
                 closest = v.model
                 distance = magnitude
             end
