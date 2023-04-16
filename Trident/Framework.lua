@@ -349,8 +349,9 @@ function Aimbot:GetVelocity(Model)
    return positionDifference / 0.1
 end
 
-function Aimbot:Predict(Model,Prediction)
-    if Model then
+function Aimbot:Predict(Model)
+    Prediction = Vector3.new(0,0,0)
+    if Model and Prediction then
         local Velocity = Aimbot:GetVelocity(Model)
         local PS,PD = Aimbot:GetProjectileInfo()
         local Dist = (Model.HumanoidRootPart.Position - Camera.CFrame.Position).Magnitude
@@ -358,7 +359,7 @@ function Aimbot:Predict(Model,Prediction)
         if PS == 0 then 
             PS = 800
         else
-            PS = PS + 150
+            PS = PS + 200
         end
         local TimeToTarget = Dist / PS
         Prediction = Model[Aimbot.AimbotHitpart].Position + (Velocity * TimeToTarget)
