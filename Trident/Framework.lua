@@ -27,11 +27,6 @@ Lighting:GetPropertyChangedSignal("FogEnd"):Connect(function()
         Lighting.FogEnd = math.huge
     end
 end)
-Lighting:GetPropertyChangedSignal("Brightness"):Connect(function()
-    if Framework.Settings.FullBright == true then
-        Lighting.Brightness = 1
-    end
-end)
 local index; index = hookmetamethod(game, '__index', function(obj, idx)
     if not checkcaller() and index(obj, 'Name') == 'Camera' and idx == 'FieldOfView' then
         return Framework.Settings.Fov
