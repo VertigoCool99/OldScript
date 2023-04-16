@@ -9,12 +9,31 @@ local RunService = Game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
 
 --Tables
-local Framework = {}
+local Framework = {Settings={FullBright=true,Fov=90}}
 local Esp = {Settings={Boxes=false,Distances=false,Armor=false,ItemDistances=false,ItemNames=false,OreDistances=false,OreNames=false,PlayerRenderDistance=1000,ItemRenderDistance=1000,OreRenderDistance=1000,PlayerBoxColor=Color3.fromRGB(120,81,169),PlayerDistanceColor=Color3.fromRGB(120,81,169),PlayerArmorColor=Color3.fromRGB(120,81,169),Sleeping=false,PlayerSleepingColor=Color3.fromRGB(120,81,169),LocalChamsColor=Color3.fromRGB(120,81,169),LocalChamsMaterial=Enum.Material.ForceField},Drawings={},Connections={}}
 local Crosshair = {Enabled=false,CrosshairThickness=2,CrosshairSize=8,CrosshairColor=Color3.fromRGB(255,0,255),X,Y}
 local Aimbot = {Settings={FovEnabled=false,FovTransparency=1,FovSize=90,FovFilled=false,FovColor=Color3.fromRGB(120,81,169)},Fov={},FovCircleDrawing=nil,AimbotHitpart="Head",AimbotSmoothing=3,Prediction=false,DropPrediction=false,TargetSleepers=false}
 local AllowedOres = {"StoneOre","NitrateOre","IronOre"}
 local AllowedItems = {"PartsBox","MilitaryCrate","SnallBox","SnallBox","Backpack","VendingMachine"}
+
+--Possibly detected
+Lighting:GetPropertyChangedSignal("ClockTime"):Connect(function()
+    if Framework.Settings.FullBright == true then
+        Lighting.ClockTime = 10
+    end
+end)
+Lighting:GetPropertyChangedSignal("FogEnd"):Connect(function()
+    if Framework.Settings.FullBright == true then
+        Lighting.FogEnd = math.huge
+    end
+end)
+local index; index = hookmetamethod(game, '__index', function(obj, idx)
+    if not checkcaller() and index(obj, 'Name') == 'Camera' and idx == 'FieldOfView' then
+        return Framework.Settings.Fov
+    end    
+    return index(obj, idx)
+end)
+
 
 --Functions
 function Framework:IsSleeping(Model)
