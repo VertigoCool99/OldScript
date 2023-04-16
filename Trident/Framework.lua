@@ -54,7 +54,7 @@ function Framework:IsSleeping(Model)
 end
 function Framework:IsVisible(PlayerModel)
     local parts = Camera:GetPartsObscuringTarget({PlayerModel:GetPivot().Position},game:GetService("Workspace").Ignore:GetDescendants())
-    if #parts > 0
+    if #parts > 0 then
         return false
     else
         return true
