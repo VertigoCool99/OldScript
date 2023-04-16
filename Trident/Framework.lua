@@ -32,13 +32,6 @@ Lighting:GetPropertyChangedSignal("Brightness"):Connect(function()
         Lighting.Brightness = 1.5
     end
 end)
-local index; index = hookmetamethod(game, '__index', function(obj, idx)
-    if not checkcaller() and index(obj, 'Name') == 'Camera' and idx == 'FieldOfView' then
-        return Framework.Settings.Fov
-    end    
-    return index(obj, idx)
-end)
-
 
 --Functions
 function Framework:IsSleeping(Model)
