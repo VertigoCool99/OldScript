@@ -1,4 +1,4 @@
-print("Framework Version: v1.07\nLoading")
+print("Framework Version: v1.08\nLoading")
 
 --Locals
 local oldtick = tick()
@@ -6,6 +6,7 @@ local Camera = game:GetService("Workspace").CurrentCamera
 local CharcaterMiddle = game:GetService("Workspace").Ignore.LocalCharacter.Middle
 local Mouse = game.Players.LocalPlayer:GetMouse()
 local RunService = Game:GetService("RunService")
+local Lighting = game:GetService("Lighting")
 
 --Tables
 local Framework = {}
@@ -14,6 +15,24 @@ local Crosshair = {Enabled=false,CrosshairThickness=2,CrosshairSize=8,CrosshairC
 local Aimbot = {Settings={FovEnabled=false,FovTransparency=1,FovSize=90,FovFilled=false,FovColor=Color3.fromRGB(120,81,169)},Fov={},FovCircleDrawing=nil,AimbotHitpart="Head",AimbotSmoothing=3,Prediction=false,DropPrediction=false,TargetSleepers=false}
 local AllowedOres = {"StoneOre","NitrateOre","IronOre"}
 local AllowedItems = {"PartsBox","MilitaryCrate","SnallBox","SnallBox","Backpack","VendingMachine"}
+
+--Possibly detected
+Lighting:GetPropertyChangedSignal("ClockTime"):Connect(function()
+    if Framework.Settings.FullBright == true
+        Lighting.ClockTime = 10
+    end
+end)
+Lighting:GetPropertyChangedSignal("FogEnd"):Connect(function()
+    if Framework.Settings.FullBright == true
+        Lighting.FogEnd = math.huge
+    end
+end)
+local index; index = hookmetamethod(game, '__index', function(obj, idx)
+    if not checkcaller() and index(obj, 'Name') == 'Camera' and idx == 'FieldOfView' then
+        return Framework.Settings.Fov
+    end    
+    return index(obj, idx)
+end)
 
 --Functions
 function Framework:IsSleeping(Model)
