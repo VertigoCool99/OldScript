@@ -368,7 +368,7 @@ function Aimbot:Predict(Model)
 end
 
 function Aimbot:PredictDrop(Model)
-    if not Model then return end
+    if not Model then return Vector3.new(0,0,0) end
     local PS, PD = Aimbot:GetProjectileInfo()
     PS = PS and (PS + 200) or 800
     local distance = (Model.HumanoidRootPart.Position - Camera.CFrame.Position).Magnitude
