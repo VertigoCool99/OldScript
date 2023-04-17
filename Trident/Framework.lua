@@ -16,23 +16,6 @@ local Aimbot = {Settings={FovEnabled=false,FovTransparency=1,FovSize=90,FovFille
 local AllowedOres = {"StoneOre","NitrateOre","IronOre"}
 local AllowedItems = {"PartsBox","MilitaryCrate","SnallBox","SnallBox","Backpack","VendingMachine"}
 
---Possibly detected
-Lighting:GetPropertyChangedSignal("ClockTime"):Connect(function()
-    if Framework.Settings.FullBright == true then
-        Lighting.ClockTime = 10
-    end
-end)
-Lighting:GetPropertyChangedSignal("FogEnd"):Connect(function()
-    if Framework.Settings.FullBright == true then
-        Lighting.FogEnd = math.huge
-    end
-end)
-Lighting:GetPropertyChangedSignal("Brightness"):Connect(function()
-    if Framework.Settings.FullBright == true then
-        Lighting.Brightness = 1.5
-    end
-end)
-
 --Functions
 function Framework:IsSleeping(Model)
     if Model and Model:FindFirstChild("AnimationController") and Model.AnimationController:FindFirstChild("Animator") then
