@@ -342,7 +342,7 @@ function Aimbot:Predict(Model)
         if PS == 0 then 
             PS = 800
         else
-            PS = PS * 3
+            PS = PS * 10
         end
         local TimeToTarget = tonumber(Dist) / tonumber(PS)
         Prediction = Model[Aimbot.Settings.AimbotHitpart].Position + (Velocity * TimeToTarget)
