@@ -351,16 +351,26 @@ function Aimbot:Predict(Model)
 end
 
 function Aimbot:PredictDrop(Model)
-    if not Model then return end
-    
-    local PS, PD = Aimbot:GetProjectileInfo()
-    PS = PS and (PS + 200) or 800
-    
-    local distance = (Model.HumanoidRootPart.Position - Camera.CFrame.Position).Magnitude
-    local velocity = Aimbot:GetVelocity(Model).Magnitude
-    local drop = (distance * velocity) / PS + (distance / PS)^2 * PD
-    
-    return drop
+    if Model then
+        local PS,PD = Aimbot:GetProjectileInfo()
+        if PS == 0 then 
+            PS = 800
+        else
+            PS = PS + 200
+        end
+        local distance = (Camera.CFrame.p - Model[Aimbot.AimbotHitpart].CFrame.p).Magnitude
+        local time = (distance / PS)
+     
+        local finalspeed = PS * PS ^ 2 * time ^ 2
+        time += (distance / finalspeed)
+     
+        local droptime = PD * time ^ 2
+     
+        if not tostring(droptime):find("nan") then
+            return droptime
+        end
+        return 0
+    end
 end
 
 print("Loaded In: "..tick()-oldtick)
