@@ -358,7 +358,7 @@ function Aimbot:PredictDrop(Model)
         else
             PS = PS + 200
         end
-        local distance = (Camera.CFrame.p - Model[Aimbot.AimbotHitpart].CFrame.p).Magnitude
+        local distance = (Camera.CFrame.p - Model:GetPivot().p).Magnitude
         local time = (distance / PS)
      
         local finalspeed = PS * PS ^ 2 * time ^ 2
