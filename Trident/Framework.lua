@@ -343,26 +343,25 @@ function Aimbot:InFov(Model)
 end
 
 function Aimbot:GetClosest()
-    local closest,distance = nil,Esp.Settings.PlayerRenderDistance
+    local closest,PlayerDistance = nil,Esp.Settings.PlayerRenderDistance
     for i,v in pairs(Framework:GetPlayers()) do
         if v.model:FindFirstChild("HumanoidRootPart") then
             local pos = Camera.WorldToViewportPoint(Camera, v.model:GetPivot().Position)
-            local magnitude = (Vector2.new(pos.X, pos.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude
-            if Aimbot.Settings.TargetSleepers == false and Framework:IsSleeping(v.model) == false then
-                if magnitude < distance and Aimbot:InFov(v.model) then
+            local MouseMagnitude = (Vector2.new(pos.X, pos.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude
+            local PlayerDistance = Framework:DistanceFromCharacter(v.model:GetPivot().Position)
+
+            if Aimbot.Settings.TargetSleepers == true and Framework:IsSleeping(v.model) == false then
+                if MouseMagnitude <= Aimbot.Settings.FovSize and PlayerDistance <= Esp.Settings.PlayerRenderDistance then
                     closest = v.model
-                    distance = magnitude
+                    PlayerDistance = PlayerDistance
                 end
-            elseif Aimbot.Settings.TargetSleepers == true then
-                if magnitude < distance and Aimbot:InFov(v.model) then
+            elseif Aimbot.Settings.TargetSleepers == false then
+                if MouseMagnitude <= Aimbot.Settings.FovSize and PlayerDistance <= Esp.Settings.PlayerRenderDistance then
                     closest = v.model
-                    distance = magnitude
+                    PlayerDistance = PlayerDistance
                 end
             end
         end
-    end
-    if Aimbot.Settings.HighlightTarget == true then
-        Aimbot.HighlightedTarget = closest
     end
     return closest
 end
