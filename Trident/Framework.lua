@@ -23,14 +23,15 @@ function Framework:ReplaceSkybox(SkyBoxName)
     if SkyBoxName == "Standard" then
         Sky:Destroy()
     end
-    local SkyBoxes = {
+local SkyBoxes = {
+    ["Standard"] = {["SkyboxBk"] = Sky.SkyboxBk,["SkyboxDn"] = Sky.SkyboxDn,["SkyboxFt"] = Sky.SkyboxFt,["SkyboxLf"] = Sky.SkyboxLf,["SkyboxRt"] = Sky.SkyboxRt,["SkyboxUp"] = Sky.SkyboxUp,},
     ["Among Us"] = {["SkyboxBk"] = "rbxassetid://5752463190",["SkyboxDn"] = "rbxassetid://5752463190",["SkyboxFt"] = "rbxassetid://5752463190",["SkyboxLf"] = "rbxassetid://5752463190",["SkyboxRt"] = "rbxassetid://5752463190",["SkyboxUp"] = "rbxassetid://5752463190"},
-    ["Spongebob"] = {"SkyboxBk"="rbxassetid://277099484","SkyboxDn"="rbxassetid://277099500","SkyboXFt"="rbxassetid://277099554","SkyboxLf"="rbxassetid://277099531","SkyboxRt"="rbxassetid://277099589","SkyboxUp"="rbxassetid://277101591"},
-    ["Deep Space"] = {"SkyboxBk"="rbxassetid://159248188","SkyboxDn"="rbxassetid://159248183","SkyboXFt"="rbxassetid://159248187","SkyboxLf"="rbxassetid://159248173","SkyboxRt"="rbxassetid://159248192","SkyboxUp"="rbxassetid://159248176"},
-    ["Winter"] = {"SkyboxBk"="rbxassetid://510645155","SkyboxDn"="rbxassetid://510645130","SkyboXFt"="rbxassetid://510645179","SkyboxLf"="rbxassetid://510645117","SkyboxRt"="rbxassetid://510645146","SkyboxUp"="rbxassetid://510645195"},
-    ["Clouded Sky"] = {"SkyboxBk"="rbxassetid://252760981","SkyboxDn"="rbxassetid://252763035","SkyboXFt"="rbxassetid://252761439","SkyboxLf"="rbxassetid://252760980","SkyboxRt"="rbxassetid://252760986","SkyboxUp"="rbxassetid://252762652"},
+    ["Spongebob"] = {["SkyboxBk"]="rbxassetid://277099484",["SkyboxDn"]="rbxassetid://277099500",["SkyboXFt"]="rbxassetid://277099554",["SkyboxLf"]="rbxassetid://277099531",["SkyboxRt"]="rbxassetid://277099589",["SkyboxUp"]="rbxassetid://277101591"},
+    ["Deep Space"] = {["SkyboxBk"]="rbxassetid://159248188",["SkyboxDn"]="rbxassetid://159248183",["SkyboXFt"]="rbxassetid://159248187",["SkyboxLf"]="rbxassetid://159248173","SkyboxRt"="rbxassetid://159248192",["SkyboxUp"]="rbxassetid://159248176"},
+    ["Winter"] = {["SkyboxBk"]="rbxassetid://510645155",["SkyboxDn"]="rbxassetid://510645130",["SkyboXFt"]="rbxassetid://510645179",["SkyboxLf"]="rbxassetid://510645117",["SkyboxRt"]="rbxassetid://510645146",["SkyboxUp"]="rbxassetid://510645195"},
+    ["Clouded Sky"] = {["SkyboxBk"]="rbxassetid://252760981",["SkyboxDn"]="rbxassetid://252763035",["SkyboXFt"]="rbxassetid://252761439",["SkyboxLf"]="rbxassetid://252760980",["SkyboxRt"]="rbxassetid://252760986",["SkyboxUp"]="rbxassetid://252762652"},
     --["test"] = {"SkyboxBk"="rbxassetid://","SkyboxDn"="rbxassetid://","SkyboXFt"="rbxassetid://","SkyboxLf"="rbxassetid://","SkyboxRt"="rbxassetid://","SkyboxUp"="rbxassetid://"},
-    }
+}
     for i, v in pairs(SkyBoxes[SkyBoxName]) do
         Sky[i] = v
     end
