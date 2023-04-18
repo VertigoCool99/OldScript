@@ -351,12 +351,12 @@ function Aimbot:GetClosest()
         if v.model:FindFirstChild("HumanoidRootPart") then
             local pos = Camera.WorldToViewportPoint(Camera, v.model:GetPivot().Position)
             local magnitude = (Vector2.new(pos.X, pos.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude
-            if Aimbot.Settings.TargetSleepers == true and Framework:IsSleeping(v.model) == false then
+            if Aimbot.Settings.TargetSleepers == false and Framework:IsSleeping(v.model) == false then
                 if magnitude < distance and Aimbot:InFov(v.model) then
                     closest = v.model
                     distance = magnitude
                 end
-            elseif Aimbot.Settings.TargetSleepers == false then
+            elseif Aimbot.Settings.TargetSleepers == true then
                 if magnitude < distance and Aimbot:InFov(v.model) then
                     closest = v.model
                     distance = magnitude
