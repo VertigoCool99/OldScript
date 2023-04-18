@@ -7,6 +7,7 @@ local CharcaterMiddle = game:GetService("Workspace").Ignore.LocalCharacter.Middl
 local Mouse = game.Players.LocalPlayer:GetMouse()
 local RunService = Game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
+local SkyBoxes = {["Standard"] = {["SkyboxBk"] = Sky.SkyboxBk,["SkyboxDn"] = Sky.SkyboxDn,["SkyboxFt"] = Sky.SkyboxFt,["SkyboxLf"] = Sky.SkyboxLf,["SkyboxRt"] = Sky.SkyboxRt,["SkyboxUp"] = Sky.SkyboxUp,},["Among Us"] = {["SkyboxBk"] = "rbxassetid://5752463190",["SkyboxDn"] = "rbxassetid://5752463190",["SkyboxFt"] = "rbxassetid://5752463190",["SkyboxLf"] = "rbxassetid://5752463190",["SkyboxRt"] = "rbxassetid://5752463190",["SkyboxUp"] = "rbxassetid://5752463190"},["Neptune"] = {["SkyboxBk"] = "rbxassetid://218955819",["SkyboxDn"] = "rbxassetid://218953419",["SkyboxFt"] = "rbxassetid://218954524",["SkyboxLf"] = "rbxassetid://218958493",["SkyboxRt"] = "rbxassetid://218957134",["SkyboxUp"] = "rbxassetid://218950090"},["Aesthetic Night"] = {["SkyboxBk"] = "rbxassetid://1045964490",["SkyboxDn"] = "rbxassetid://1045964368",["SkyboxFt"] = "rbxassetid://1045964655",["SkyboxLf"] = "rbxassetid://1045964655",["SkyboxRt"] = "rbxassetid://1045964655",["SkyboxUp"] = "rbxassetid://1045962969"},["Redshift"] = {["SkyboxBk"] = "rbxassetid://401664839",["SkyboxDn"] = "rbxassetid://401664862",["SkyboxFt"] = "rbxassetid://401664960",["SkyboxLf"] = "rbxassetid://401664881",["SkyboxRt"] = "rbxassetid://401664901",["SkyboxUp"] = "rbxassetid://401664936"},["Galaxy"] = {["SkyboxBk"] = "rbxassetid://10623658813",["SkyboxDn"] = "rbxassetid://10623658813",["SkyboxFt"] = "rbxassetid://10623658813",["SkyboxLf"] = "rbxassetid://10623658813",["SkyboxRt"] = "rbxassetid://10623658813",["SkyboxUp"] = "rbxassetid://10623658813"},["Dark Clouds"] = {["SkyboxBk"] = "rbxassetid://48020371",["SkyboxDn"] = "rbxassetid://48020144",["SkyboxFt"] = "rbxassetid://48020234",["SkyboxLf"] = "rbxassetid://48020211",["SkyboxRt"] = "rbxassetid://48020254",["SkyboxUp"] = "rbxassetid://48020383"},["Space"] = {["SkyboxBk"] = "rbxassetid://166509999",["SkyboxDn"] = "rbxassetid://166510057",["SkyboxFt"] = "rbxassetid://166510116",["SkyboxLf"] = "rbxassetid://166510092",["SkyboxRt"] = "rbxassetid://166510131",["SkyboxUp"] = "rbxassetid://166510114"},}
 
 --Tables
 local Framework = {Settings={FullBright=true,Fov=90}}
@@ -17,6 +18,13 @@ local AllowedOres = {"StoneOre","NitrateOre","IronOre"}
 local AllowedItems = {"PartsBox","MilitaryCrate","SnallBox","SnallBox","Backpack","VendingMachine"}
 
 --Functions
+function Framework:ReplaceSkybox(SkyBoxName)
+    local Sky = Lighting:FindFirstChildOfClass("Sky")
+    if not Sky then Sky = Instance.new("Sky",Lighting) end
+    for i, v in pairs(SkyBoxes[SkyBoxName]) do
+        Sky[i] = v
+    end
+end
 function Framework:IsSleeping(Model)
     if Model and Model:FindFirstChild("AnimationController") and Model.AnimationController:FindFirstChild("Animator") then
         for i,v in pairs(Model.AnimationController.Animator:GetPlayingAnimationTracks()) do
