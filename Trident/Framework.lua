@@ -361,6 +361,9 @@ function Aimbot:GetClosest()
             end
         end
     end
+    if Aimbot.Settings.HighlightTarget == true then
+        Aimbot.HighlightedTarget = closest
+    end
     return closest
 end
 
