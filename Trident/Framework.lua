@@ -195,7 +195,7 @@ do
 
                 if Visible == true and Esp.Settings.Boxes == true and Framework:DistanceFromCharacter(Model:GetPivot().p) <= Esp.Settings.PlayerRenderDistance then
                     if Model == Aimbot.HighlightedTarget then
-                        Box.Color = Color3.fromRGB(0,0,0)
+                        Box.Color = Color3.fromRGB(255,255,255)
                     else
                         Box.Color = Esp.Settings.PlayerBoxColor
                     end
@@ -211,7 +211,7 @@ do
                 end
                 if Visible == true and Esp.Settings.Distances == true and Framework:DistanceFromCharacter(Model:GetPivot().p) <= Esp.Settings.PlayerRenderDistance then
                     if Model == Aimbot.HighlightedTarget then
-                        DistanceText.Color = Color3.fromRGB(0,0,0)
+                        DistanceText.Color = Color3.fromRGB(255,255,255)
                     else
                         DistanceText.Color = Esp.Settings.PlayerDistanceColor
                     end
@@ -224,7 +224,7 @@ do
                 end
                 if Visible == true and Esp.Settings.Sleeping == true and Framework:DistanceFromCharacter(Model:GetPivot().p) <= Esp.Settings.PlayerRenderDistance then
                     if Model == Aimbot.HighlightedTarget then
-                        SleepingText.Color = Color3.fromRGB(0,0,0)
+                        SleepingText.Color = Color3.fromRGB(255,255,255)
                     else
                         SleepingText.Color = Esp.Settings.PlayerSleepingColor
                     end
@@ -237,7 +237,7 @@ do
                 end
                 if Visible == true and Esp.Settings.Armor == true and Framework:DistanceFromCharacter(Model:GetPivot().p) <= Esp.Settings.PlayerRenderDistance then
                     if Model == Aimbot.HighlightedTarget then
-                        ArmorText.Color = Color3.fromRGB(0,0,0)
+                        ArmorText.Color = Color3.fromRGB(255,255,255)
                     else
                         ArmorText.Color = Esp.Settings.PlayerArmorColor
                     end
