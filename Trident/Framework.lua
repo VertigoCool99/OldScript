@@ -12,7 +12,7 @@ local Lighting = game:GetService("Lighting")
 local Framework = {Settings={FullBright=true,Fov=90}}
 local Esp = {Settings={Boxes=false,Distances=false,Armor=false,ItemDistances=false,ItemNames=false,OreDistances=false,OreNames=false,PlayerRenderDistance=1000,ItemRenderDistance=1000,OreRenderDistance=1000,PlayerBoxColor=Color3.fromRGB(120,81,169),PlayerDistanceColor=Color3.fromRGB(120,81,169),PlayerArmorColor=Color3.fromRGB(120,81,169),Sleeping=false,PlayerSleepingColor=Color3.fromRGB(120,81,169),LocalChamsColor=Color3.fromRGB(120,81,169),LocalChamsMaterial=Enum.Material.ForceField},Drawings={},Connections={}}
 local Crosshair = {Enabled=false,CrosshairThickness=2,CrosshairSize=8,CrosshairColor=Color3.fromRGB(255,0,255),X,Y}
-local Aimbot = {Settings={FovEnabled=false,FovTransparency=1,FovSize=90,FovFilled=false,FovColor=Color3.fromRGB(120,81,169),TargetSleepers=false,AimbotHitpart="Head",Prediction=false,DropPrediction=false},Fov={},FovCircleDrawing=nil,AimbotSmoothing=3}
+local Aimbot = {Settings={FovEnabled=false,FovTransparency=1,FovSize=90,FovFilled=false,FovColor=Color3.fromRGB(120,81,169),TargetSleepers=false,AimbotHitpart="Head",Prediction=false,DropPrediction=false,HighlightTarget=false},Fov={},FovCircleDrawing=nil,AimbotSmoothing=3,HighlightedTarget=nil}
 local AllowedOres = {"StoneOre","NitrateOre","IronOre"}
 local AllowedItems = {"PartsBox","MilitaryCrate","SnallBox","SnallBox","Backpack","VendingMachine"}
 
@@ -194,7 +194,11 @@ do
                 local x,y = math.floor(Position.X), math.floor(Position.Y);
 
                 if Visible == true and Esp.Settings.Boxes == true and Framework:DistanceFromCharacter(Model:GetPivot().p) <= Esp.Settings.PlayerRenderDistance then
-                    Box.Color = Esp.Settings.PlayerBoxColor
+                    if Model == Aimbot.HighlightedTarget then
+                        Box.Color = Color3.fromRGB(0,0,0)
+                    else
+                        Box.Color = Esp.Settings.PlayerBoxColor
+                    end
                     BoxOutline.Visible = true
                     Box.Visible = true
                     BoxOutline.Position = Vector2.new(math.floor(x-w* 0.5),math.floor(y-h*0.5))
@@ -206,6 +210,11 @@ do
                     Box.Visible = false
                 end
                 if Visible == true and Esp.Settings.Distances == true and Framework:DistanceFromCharacter(Model:GetPivot().p) <= Esp.Settings.PlayerRenderDistance then
+                    if Model == Aimbot.HighlightedTarget then
+                        DistanceText.Color = Color3.fromRGB(0,0,0)
+                    else
+                        DistanceText.Color = Esp.Settings.PlayerDistanceColor
+                    end
                     DistanceText.Visible = true
                     DistanceText.Position = Vector2.new(x, math.floor(y+h*0.5))
                     DistanceText.Color = Esp.Settings.PlayerDistanceColor
@@ -214,6 +223,11 @@ do
                     DistanceText.Visible = false
                 end
                 if Visible == true and Esp.Settings.Sleeping == true and Framework:DistanceFromCharacter(Model:GetPivot().p) <= Esp.Settings.PlayerRenderDistance then
+                    if Model == Aimbot.HighlightedTarget then
+                        SleepingText.Color = Color3.fromRGB(0,0,0)
+                    else
+                        SleepingText.Color = Esp.Settings.PlayerSleepingColor
+                    end
                     if Framework:IsSleeping(Model) == true then SleepingText.Text = "Sleeping" else SleepingText.Text = "Awake" end
                     SleepingText.Visible = true
                     SleepingText.Color = Esp.Settings.PlayerSleepingColor
@@ -222,6 +236,11 @@ do
                     SleepingText.Visible = false
                 end
                 if Visible == true and Esp.Settings.Armor == true and Framework:DistanceFromCharacter(Model:GetPivot().p) <= Esp.Settings.PlayerRenderDistance then
+                    if Model == Aimbot.HighlightedTarget then
+                        ArmorText.Color = Color3.fromRGB(0,0,0)
+                    else
+                        ArmorText.Color = Esp.Settings.PlayerArmorColor
+                    end
                     if Framework:GetArmor(Model) == true then ArmorText.Text = "Armored" else ArmorText.Text = "No Armor" end
                     ArmorText.Visible = true
                     ArmorText.Color = Esp.Settings.PlayerArmorColor
