@@ -336,7 +336,7 @@ function Aimbot:InFov(Model)
     if not Model then return false end
     local playerpos = Camera:WorldToViewportPoint(Model:GetPivot().p)
     local distance = (Vector2.new(playerpos.X,playerpos.Y) - Vector2.new(Mouse.X,Mouse.Y)).Magnitude
-    if distance <= Aimbot.Settings.FovSize * 3 then
+    if distance <= Aimbot.Settings.FovSize + 30 then
         return true
     end
     return false
