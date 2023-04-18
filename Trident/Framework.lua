@@ -89,6 +89,13 @@ function Framework:IsOnScreen(Model)
     local RandomVar, OnScreen = Camera:WorldToViewportPoint(Model:GetPivot().p)
     return OnScreen
 end
+function Framework:ToggleLeaves(Trans)
+    for i,v in pairs(Framework:GetEntitys()) do
+        if v.typ == "Tree1" or v.typ == "Tree2" then
+            v.model.Leaves.Transparency = Trans
+        end
+    end
+end
 function Framework:PositionToVector2(Vector3)
     local ViewportPosition, onscreen = Camera:WorldToViewportPoint(Vector3)
     return Vector2.new(ViewportPosition.X,ViewportPosition.Y), onscreen
