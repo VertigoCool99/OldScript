@@ -24,7 +24,6 @@ function Framework:ReplaceSkybox(SkyBoxName)
         Sky:Destroy()
     end
     local SkyBoxes = {
-    ["Standard"] = {["SkyboxBk"] = Sky.SkyboxBk,["SkyboxDn"] = Sky.SkyboxDn,["SkyboxFt"] = Sky.SkyboxFt,["SkyboxLf"] = Sky.SkyboxLf,["SkyboxRt"] = Sky.SkyboxRt,["SkyboxUp"] = Sky.SkyboxUp,},
     ["Among Us"] = {["SkyboxBk"] = "rbxassetid://5752463190",["SkyboxDn"] = "rbxassetid://5752463190",["SkyboxFt"] = "rbxassetid://5752463190",["SkyboxLf"] = "rbxassetid://5752463190",["SkyboxRt"] = "rbxassetid://5752463190",["SkyboxUp"] = "rbxassetid://5752463190"},
     ["Spongebob"] = {"SkyboxBk"="rbxassetid://277099484","SkyboxDn"="rbxassetid://277099500","SkyboXFt"="rbxassetid://277099554","SkyboxLf"="rbxassetid://277099531","SkyboxRt"="rbxassetid://277099589","SkyboxUp"="rbxassetid://277101591"},
     ["Deep Space"] = {"SkyboxBk"="rbxassetid://159248188","SkyboxDn"="rbxassetid://159248183","SkyboXFt"="rbxassetid://159248187","SkyboxLf"="rbxassetid://159248173","SkyboxRt"="rbxassetid://159248192","SkyboxUp"="rbxassetid://159248176"},
