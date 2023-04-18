@@ -217,7 +217,6 @@ do
                     end
                     DistanceText.Visible = true
                     DistanceText.Position = Vector2.new(x, math.floor(y+h*0.5))
-                    DistanceText.Color = Esp.Settings.PlayerDistanceColor
                     DistanceText.Text = tostring(math.floor(Framework:DistanceFromCharacter(Model:GetPivot().p))).." Studs"
                 else
                     DistanceText.Visible = false
@@ -230,7 +229,6 @@ do
                     end
                     if Framework:IsSleeping(Model) == true then SleepingText.Text = "Sleeping" else SleepingText.Text = "Awake" end
                     SleepingText.Visible = true
-                    SleepingText.Color = Esp.Settings.PlayerSleepingColor
                     SleepingText.Position = Vector2.new(x, math.floor(y-h*0.5-SleepingText.TextBounds.Y))
                 else
                     SleepingText.Visible = false
@@ -243,7 +241,6 @@ do
                     end
                     if Framework:GetArmor(Model) == true then ArmorText.Text = "Armored" else ArmorText.Text = "No Armor" end
                     ArmorText.Visible = true
-                    ArmorText.Color = Esp.Settings.PlayerArmorColor
                     ArmorText.Position = Vector2.new(x, math.floor(y+h*0.5+ArmorText.TextBounds.Y))
                 else
                     ArmorText.Visible = false
