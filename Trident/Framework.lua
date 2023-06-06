@@ -7,6 +7,7 @@ local CharcaterMiddle = game:GetService("Workspace").Ignore.LocalCharacter.Middl
 local Mouse = game.Players.LocalPlayer:GetMouse()
 local RunService = Game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
+local FovFunction = nil
 
 --Tables
 local Framework = {Settings={FullBright=true,Fov=90}}
@@ -15,6 +16,15 @@ local Crosshair = {Enabled=false,CrosshairThickness=2,CrosshairSize=8,CrosshairC
 local Aimbot = {Settings={FovEnabled=false,FovTransparency=1,FovSize=90,FovFilled=false,FovColor=Color3.fromRGB(120,81,169),TargetSleepers=false,AimbotHitpart="Head",Prediction=false,DropPrediction=false,HighlightTarget=true},Fov={},FovCircleDrawing=nil,AimbotSmoothing=3,HighlightedTarget=nil}
 local AllowedOres = {"StoneOre","NitrateOre","IronOre"}
 local AllowedItems = {"PartsBox","MilitaryCrate","SnallBox","SnallBox","Backpack","VendingMachine"}
+
+--Get Fov Function
+for i,v in pairs(getreg()) do
+    if type(v) == "function" and getfenv(v).script and getfenv(v).script.Name == "Camera" then
+        if type(v) == "function" and #getupvalues(v) > 17 then
+            FovFunction = v
+        end
+    end
+end
 
 --Functions
 function Framework:SetFov(Number)
