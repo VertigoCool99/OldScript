@@ -17,6 +17,9 @@ local AllowedOres = {"StoneOre","NitrateOre","IronOre"}
 local AllowedItems = {"PartsBox","MilitaryCrate","SnallBox","SnallBox","Backpack","VendingMachine"}
 
 --Functions
+function Framework:SetFov(Number)
+    setupvalue(FovFunction,17,Number)
+end
 function Framework:ReplaceSkybox(SkyBoxName)
     local Sky = Lighting:FindFirstChildOfClass("Sky")
     if not Sky then Sky = Instance.new("Sky",Lighting) end
