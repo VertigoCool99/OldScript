@@ -197,8 +197,8 @@ end
 
 --Esp Loops
 do
-    function Esp:AddPlayer(Model)
-        local Box,BoxOutline,ArmorText,DistanceText,SleepingText = Framework:Draw("Square",{Thickness=1,Filled=false,Color = Esp.Settings.PlayerBoxColor,ZIndex = -9}),Framework:Draw("Square",{Thickness=2,Filled=false,Color = Color3.fromRGB(0,0,0),ZIndex = -10}),Framework:Draw("Text",{Text = "Nil",Font=2,Size=13,Center=true,Outline=true,Color = Esp.Settings.PlayerArmorColor,ZIndex = -9}),Framework:Draw("Text",{Text ="",Font=2,Size=13,Center=true,Outline=true,Color = Esp.Settings.PlayerDistanceColor,ZIndex = -9}),Framework:Draw("Text",{Text ="",Font=2,Size=13,Center=true,Outline=true,Color = Esp.Settings.PlayerSleepingColor,ZIndex = -9})
+    function Esp:AddPlayer(Model,PlayerTable)
+        local Box,BoxOutline,ArmorText,DistanceText,SleepingText,ToolName = Framework:Draw("Square",{Thickness=1,Filled=false,Color = Esp.Settings.PlayerBoxColor,ZIndex = -9}),Framework:Draw("Square",{Thickness=2,Filled=false,Color = Color3.fromRGB(0,0,0),ZIndex = -10}),Framework:Draw("Text",{Text = "Nil",Font=2,Size=13,Center=true,Outline=true,Color = Esp.Settings.PlayerArmorColor,ZIndex = -9}),Framework:Draw("Text",{Text ="",Font=2,Size=13,Center=true,Outline=true,Color = Esp.Settings.PlayerDistanceColor,ZIndex = -9}),Framework:Draw("Text",{Text ="",Font=2,Size=13,Center=true,Outline=true,Color = Esp.Settings.PlayerSleepingColor,ZIndex = -9}),Framework:Draw("Text",{Text ="",Font=2,Size=13,Center=true,Outline=true,Color = Esp.Settings.PlayerToolColor,ZIndex = -9})
         local Render = game:GetService("RunService").RenderStepped:Connect(function()
             if Model and Model:FindFirstChild("HumanoidRootPart") then
                 local Position,Visible = Camera:WorldToViewportPoint(Model:GetPivot().p)
@@ -208,7 +208,7 @@ do
 
                 if Visible == true and Esp.Settings.Boxes == true and Framework:DistanceFromCharacter(Model:GetPivot().p) <= Esp.Settings.PlayerRenderDistance then
                     if Model == Aimbot.HighlightedTarget then
-                        Box.Color = Color3.fromRGB(255,255,255)
+                        Box.Color = Color3.fromRGB(0,0,0)
                     else
                         Box.Color = Esp.Settings.PlayerBoxColor
                     end
@@ -224,36 +224,34 @@ do
                 end
                 if Visible == true and Esp.Settings.Distances == true and Framework:DistanceFromCharacter(Model:GetPivot().p) <= Esp.Settings.PlayerRenderDistance then
                     if Model == Aimbot.HighlightedTarget then
-                        DistanceText.Color = Color3.fromRGB(255,255,255)
+                        DistanceText.Color = Color3.fromRGB(0,0,0)
                     else
                         DistanceText.Color = Esp.Settings.PlayerDistanceColor
                     end
                     DistanceText.Visible = true
                     DistanceText.Position = Vector2.new(x, math.floor(y+h*0.5))
+                    DistanceText.Color = Esp.Settings.PlayerDistanceColor
                     DistanceText.Text = tostring(math.floor(Framework:DistanceFromCharacter(Model:GetPivot().p))).." Studs"
                 else
                     DistanceText.Visible = false
                 end
                 if Visible == true and Esp.Settings.Sleeping == true and Framework:DistanceFromCharacter(Model:GetPivot().p) <= Esp.Settings.PlayerRenderDistance then
-                    if Model == Aimbot.HighlightedTarget then
-                        SleepingText.Color = Color3.fromRGB(255,255,255)
-                    else
-                        SleepingText.Color = Esp.Settings.PlayerSleepingColor
-                    end
-                    if Framework:IsSleeping(Model) == true then SleepingText.Text = "Sleeping" else SleepingText.Text = "Awake" end
+                    if PlayerTable.sleeping == true then SleepingText.Text = "Sleeping" else SleepingText.Text = "Awake" end
                     SleepingText.Visible = true
+                    SleepingText.Color = Esp.Settings.PlayerSleepingColor
                     SleepingText.Position = Vector2.new(x, math.floor(y-h*0.5-SleepingText.TextBounds.Y))
                 else
                     SleepingText.Visible = false
                 end
                 if Visible == true and Esp.Settings.Armor == true and Framework:DistanceFromCharacter(Model:GetPivot().p) <= Esp.Settings.PlayerRenderDistance then
                     if Model == Aimbot.HighlightedTarget then
-                        ArmorText.Color = Color3.fromRGB(255,255,255)
+                        ArmorText.Color = Color3.fromRGB(0,0,0)
                     else
                         ArmorText.Color = Esp.Settings.PlayerArmorColor
                     end
                     if Framework:GetArmor(Model) == true then ArmorText.Text = "Armored" else ArmorText.Text = "No Armor" end
                     ArmorText.Visible = true
+                    ArmorText.Color = Esp.Settings.PlayerArmorColor
                     ArmorText.Position = Vector2.new(x, math.floor(y+h*0.5+ArmorText.TextBounds.Y))
                 else
                     ArmorText.Visible = false
