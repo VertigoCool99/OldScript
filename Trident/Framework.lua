@@ -173,8 +173,6 @@ function Esp:CreateCrosshair()
 
         Crosshair.X.Visible = Crosshair.Enabled
         Crosshair.Y.Visible = Crosshair.Enabled
-        Crosshair.X3.Visible = Crosshair.Enabled
-        Crosshair.Y3.Visible = Crosshair.Enabled
         Esp.Connections.UpdateCrosshair = Framework:CreateConnection(RunService.RenderStepped,function()
             if Crosshair.Spin == false then
                 Crosshair.X2.Visible = false;Crosshair.Y2.Visible = false;Crosshair.X1.Visible = false;Crosshair.Y1.Visible = false
@@ -198,17 +196,17 @@ Esp.Connections.SpinCrosshair = Framework:CreateConnection(RunService.Heartbeat,
     if Crosshair.Spin == true and Crosshair.Enabled == true then
         Crosshair.X.Visible = false;Crosshair.Y.Visible = false
         Crosshair.X2.Visible = true;Crosshair.Y2.Visible = true;Crosshair.X1.Visible = true;Crosshair.Y1.Visible = true
-        CurrentAngle = CurrentAngle + math.rad(Crosshair.Speed*DeltaTime);
-        Crosshair.X2.From = GetCenterScreen() + (Vector2.new(math.cos(CurrentAngle), math.sin(CurrentAngle)));
+        CurrentAngle = CurrentAngle + math.rad(Crosshair.Speed*dTime);
+        Crosshair.X2.From = GetCenterScreen() + (Vector2.new(math.cos(CurrentAngle), math.sin(CurrentAngle))*Crosshair.CrosshairOffset);
         Crosshair.X2.To = Crosshair.X.From + (Vector2.new(math.cos(CurrentAngle), math.sin(CurrentAngle))*Crosshair.CrosshairSize);
     
-        Crosshair.Y2.From = GetCenterScreen() + (Vector2.new(math.cos(CurrentAngle + math.pi/2), math.sin(CurrentAngle + math.pi/2)));
+        Crosshair.Y2.From = GetCenterScreen() + (Vector2.new(math.cos(CurrentAngle + math.pi/2), math.sin(CurrentAngle + math.pi/2))*Crosshair.CrosshairOffset);
         Crosshair.Y2.To = Crosshair.Y.From + (Vector2.new(math.cos(CurrentAngle + math.pi/2), math.sin(CurrentAngle + math.pi/2))*Crosshair.CrosshairSize);
     
-        Crosshair.X1.From = GetCenterScreen() + (Vector2.new(math.cos(CurrentAngle + math.pi), math.sin(CurrentAngle + math.pi)));
+        Crosshair.X1.From = GetCenterScreen() + (Vector2.new(math.cos(CurrentAngle + math.pi), math.sin(CurrentAngle + math.pi))*Crosshair.CrosshairOffset);
         Crosshair.X1.To = Crosshair.X1.From + (Vector2.new(math.cos(CurrentAngle + math.pi), math.sin(CurrentAngle + math.pi))*Crosshair.CrosshairSize);
         
-        Crosshair.Y1.From = GetCenterScreen() + (Vector2.new(math.cos(CurrentAngle + math.pi/2*3), math.sin(CurrentAngle + math.pi/2*3)));
+        Crosshair.Y1.From = GetCenterScreen() + (Vector2.new(math.cos(CurrentAngle + math.pi/2*3), math.sin(CurrentAngle + math.pi/2*3))*Crosshair.CrosshairOffset);
         Crosshair.Y1.To = Crosshair.Y1.From + (Vector2.new(math.cos(CurrentAngle + math.pi/2*3), math.sin(CurrentAngle + math.pi/2*3))*Crosshair.CrosshairSize);
     end
 end)
