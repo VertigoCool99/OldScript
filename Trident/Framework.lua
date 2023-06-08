@@ -1,4 +1,4 @@
-print("Framework Version: v1.11\nLoading")
+print("Framework Version: v1.12\nLoading")
 
 --Locals
 local oldtick = tick()
@@ -158,42 +158,60 @@ function Esp:CreateCrosshair()
     do
         Crosshair.X = Framework:Draw("Line",{Thickness=Crosshair.CrosshairThickness,Color=Crosshair.CrosshairColor,ZIndex = -9})
         Crosshair.Y = Framework:Draw("Line",{Thickness=Crosshair.CrosshairThickness,Color=Crosshair.CrosshairColor,ZIndex = -9})
-        Crosshair.X.From = Framework:GetCenterScreen() - Vector2.new(0,Crosshair.CrosshairSize)
+        Crosshair.X3 = Framework:Draw("Line",{Thickness=Crosshair.CrosshairThickness,Color=Crosshair.CrosshairColor,ZIndex = -9})
+        Crosshair.Y3 = Framework:Draw("Line",{Thickness=Crosshair.CrosshairThickness,Color=Crosshair.CrosshairColor,ZIndex = -9})
+        Crosshair.X1 = Framework:Draw("Line",{Thickness=Crosshair.CrosshairThickness,Color=Crosshair.CrosshairColor,ZIndex = -9,Visible = false})
+        Crosshair.Y1 = Framework:Draw("Line",{Thickness=Crosshair.CrosshairThickness,Color=Crosshair.CrosshairColor,ZIndex = -9,Visible = false})
+        Crosshair.X2 = Framework:Draw("Line",{Thickness=Crosshair.CrosshairThickness,Color=Crosshair.CrosshairColor,ZIndex = -9,Visible = false})
+        Crosshair.Y2 = Framework:Draw("Line",{Thickness=Crosshair.CrosshairThickness,Color=Crosshair.CrosshairColor,ZIndex = -9,Visible = false})
+        
+        Crosshair.X.From = Framework:GetCenterScreen() - Vector2.new(0,Crosshair.CrosshairOffset)
         Crosshair.X.To = Framework:GetCenterScreen() + Vector2.new(0,Crosshair.CrosshairSize)
-        Crosshair.Y.From = Framework:GetCenterScreen() - Vector2.new(Crosshair.CrosshairSize,0)
+
+        Crosshair.Y.From = Framework:GetCenterScreen() - Vector2.new(Crosshair.CrosshairOffset,0)
         Crosshair.Y.To = Framework:GetCenterScreen() + Vector2.new(Crosshair.CrosshairSize,0)
+
         Crosshair.X.Visible = Crosshair.Enabled
         Crosshair.Y.Visible = Crosshair.Enabled
+        Crosshair.X3.Visible = Crosshair.Enabled
+        Crosshair.Y3.Visible = Crosshair.Enabled
         Esp.Connections.UpdateCrosshair = Framework:CreateConnection(RunService.RenderStepped,function()
-            Crosshair.X.Color=Crosshair.CrosshairColor
-            Crosshair.X.Thickness=Crosshair.CrosshairThickness
-            Crosshair.Y.Color=Crosshair.CrosshairColor
-            Crosshair.Y.Thickness=Crosshair.CrosshairThickness
-            Crosshair.X.From = Framework:GetCenterScreen() - Vector2.new(0,Crosshair.CrosshairSize)
-            Crosshair.X.To = Framework:GetCenterScreen() + Vector2.new(0,Crosshair.CrosshairSize)
-            Crosshair.Y.From = Framework:GetCenterScreen() - Vector2.new(Crosshair.CrosshairSize,0)
-            Crosshair.Y.To = Framework:GetCenterScreen() + Vector2.new(Crosshair.CrosshairSize,0)
-            Crosshair.X.Visible = Crosshair.Enabled
-            Crosshair.Y.Visible = Crosshair.Enabled
+            if Crosshair.Spin == false then
+                Crosshair.X2.Visible = false;Crosshair.Y2.Visible = false;Crosshair.X1.Visible = false;Crosshair.Y1.Visible = false
+                Crosshair.X.Color=Crosshair.CrosshairColor
+                Crosshair.X.Thickness=Crosshair.CrosshairThickness
+                Crosshair.Y.Color=Crosshair.CrosshairColor
+                Crosshair.Y.Thickness=Crosshair.CrosshairThickness
+                Crosshair.X.From = Framework:GetCenterScreen() - Vector2.new(0,Crosshair.CrosshairSize)
+                Crosshair.X.To = Framework:GetCenterScreen() + Vector2.new(0,Crosshair.CrosshairSize)
+                Crosshair.Y.From = Framework:GetCenterScreen() - Vector2.new(Crosshair.CrosshairSize,0)
+                Crosshair.Y.To = Framework:GetCenterScreen() + Vector2.new(Crosshair.CrosshairSize,0)
+                Crosshair.X.Visible = Crosshair.Enabled
+                Crosshair.Y.Visible = Crosshair.Enabled
+            end
         end)
     end
 end
-function Esp:GetBoxPosAndSize(Object)
-    cf,size = Object:GetBoundingBox()
-    corners = {cf * CFrame.new(size.x/2,size.y/2,size.z/2),cf * CFrame.new(size.x/2,size.y/2,-size.z/2),cf * CFrame.new(-size.x/2,size.y/2,size.z/2),cf * CFrame.new(-size.x/2,size.y/2,-size.z/2),cf * CFrame.new(size.x/2,-size.y/2,size.z/2),cf * CFrame.new(size.x/2,-size.y/2,-size.z/2),cf * CFrame.new(-size.x/2,-size.y/2,size.z/2),cf * CFrame.new(-size.x/2,-size.y/2,-size.z/2),}
-    local left,top = Vector2.new(math.huge,0),Vector2.new(0,math.huge)
-    local right,bottom = Vector2.new(-math.huge,0),Vector2.new(0,-math.huge)
-    for i, v in pairs(corners) do
-        local point = Camera:WorldToViewportPoint(v.Position)
-        if point.Y < top.Y then top = point end
-        if point.Y > bottom.Y then bottom = point end
-        if point.X > right.X then right = point end
-        if point.X < left.X then left = point end
+--SpinningCrosshair
+local currentAngle = 0
+Esp.Connections.SpinCrosshair = Framework:CreateConnection(RunService.Heartbeat,function(dTime)
+    if Crosshair.Spin == true and Crosshair.Enabled == true then
+        Crosshair.X.Visible = false;Crosshair.Y.Visible = false
+        Crosshair.X2.Visible = true;Crosshair.Y2.Visible = true;Crosshair.X1.Visible = true;Crosshair.Y1.Visible = true
+        CurrentAngle = CurrentAngle + math.rad(Crosshair.Speed*DeltaTime);
+        Crosshair.X2.From = GetCenterScreen() + (Vector2.new(math.cos(CurrentAngle), math.sin(CurrentAngle)));
+        Crosshair.X2.To = Crosshair.X.From + (Vector2.new(math.cos(CurrentAngle), math.sin(CurrentAngle))*Crosshair.CrosshairSize);
+    
+        Crosshair.Y2.From = GetCenterScreen() + (Vector2.new(math.cos(CurrentAngle + math.pi/2), math.sin(CurrentAngle + math.pi/2)));
+        Crosshair.Y2.To = Crosshair.Y.From + (Vector2.new(math.cos(CurrentAngle + math.pi/2), math.sin(CurrentAngle + math.pi/2))*Crosshair.CrosshairSize);
+    
+        Crosshair.X1.From = GetCenterScreen() + (Vector2.new(math.cos(CurrentAngle + math.pi), math.sin(CurrentAngle + math.pi)));
+        Crosshair.X1.To = Crosshair.X1.From + (Vector2.new(math.cos(CurrentAngle + math.pi), math.sin(CurrentAngle + math.pi))*Crosshair.CrosshairSize);
+        
+        Crosshair.Y1.From = GetCenterScreen() + (Vector2.new(math.cos(CurrentAngle + math.pi/2*3), math.sin(CurrentAngle + math.pi/2*3)));
+        Crosshair.Y1.To = Crosshair.Y1.From + (Vector2.new(math.cos(CurrentAngle + math.pi/2*3), math.sin(CurrentAngle + math.pi/2*3))*Crosshair.CrosshairSize);
     end
-    if left and right and top and bottom then
-       return math.floor(left.X),math.floor(right.X),math.floor(top.Y),math.floor(bottom.Y)
-    end
-end
+end)
 
 --Esp Loops
 do
