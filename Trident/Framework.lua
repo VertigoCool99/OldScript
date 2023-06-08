@@ -1,4 +1,4 @@
-print("Framework Version: v1.12\nLoading")
+print("Framework Version: v1.12A\nLoading")
 
 --Locals
 local oldtick = tick()
