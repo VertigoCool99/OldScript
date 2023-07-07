@@ -30,7 +30,7 @@ local Fov = {Settings={
     Snapline=false,SnaplineColor=Color3.fromRGB(255,255,255)
 }}
 local Combat = {Settings={
-    SilentEnabled=true,SilentHitChance=100,SilentAimPart="Head",TeamCheck=true,SleeperCheck=true,
+    SilentEnabled=false,SilentHitChance=100,SilentAimPart="Head",TeamCheck=true,SleeperCheck=true,
     NoRecoil=false
 }}
 local Misc = {Settings={
@@ -404,7 +404,9 @@ local FovTab = FovTabbox:AddTab('Fov')
 local GunModsTabbox = Tabs.Combat:AddRightTabbox()
 local GunModsTab = GunModsTabbox:AddTab('Modifications')
 
-SilentTab:AddToggle('SilentAim',{Text='Enabled',Default=true}):AddKeyPicker('SilentKey', {Default='MB2',SyncToggleState=true,Mode='Hold',Text='Silent Aim',NoUI=false})
+SilentTab:AddToggle('SilentAim',{Text='Enabled',Default=true}):AddKeyPicker('SilentKey', {Default='MB2',SyncToggleState=true,Mode='Hold',Text='Silent Aim',NoUI=false}):OnChanged(function(Value)
+    Combat.Settings.SilentEnabled = Value
+end)
 SilentTab:AddToggle('TeamCheck',{Text='Team Check',Default=true}):OnChanged(function(Value)
     Combat.Settings.TeamCheck = Value
 end)
@@ -698,23 +700,28 @@ end)
 --Silent Aim
 local oldFunction; oldFunction = hookfunction(getupvalues(getrenv()._G.modules.FPS.ToolControllers.BowSpecial.PlayerFire)[4],function(...)
     args = {...}
+    Player = Functions:GetClosest()
+    print("Hooked 1")
     if Combat.Settings.SilentEnabled == true and Player ~= nil and (CharcaterMiddle:GetPivot().Position-Player:GetPivot().Position).Magnitude <= Esp.Settings.RenderDistance and math.random(0,100) <= Combat.Settings.SilentHitChance then
+        print("Hooked 2")
         if Combat.TeamCheck == true and Player.Head.Teamtag.Enabled == false then
             args[1] = CFrame.lookAt(args[1].Position,Player[Combat.Settings.SilentAimPart]:GetPivot().p+Functions:Predict())
         else
             args[1] = CFrame.lookAt(args[1].Position,Player[Combat.Settings.SilentAimPart]:GetPivot().p+Functions:Predict())
         end
+        print("Hooked 3")
     end
     return oldFunction(unpack(args))
 end)
 
 local oldFunctionGun; oldFunctionGun = hookfunction(getupvalues(getrenv()._G.modules.FPS.ToolControllers.RangedWeapon.PlayerFire)[2],function(...)
     args = {...}
+    Player = Functions:GetClosest()
     if Combat.Settings.SilentEnabled == true and Player ~= nil and (CharcaterMiddle:GetPivot().Position-Player:GetPivot().Position).Magnitude <= Esp.Settings.RenderDistance and math.random(0,100) <= Combat.Settings.SilentHitChance then
         if Combat.TeamCheck == true and Player.Head.Teamtag.Enabled == false then
-            args[1] = CFrame.lookAt(args[1].Position,Player[Combat.Settings.SilentAimPart]:GetPivot().p+Functions:Predict())
+            Functions:GetClosest()[Combat.Settings.SilentAimPart]:GetPivot().p+Vector3.new((Player[Combat.Settings.SilentAimPart]:GetPivot().Position.X - oldX)*1.7,(Player[Combat.Settings.SilentAimPart].Position.Y - oldY),0.001)
         else
-            args[1] = CFrame.lookAt(args[1].Position,Player[Combat.Settings.SilentAimPart]:GetPivot().p+Functions:Predict())
+            Functions:GetClosest()[Combat.Settings.SilentAimPart]:GetPivot().p+Vector3.new((Player[Combat.Settings.SilentAimPart]:GetPivot().Position.X - oldX)*1.7,(Player[Combat.Settings.SilentAimPart].Position.Y - oldY),0.001)
         end
     end
     return oldFunctionGun(unpack(args))
