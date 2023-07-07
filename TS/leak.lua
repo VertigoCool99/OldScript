@@ -330,11 +330,12 @@ local PlayerUpdater = game:GetService("RunService").RenderStepped
 local PlayerConnection = PlayerUpdater:Connect(function()
     Esp:UpdateEsp()
 end)
+--[[
 local OreUpdater = game:GetService("RunService").RenderStepped
 local OreConnection = OreUpdater:Connect(function()
     Esp:UpdateOreEsp()
 end)
-
+]]
 --Init Functions
 for i, v in pairs(getupvalues(getrenv()._G.modules.Player.GetPlayerModel)[1]) do
     if not table.find(cache,v) then
@@ -350,7 +351,6 @@ for i,v in pairs(getrenv()._G.modules.Entity.List) do
         Esp:CreateOreEsp(v)
     end
 end
-
 
 local oldOreHook;oldOreHook = hookfunction(getrenv()._G.modules.Entity.BulkLoad,function(...)
     for i,v in pairs(getrenv()._G.modules.Entity.List) do
@@ -529,7 +529,6 @@ Options.OreDistanceColor:OnChanged(function(Value)
 end)
 ]]
 
-
 local CrosshairTabbox = Tabs.Visual:AddRightTabbox()
 local CrosshairTab = CrosshairTabbox:AddTab('Crosshair')
 
@@ -700,28 +699,26 @@ end)
 --Silent Aim
 local oldFunction; oldFunction = hookfunction(getupvalues(getrenv()._G.modules.FPS.ToolControllers.BowSpecial.PlayerFire)[4],function(...)
     args = {...}
-    Player = Functions:GetClosest()
-    print("Hooked 1")
+    local Player = Functions:GetClosest()
     if Combat.Settings.SilentEnabled == true and Player ~= nil and (CharcaterMiddle:GetPivot().Position-Player:GetPivot().Position).Magnitude <= Esp.Settings.RenderDistance and math.random(0,100) <= Combat.Settings.SilentHitChance then
-        print("Hooked 2")
         if Combat.TeamCheck == true and Player.Head.Teamtag.Enabled == false then
             args[1] = CFrame.lookAt(args[1].Position,Player[Combat.Settings.SilentAimPart]:GetPivot().p+Functions:Predict())
         else
             args[1] = CFrame.lookAt(args[1].Position,Player[Combat.Settings.SilentAimPart]:GetPivot().p+Functions:Predict())
         end
-        print("Hooked 3")
     end
     return oldFunction(unpack(args))
 end)
 
 local oldFunctionGun; oldFunctionGun = hookfunction(getupvalues(getrenv()._G.modules.FPS.ToolControllers.RangedWeapon.PlayerFire)[2],function(...)
     args = {...}
-    Player = Functions:GetClosest()
+    local Player = Functions:GetClosest()
+    local oldX,oldY = Player.X,Player.Y
     if Combat.Settings.SilentEnabled == true and Player ~= nil and (CharcaterMiddle:GetPivot().Position-Player:GetPivot().Position).Magnitude <= Esp.Settings.RenderDistance and math.random(0,100) <= Combat.Settings.SilentHitChance then
         if Combat.TeamCheck == true and Player.Head.Teamtag.Enabled == false then
-            Functions:GetClosest()[Combat.Settings.SilentAimPart]:GetPivot().p+Vector3.new((Player[Combat.Settings.SilentAimPart]:GetPivot().Position.X - oldX)*1.7,(Player[Combat.Settings.SilentAimPart].Position.Y - oldY),0.001)
+            args[1] = Player[Combat.Settings.SilentAimPart]:GetPivot().Position + Vector3.new((Player[Combat.Settings.SilentAimPart]:GetPivot().Position.X - oldX)*1.7,(Player[Combat.Settings.SilentAimPart].Position.Y - oldY),0.001)
         else
-            Functions:GetClosest()[Combat.Settings.SilentAimPart]:GetPivot().p+Vector3.new((Player[Combat.Settings.SilentAimPart]:GetPivot().Position.X - oldX)*1.7,(Player[Combat.Settings.SilentAimPart].Position.Y - oldY),0.001)
+            args[1] = Player[Combat.Settings.SilentAimPart]:GetPivot().p + Vector3.new((Player[Combat.Settings.SilentAimPart]:GetPivot().Position.X - oldX)*1.7,(Player[Combat.Settings.SilentAimPart].Position.Y - oldY),0.001)
         end
     end
     return oldFunctionGun(unpack(args))
