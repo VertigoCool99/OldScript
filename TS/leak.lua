@@ -671,50 +671,10 @@ LightingTab:AddToggle('Grass', {Text = 'Grass',Default = true}):OnChanged(functi
 end)
 
 MiscTab:AddToggle('Noclip',{Text='Semi Noclip',Default=false}):AddKeyPicker('NoclipKey', {Default='N',SyncToggleState=true,Mode='Toggle',Text='Noclip',NoUI=false})
-MiscTab:AddToggle('SpeedHack',{Text='Speed Boost',Default=false}):AddKeyPicker('SpeedHackKey', {Default='H',SyncToggleState=true,Mode='Toggle',Text='Speed Boost',NoUI=false})
-MiscTab:AddSlider('SpeedHackSpeed', {Text = 'Speed',Default = 28,Min = 1,Max = 34,Rounding = 0,Compact=false}):OnChanged(function(Value)
-    Misc.Settings.SpeedHackSpeed = Value
-end)
 
 --Misc Switches
 Toggles.Noclip:OnChanged(function(Value)
     getrenv()._G.modules.Character.SetNoclipping(Value)
-end)
-Toggles.SpeedHack:OnChanged(function(Value)
-    Misc.Settings.SpeedHackEnabled = Value
-end)
-
---Speed Boost
-local HPress,Speedy,Speedyk = true,false,false
-
-game:GetService("RunService").RenderStepped:Connect(function(step)
-    if Misc.Settings.SpeedHackEnabled == true and Speedy == true then
-        for i,v in pairs(game:GetService("Workspace").Ignore.LocalCharacter:GetChildren()) do
-            v.CFrame = v.CFrame + Camera.CFrame.LookVector * Misc.Settings.SpeedHackSpeed * step
-        end
-    end
-end)
-
-game:GetService("UserInputService").InputBegan:Connect(function(input)
-    if Options.SpeedHackKey:GetState() == true then
-        if HPress == true then
-            HPress,Speedyk = false,true
-        elseif HPress == false then
-            HPress,Speedyk = true,false
-        end
-    end
-end)
-
-game:GetService("UserInputService").InputBegan:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.C and Speedyk then
-        Speedy = true
-    end
-end)
-
-game:GetService("UserInputService").InputEnded:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.C then
-        Speedy = false
-    end
 end)
 
 --Hooks
