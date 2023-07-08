@@ -713,15 +713,14 @@ end)
 local oldFunctionGun; oldFunctionGun = hookfunction(getupvalues(getrenv()._G.modules.FPS.ToolControllers.RangedWeapon.PlayerFire)[2],function(...)
     args = {...}
     local Player = Functions:GetClosest()
-    local oldX,oldY = Player.X,Player.Y
     if Combat.Settings.SilentEnabled == true and Player ~= nil and (CharcaterMiddle:GetPivot().Position-Player:GetPivot().Position).Magnitude <= Esp.Settings.RenderDistance and math.random(0,100) <= Combat.Settings.SilentHitChance then
         if Combat.TeamCheck == true and Player.Head.Teamtag.Enabled == false then
-            args[1] = Player[Combat.Settings.SilentAimPart]:GetPivot().Position + Vector3.new((Player[Combat.Settings.SilentAimPart]:GetPivot().Position.X - oldX)*1.7,(Player[Combat.Settings.SilentAimPart].Position.Y - oldY),0.001)
+            args[1] = CFrame.lookAt(args[1].Position,Player[Combat.Settings.SilentAimPart]:GetPivot().p+Functions:Predict())
         else
-            args[1] = Player[Combat.Settings.SilentAimPart]:GetPivot().p + Vector3.new((Player[Combat.Settings.SilentAimPart]:GetPivot().Position.X - oldX)*1.7,(Player[Combat.Settings.SilentAimPart].Position.Y - oldY),0.001)
+            args[1] = CFrame.lookAt(args[1].Position,Player[Combat.Settings.SilentAimPart]:GetPivot().p+Functions:Predict())
         end
     end
-    return oldFunctionGun(unpack(args))
+    return oldFunction(unpack(args))
 end)
 
 local MenuGroup = Tabs['UI Settings']:AddLeftGroupbox('Menu')
