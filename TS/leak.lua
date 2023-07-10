@@ -31,7 +31,6 @@ local Fov = {Settings={
 }}
 local Combat = {Settings={
     SilentEnabled=false,SilentHitChance=100,SilentAimPart="Head",TeamCheck=true,SleeperCheck=true,
-    NoRecoil=false
 }}
 local Misc = {Settings={
     SpeedHackEnabled=false,SpeedHackSpeed=30,
@@ -455,9 +454,6 @@ GunModsTab:AddToggle('AutoReload',{Text='Auto Reload',Default=false}):OnChanged(
         end
     end)
 end)
-GunModsTab:AddToggle('NoRecoil',{Text='No Recoil',Default=false}):OnChanged(function(Value)
-    Combat.Settings.NoRecoil = Value
-end)
 GunModsTab:AddToggle('NoSway',{Text='No Sway',Default=false}):OnChanged(function(Value)
     NoSway = Value
 end)
@@ -687,13 +683,6 @@ local NoSwayHook;NoSwayHook = hookfunction(getrenv()._G.modules.Camera.SetSwaySp
     	return
     end
     return NoSwayHook(...)
-end)
-local OldHook; OldHook = hookfunction(getrenv()._G.modules.Camera.Recoil, function(...)
-    args = {...}
-    if Combat.Settings.NoRecoil == true then
-        args[1]["cameraY"] = 0;args[1]["cameraX"] = 0
-    end
-    return OldHook(unpack(args))
 end)
 
 --Silent Aim
