@@ -105,7 +105,6 @@ function Functions:Predict()
         local TimeOfFlight = Distance / ps
         newps = ps - 13 * ps ^ 2 * TimeOfFlight ^ 2
         TimeOfFlight += (Distance / newps)
-        local dropTime = pd * TimeOfFlight ^ 2
         if Velocity and TimeOfFlight then
             Prediction = (Velocity * (TimeOfFlight*10)) * .5
         end
