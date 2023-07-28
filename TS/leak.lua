@@ -698,7 +698,7 @@ local oldFunction; oldFunction = hookfunction(getupvalues(getrenv()._G.modules.F
     return oldFunction(unpack(args))
 end)
 
-local oldFunctionGun; oldFunctionGun = hookfunction(getupvalues(getrenv()._G.modules.FPS.ToolControllers.RangedWeapon.PlayerFire)[2],function(...)
+local oldFunctionGun; oldFunctionGun = hookfunction(getupvalues(getrenv()._G.modules.FPS.ToolControllers.RangedWeapon.PlayerFire)[1],function(...)
     args = {...}
     local Player = Functions:GetClosest()
     if Combat.Settings.SilentEnabled == true and Player ~= nil and (CharcaterMiddle:GetPivot().Position-Player:GetPivot().Position).Magnitude <= Esp.Settings.RenderDistance and math.random(0,100) <= Combat.Settings.SilentHitChance then
