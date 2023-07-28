@@ -14,7 +14,7 @@ local oldTick = tick()
 
 --Tables
 local Settings = {
-    MainFarm=false,InfiniteFarm=false,DrillMasterFarm=false,
+    MainFarm=false,InfiniteFarm=false,DrillMasterFarm=false,EventFarm=false,
     HitTimesPerS=10,
     AutoHealth=false,AutoDamage=false,AutoSpeed=false,AutoCrit=false,AutoSkills=false,AutoRebirth=false,
     SlashSpeed=false,SlashSpeedValue=0,
@@ -60,6 +60,9 @@ function GetMyMonstersDrillMaster()
         end
     end
 end
+function GetMyMonstersEvent()
+	return game:GetService("Workspace").ForScript.SkibiMap.Monster_
+end
 
 function KillMonsters(MonsterFolder,HitTimes)
     HitTimes = HitTimes or 10
@@ -102,6 +105,7 @@ end)
 AutoFarmsTab:AddToggle('MainFarm', {Text='Main Farm',Default = false,Tooltip="Main Mobs In The Worlds"})
 AutoFarmsTab:AddToggle('InfiniteFarm', {Text='Eternal Farm',Default = false,Tooltip="Eternal Arena Mobs"})
 AutoFarmsTab:AddToggle('DrillMasterFarm', {Text='Drill Master Farm',Default = false,Tooltip="Drill Master Arena Mobs"})
+AutoFarmsTab:AddToggle('EventFarm', {Text='EventFarm Farm',Default = false,Tooltip="Event Arena Mobs"})
 
 Toggles.MainFarm:OnChanged(function(state)
     Settings.MainFarm = state
@@ -128,6 +132,14 @@ Toggles.DrillMasterFarm:OnChanged(function(state)
     task.spawn(function()
         while Settings.DrillMasterFarm == true do task.wait(.05)
             KillMonsters(GetMyMonstersDrillMaster(),Settings.HitTimesPerS)
+        end
+    end)
+end)
+Toggles.EventFarm:OnChanged(function(state)
+    Settings.EventFarm = state
+    task.spawn(function()
+        while Settings.EventFarm == true do task.wait(.1)
+            KillMonsters(GetMyMonstersEvent(),Settings.HitTimesPerS)
         end
     end)
 end)
