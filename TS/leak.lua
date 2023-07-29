@@ -742,4 +742,4 @@ game.Players.PlayerRemoving:Connect(function()
 end)
 
 Library:Notify("Loaded "..string.sub(tostring(tick()-oldTick),3).."s",8)
-Library:Notify("Status: Undetected 🟩",8)
+Library:Notify("Status: Detected 🟥",8)
