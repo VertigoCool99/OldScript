@@ -34,7 +34,6 @@ local Combat = {Settings={
 }}
 local Misc = {Settings={
     SpeedHackEnabled=false,SpeedHackSpeed=30,
-    LeavesTrans=0.4,
 }}
 local cache,OreCache = {},{}
 local AllowedOres,AllowedItems = {"StoneOre","NitrateOre","IronOre"},{"PartsBox","MilitaryCrate","SnallBox","SnallBox","Backpack","VendingMachine"}
@@ -53,13 +52,6 @@ function Functions:GetBarrel()
     if game:GetService("Workspace").Ignore.FPSArms:FindFirstChild("HandModel") then
         if game:GetService("Workspace").Ignore.FPSArms.HandModel:FindFirstChild("ADS",true) then
             return game:GetService("Workspace").Ignore.FPSArms.HandModel:FindFirstChild("ADS",true)
-        end
-    end
-end
-function Functions:ToggleLeaves(Trans)
-    for i,v in pairs(getrenv()._G.modules.Entity.List) do
-        if v.typ == "Tree1" or v.typ == "Tree2" then
-            v.model.Leaves.Transparency = Trans
         end
     end
 end
@@ -383,8 +375,8 @@ local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
 local ThemeManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/VertigoCool99/LoadScript/main/FloatManager.lua"))()
 local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
 
-local Window = Library:CreateWindow({Title = 'Float.balls | Dev REWRITE',Center = true, AutoShow = true})
-Library:SetWatermark('Float.balls | Dev REWRITE')
+local Window = Library:CreateWindow({Title = 'Float.balls | Free',Center = true, AutoShow = true})
+Library:SetWatermark('Float.balls | Free')
 Library:OnUnload(function() 
     Library.Unloaded = true
     for i,v in pairs(Toggles) do
@@ -653,15 +645,6 @@ LightingTab:AddDropdown('SkyboxeChange', {Values = {"Standard","Among Us","Spong
 end)
 LightingTab:AddDropdown('LightingMode', {Values = {"Compatibility","Future","ShadowMap","Voxel"},Default = 1,Multi = false,Text = 'Lighting'})
 LightingTab:AddDivider()
-LightingTab:AddToggle('Leaves', {Text = 'Leaves',Default = true}):OnChanged(function(Value)
-    if Toggles.Leaves.Value == true then
-        Functions:ToggleLeaves(0.4)
-        Misc.Settings.LeavesTrans = 0.4
-    else
-        Functions:ToggleLeaves(1)
-        Misc.Settings.LeavesTrans = 1
-    end
-end)
 LightingTab:AddToggle('Grass', {Text = 'Grass',Default = true}):OnChanged(function(Value)
     sethiddenproperty(game:GetService("Workspace").Terrain,"Decoration",Value)
 end)
