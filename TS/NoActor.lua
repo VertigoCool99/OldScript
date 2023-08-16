@@ -111,7 +111,6 @@ function Esp:UpdateEsp()
                 if Esp.Settings.TargetSleepers == true and sleeping == true then v.Sleeping.Visible = false end
 
                 v.Sleeping.Outline=Esp.Settings.TextOutline;v.Sleeping.Color=Esp.Settings.SleepingColor;v.Sleeping.Size=math.max(math.min(math.abs(Esp.Settings.TextSize*scale),Esp.Settings.TextSize),Esp.Settings.MinTextSize);v.Sleeping.Color = Esp.Settings.SleepingColor;v.Sleeping.Font=Esp.Settings.TextFont;v.Sleeping.Position = Vector2.new(x,math.floor(y-h*0.5-v.Sleeping.TextBounds.Y))
-                print(v.Sleeping.Visible)
             else
                 v.Sleeping.Visible=false
             end
@@ -161,7 +160,7 @@ function Esp:UpdateEsp()
                 v.ViewAngle.Visible = false
             end
         else
-            v.Box.Visible=false;v.BoxOutline.Visible=false;v.Armour.Visible=false;v.Distance.Visible=false;v.ViewAngle.Visible=false;v.Sleeping=false;
+            v.Box.Visible=false;v.BoxOutline.Visible=false;v.Armour.Visible=false;v.Distance.Visible=false;v.ViewAngle.Visible=false;v.Sleeping.Visible=false;
         end
     end
 end
@@ -181,11 +180,9 @@ for i,v in pairs(workspace:GetChildren()) do
 end
 
 game:GetService("Workspace").ChildAdded:Connect(function(child)
-    for i,v in pairs(workspace:GetChildren()) do
-        if v:FindFirstChild("HumanoidRootPart") and not table.find(cache,v) then
-            table.insert(cache,v)
-            Esp:CreateEsp({model=v})
-        end
+    if child:FindFirstChild("HumanoidRootPart") and not table.find(cache,child) then
+        table.insert(cache,child)
+        Esp:CreateEsp({model=child})
     end
 end)
 
@@ -287,15 +284,15 @@ Toggles.EnabledHB:OnChanged(function(EnabledHBB)
     end
 end)
 
-HeadHitboxTab:AddSlider('HitboxXSize_Slider', {Text = 'X-Size', Default = 2, Min = 0, Max = 3, Rounding = 2, Suffix = "%", Compact = false}):OnChanged(function(HitboxXSize)
+HeadHitboxTab:AddSlider('HitboxXSize_Slider', {Text = 'X-Size', Default = 2, Min = 0, Max = 4, Rounding = 2, Suffix = "%", Compact = false}):OnChanged(function(HitboxXSize)
     HitBX = HitboxXSize
 end)
 
-HeadHitboxTab:AddSlider('HitboxYSize_Slider', {Text = 'Y-Size', Default = 2, Min = 0, Max = 3, Rounding = 2, Suffix = "%", Compact = false}):OnChanged(function(HitboxYSize)
+HeadHitboxTab:AddSlider('HitboxYSize_Slider', {Text = 'Y-Size', Default = 2, Min = 0, Max = 4, Rounding = 2, Suffix = "%", Compact = false}):OnChanged(function(HitboxYSize)
     HitBY = HitboxYSize
 end)
 
-HeadHitboxTab:AddSlider('HitboxZSize_Slider', {Text = 'Z-Size', Default = 2, Min = 0, Max = 3, Rounding = 2, Suffix = "%", Compact = false}):OnChanged(function(HitboxZSize)
+HeadHitboxTab:AddSlider('HitboxZSize_Slider', {Text = 'Z-Size', Default = 2, Min = 0, Max = 4, Rounding = 2, Suffix = "%", Compact = false}):OnChanged(function(HitboxZSize)
     HitBZ = HitboxZSize
 end)
 
