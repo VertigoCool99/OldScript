@@ -1,3 +1,8 @@
+--Modified
+--Dropdown Has Refresh
+--Label Has Update
+--Cleaned Code(reduced lines)
+
 local Flux = {RainbowColorValue = 0, HueSelectionPosition = 0}
 local PresetColor = Color3.fromRGB(66, 134, 255)
 local UserInputService = game:GetService("UserInputService")
