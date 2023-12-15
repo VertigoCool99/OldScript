@@ -2,6 +2,7 @@
 --Dropdown Has Refresh
 --Label Has Update
 --Cleaned Code(reduced lines)
+--KeyBind Now Is Connected To getgenv().FluxLib.UiBind
 
 local Flux = {RainbowColorValue = 0, HueSelectionPosition = 0}
 local PresetColor = Color3.fromRGB(66, 134, 255)
@@ -91,9 +92,10 @@ local function MakeDraggable(topbarobject, object)
 end
 
 
-
+getgenv().FluxLib = {UiBind = Enum.KeyCode.RightControl}
 function Flux:Window(text, bottom,mainclr,toclose)
-	CloseBind = toclose or Enum.KeyCode.RightControl
+	getgenv().FluxLib.UiBind = toclose
+	CloseBind = getgenv().FluxLib.UiBind or Enum.KeyCode.RightControl
 	PresetColor = mainclr or Color3.fromRGB(66, 134, 255)
 	local fs = false
 	local MainFrame = Instance.new("Frame")
@@ -196,7 +198,7 @@ function Flux:Window(text, bottom,mainclr,toclose)
 	local uitoggled = false
 	UserInputService.InputBegan:Connect(
 		function(io, p)
-			if io.KeyCode == CloseBind then
+			if io.KeyCode == getgenv().FluxLib.UiBind then
 				if uitoggled == false then
 					MainFrame:TweenSize(UDim2.new(0, 0, 0, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, .6, true)
 					uitoggled = true
