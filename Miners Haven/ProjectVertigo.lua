@@ -27,6 +27,8 @@ local humanoidRootPart = player.Character and player.Character:FindFirstChild("H
 local collectedBoxes = {}
 local oldTick = tick()
 
+local Settings = {AutoLoopUpgrader=false,LayoutCopierSelected="1",LayoutPlayerSelected="",ItemTracker=false,WebhookLink="",LoopPulse=false,AutoPulse=false,LoopRemoteDrop=false,AutoLoadSetup=false,LoadAfter=5,ShouldReload=false,LayoutSelected=1,AutoRebirth=false,LoopUpgrader=false,SelectedUpgrader="nil",SelectedFurnace="nil"}
+
 --Functions
 function GetUpgraders()
     tbl = {}
@@ -84,16 +86,43 @@ function IsShopItem(Needed)
     end
     return false
 end
+function GetMissingItems()
+    local MissingTbl = {}
+    for i,v in pairs(game:GetService("HttpService"):JSONDecode(game:GetService("Players")[Settings.LayoutPlayerSelected].Layouts["Layout"..Settings.LayoutCopierSelected].Value)) do
+        local ItemName = FetchItemModule.Get(nil,v["ItemId"]).Name
+        if HasItem(v["ItemId"]) == false and IsShopItem(v["ItemId"]) == true then
+            table.insert(MissingTbl,ItemName.." [Shop]")
+        elseif HasItem(v["ItemId"]) == false and IsShopItem(v["ItemId"]) == false then
+            table.insert(MissingTbl,ItemName)
+        end
+    end
+    local MissingString
+    if #MissingTbl > 0 then
+        MissingString = table.concat(MissingTbl, "\n")
+    else
+        MissingString = "No Missing Items!"
+    end
+    return MissingString
+end
 
-local Settings = {AutoLoopUpgrader=false,LayoutCopierSelected="1",LayoutPlayerSelected="",ItemTracker=false,WebhookLink="",LoopPulse=false,AutoPulse=false,LoopRemoteDrop=false,AutoLoadSetup=false,LoadAfter=5,ShouldReload=false,LayoutSelected=1,AutoRebirth=false,LoopUpgrader=false,SelectedUpgrader="nil",SelectedFurnace="nil"}
 local Tabs = {Main = Window:AddTab('Main'),Layouts=Window:AddTab('Layouts'),['UI Settings'] = Window:AddTab('UI Settings'),}
 
 local LayoutsTabbox = Tabs.Layouts:AddLeftTabbox()
-local LayoutsTab = LayoutsTabbox:AddTab('Ores')
+local LayoutsTab = LayoutsTabbox:AddTab('Copier')
+local LayoutsTabbox2 = Tabs.Layouts:AddRightTabbox()
+local LayoutsTabInfo = LayoutsTabbox2:AddTab('Missing Items')
+
+local Label = LayoutsTabInfo:AddLabel('No Layout Selected',true)
+LayoutsTabInfo:AddButton("Get Missing Items!",function()
+    Label:SetText("Getting Items, Please Wait!")
+    if Settings.LayoutPlayerSelected == nil and Settings.LayoutCopierSelected == nil then return end
+    Label:SetText(GetMissingItems())
+end)
 
 LayoutsTab:AddDropdown('LayoutPlayerSelected',{Values = PlayersList,Default = 2,Multi = false,Text = 'Player',})
 LayoutsTab:AddDropdown('LayoutCopierSelected', {Values = {1,2,3},Default = 1,Multi = false,Text = 'Layout',})
 LayoutsTab:AddButton('Build Layout', function()
+    if Settings.LayoutPlayerSelected == nil and Settings.LayoutCopierSelected == nil then return end
     for i,v in pairs(game:GetService("HttpService"):JSONDecode(game:GetService("Players")[Settings.LayoutPlayerSelected].Layouts["Layout"..Settings.LayoutCopierSelected].Value)) do
         task.spawn(function()
             if HasItem(v["ItemId"]) == true then
