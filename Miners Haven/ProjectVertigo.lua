@@ -243,27 +243,30 @@ Toggles.AutoSellOre:OnChanged(function()
 end)
 Toggles.ToggleAutoBoxes:OnChanged(function()
     task.spawn(function()
-        while Toggles.ToggleAutoBoxes.Value do task.wait()
+        while Toggles.ToggleAutoBoxes.Value do task.wait(.2)
             if humanoidRootPart then
                 for i, v in pairs(game:GetService("Workspace").Boxes:GetChildren()) do
                     local boxNames = {"Shadow", "Research", "Goldpot", "Golden", "Crystal", "Diamond", "Present","Lucky"}
                     if table.find(boxNames,v.Name) and not collectedBoxes[v] and v:FindFirstChild("TouchInterest") then
                         humanoidRootPart.Velocity = Vector3.zero
                         humanoidRootPart:PivotTo(v:GetPivot()*CFrame.new(0,-1,0))
-                        --firetouchinterest(humanoidRootPart,v.TouchInterest,0) causes a crash nice one awp
-                        task.wait(0.1)
-                        --firetouchinterest(humanoidRootPart,v.TouchInterest,1)
+                        firetouchinterest(humanoidRootPart,v,0)
+                        if v:FindFirstChild("TouchInterest") then
+                            firetouchinterest(humanoidRootPart,v,1)
+                        end
                         if v.Transparency ~= 0.2 then
                             collectedBoxes[v] = nil
                         else
                             collectedBoxes[v] = true
                         end
+                        task.wait(.2)
+                        humanoidRootPart.Velocity = Vector3.zero
+                        humanoidRootPart:PivotTo(v:GetPivot()*CFrame.new(0,-30,0))
                     end
                 end
                 humanoidRootPart.Velocity = Vector3.zero
                 humanoidRootPart:PivotTo(TycoonBase:GetPivot()+Vector3.new(0,TycoonBase.Size.Y+2.5,0))
-            end
-            task.wait(.3)
+            end 
         end
     end)
 end)
@@ -314,10 +317,10 @@ Toggles.AutoLoopUpgraders:OnChanged(function()
                                 firetouchinterest(v2,v.Model.Cannon,0)
                                 task.wait()
                                 firetouchinterest(v2,v.Model.Cannon,1)
-                            elseif MyTycoon:FindFirstChild(Settings.SelectedUpgrader) and MyTycoon[Settings.SelectedUpgrader].Model:FindFirstChild("Copy") then
-                                firetouchinterest(v,MyTycoon[Settings.SelectedUpgrader].Model.Copy,0)
+                            elseif v:FindFirstChild("Model") and v.Model:FindFirstChild("Copy") then
+                                firetouchinterest(v2,v.Copy,0)
                                 task.wait()
-                                firetouchinterest(v,MyTycoon[Settings.SelectedUpgrader].Model.Copy,1)
+                                firetouchinterest(v2,v,1)
                             end
                         end
                     end)
@@ -401,26 +404,35 @@ Toggles.ShouldReload:OnChanged(function()
     Settings.ShouldReload = Toggles.ShouldReload.Value
 end)
 
-game:GetService("Players").LocalPlayer.PlayerGui.GUI.Notifications.ChildAdded:Connect(function(v)
-    if v.Name == "ItemTemplate" or "ItemTemplateMini" and v:FindFirstChild("Title") and v:FindFirstChild("Tier") and v:FindFirstChild("Icon") and Settings.ItemTracker == true then
-        local ImageId = v.Icon.Image
-        if v.Tier.Text == "Slipstream" then return end
+
+game.ReplicatedStorage.ItemObtained.OnClientEvent:Connect(function(Item,Amt)
+    if Item and Amt and Settings.ItemTracker == true then
+        
+        local Tier = game.ReplicatedStorage.Tiers:FindFirstChild(tostring(Item.Tier.Value))
+        local ImageId = Item.ThumbnailId.Value
+        if Tier.TierName.Value == "Slipstream" then return end
         if string.find(ImageId,"rbxasset") then
-           ImageId = string.split(tostring(v.Icon.Image),"//")[2] 
+           ImageId = string.split(tostring(Item.ThumbnailId.Value),"//")[2] 
         end
         local ImageData = game:GetService("HttpService"):JSONDecode(request({Url="https://thumbnails.roblox.com/v1/assets?assetIds="..tonumber(ImageId).."&returnPolicy=PlaceHolder&size=512x512&format=Png&isCircular=false"}).Body)
         local ImageLink = ImageData.data[1]["imageUrl"]
+        local TierColor = Color3.new((Tier.TierColor.Value.r*0.7) + 0.2, (Tier.TierColor.Value.g*0.7) + 0.2, (Tier.TierColor.Value.b*0.7) + 0.2)
         local Data = {["embeds"]= {{
             ["title"] = "**New Item**",
             ["fields"] = {
                 {
                     ["name"] = ":page_facing_up: **Item**",
-                    ["value"] =  tostring("```\n"..v.Title.Text.."```"),
+                    ["value"] =  tostring("```\n"..Item.Name.."```"),
                     ["inline"] = true
                 },
                 {
                     ["name"] = (":arrow_up: **Tier**"),
-                    ["value"] =  tostring("```\n"..v.Tier.Text.."```"),
+                    ["value"] =  tostring("```\n"..Tier.TierName.Value.."```"),
+                    ["inline"] = true
+                },
+                {
+                    ["name"] = (":chart_with_upwards_trend:  **Total Quantity**"),
+                    ["value"] =  tostring("```\n"..require(game:GetService("Players").LocalPlayer.PlayerGui.GUI.Inventory.Inventory).localInventory[Item.ItemId.Value].Quantity.."```"),
                     ["inline"] = true
                 },
                 {
@@ -429,12 +441,13 @@ game:GetService("Players").LocalPlayer.PlayerGui.GUI.Notifications.ChildAdded:Co
                     ["inline"] = false
                 },
                 {
-                    ["name"] = (":link: **Item Info**"),
-                    ["value"] =  tostring("https://minershaven.fandom.com/wiki/"..v.Title.Text:gsub(" ", "_")),
+                    ["name"] = (":link: **Item Info | Wiki**"),
+                    ["value"] =  tostring("https://minershaven.fandom.com/wiki/"..Item.Name:gsub(" ", "_")),
                     ["inline"] = false
                 },
             },
-        ["color"] = tonumber("0x"..tostring(string.split((string.format("#%02X%02X%02X", v.BackgroundColor3.R * 0xFF,v.BackgroundColor3.G * 0xFF, v.BackgroundColor3.B * 0xFF)),"#")[2])),
+
+        ["color"] = tonumber("0x"..tostring(string.split((string.format("#%02X%02X%02X", TierColor.R * 0xFF,TierColor.G * 0xFF, TierColor.B * 0xFF)),"#")[2])),
         ["footer"] = {["text"] = "Project Vertigo | "..os.date()},
         ["thumbnail"] = {["url"]=tostring(ImageLink)}
         }}
