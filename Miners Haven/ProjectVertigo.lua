@@ -25,7 +25,8 @@ local PlayersList = {}
 local player = game.Players.LocalPlayer
 local humanoidRootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 local collectedBoxes = {}
-local oldTick = tick()
+local oldRebirths = game:GetService("Players").LocalPlayer.Rebirths.Value
+
 
 local Settings = {AutoLoopUpgrader=false,LayoutCopierSelected="1",LayoutPlayerSelected="",ItemTracker=false,WebhookLink="",LoopPulse=false,AutoPulse=false,LoopRemoteDrop=false,AutoLoadSetup=false,LoadAfter=5,ShouldReload=false,LayoutSelected=1,AutoRebirth=false,LoopUpgrader=false,SelectedUpgrader="nil",SelectedFurnace="nil"}
 
@@ -160,8 +161,12 @@ local MiscTabbox = Tabs.Main:AddLeftTabbox()
 local MiscTab = MiscTabbox:AddTab('Misc')
 local WebhookTabbox = Tabs.Main:AddRightTabbox()
 local WebhookTab = WebhookTabbox:AddTab('Webhook')
-local EventTabbox = Tabs.Main:AddLeftTabbox()
+local EventTabbox = Tabs.Main:AddRightTabbox()
 local EventTab = EventTabbox:AddTab('Event')
+local FpsTabbox = Tabs.Main:AddRightTabbox()
+local FpsTab = FpsTabbox:AddTab('FPS')
+
+FpsTab:AddToggle('RenderingToggle', {Text = 'Rendering',Default = true})
 
 EventTab:AddButton('Do Santa', function()
     task.spawn(function()
@@ -226,6 +231,9 @@ WebhookTab:AddInput('WebhookLink', {Default = 'Link',Numeric = false,Finished = 
 WebhookTab:AddToggle('ItemTracker', {Text = 'Item Tracker',Default = false})
 
 --Toggles
+Toggles.RenderingToggle:OnChanged(function()
+    game:GetService("RunService"):Set3dRenderingEnabled(Toggles.RenderingToggle.Value)
+end)
 Toggles.AutoSellOre:OnChanged(function()
     task.spawn(function()
         while Toggles.AutoSellOre.Value do task.wait()
@@ -377,7 +385,14 @@ Toggles.AutoRebirth:OnChanged(function()
     Settings.AutoRebirth = Toggles.AutoRebirth.Value
     task.spawn(function()
         while Settings.AutoRebirth do task.wait()
-            if game:GetService("Players").LocalPlayer.PlayerGui.GUI.Money.Value >= MoneyLibary.RebornPrice(game:GetService("Players").LocalPlayer) and (game:GetService("Players").LocalPlayer.PlayerTycoon.Value:GetPivot().p - game.Players.LocalPlayer.Character:GetPivot().p).Magnitude <= 150 and Settings.AutoRebirth  == true then
+            if game:GetService("Players").LocalPlayer.PlayerGui.GUI.Money.Value >= MoneyLibary.RebornPrice(game:GetService("Players").LocalPlayer) and Settings.AutoRebirth  == true then
+                if Toggles.ToggleAutoBoxes.Value == true and (game:GetService("Players").LocalPlayer.PlayerTycoon.Value:GetPivot().p - humanoidRootPart:GetPivot().p).Magnitude <= 150 then
+                    repeat task.wait()
+                        humanoidRootPart:PivotTo(game:GetService("Players").LocalPlayer.PlayerTycoon.Value:GetPivot())
+                    until (game:GetService("Players").LocalPlayer.PlayerTycoon.Value:GetPivot().p - humanoidRootPart:GetPivot().p).Magnitude <= 150
+                elseif (game:GetService("Players").LocalPlayer.PlayerTycoon.Value:GetPivot().p - humanoidRootPart:GetPivot().p).Magnitude <= 150 then
+                    humanoidRootPart:PivotTo(game:GetService("Players").LocalPlayer.PlayerTycoon.Value:GetPivot())
+                end
                 if Settings.DelayRebirth == true then
                     task.delay(2,function()
                         game:GetService("ReplicatedStorage").Rebirth:InvokeServer(26)
@@ -385,7 +400,6 @@ Toggles.AutoRebirth:OnChanged(function()
                 else
                     game:GetService("ReplicatedStorage").Rebirth:InvokeServer(26)
                 end
-                oldTick = tick()
                 if Settings.AutoLoadSetup == true then
                     game:GetService("ReplicatedStorage").Layouts:InvokeServer("Load","Layout"..Settings.LayoutSelected)
                     if Settings.ShouldReload == true then
@@ -437,7 +451,7 @@ game.ReplicatedStorage.ItemObtained.OnClientEvent:Connect(function(Item,Amt)
                 },
                 {
                     ["name"] = (":recycle: **Rebirth Data**"),
-                    ["value"] =  tostring("```\nRebirth: "..tostring(game:GetService("Players").LocalPlayer.Rebirths.Value).."```"),
+                    ["value"] =  tostring("```\nRebirth: "..tostring(game:GetService("Players").LocalPlayer.Rebirths.Value).." | Rebirths With PV: "..tostring(game:GetService("Players").LocalPlayer.Rebirths.Value-oldRebirths).."```"),
                     ["inline"] = false
                 },
                 {
@@ -491,6 +505,7 @@ MenuGroup:AddButton('Unload', function()
     for i,v in pairs(Toggles) do
         v:SetValue(false)
     end
+    game:GetService("RunService"):Set3dRenderingEnabled(true)
 end)
 MenuGroup:AddLabel('Menu bind'):AddKeyPicker('MenuKeybind', { Default = 'End', NoUI = true, Text = 'Menu keybind' }) 
 Library.ToggleKeybind = Options.MenuKeybind -- Allows you to have a custom keybind for the menu
