@@ -390,8 +390,6 @@ Toggles.AutoRebirth:OnChanged(function()
                     repeat task.wait()
                         humanoidRootPart:PivotTo(game:GetService("Players").LocalPlayer.PlayerTycoon.Value:GetPivot())
                     until (game:GetService("Players").LocalPlayer.PlayerTycoon.Value:GetPivot().p - humanoidRootPart:GetPivot().p).Magnitude <= 150
-                elseif (game:GetService("Players").LocalPlayer.PlayerTycoon.Value:GetPivot().p - humanoidRootPart:GetPivot().p).Magnitude <= 150 then
-                    humanoidRootPart:PivotTo(game:GetService("Players").LocalPlayer.PlayerTycoon.Value:GetPivot())
                 end
                 if Settings.DelayRebirth == true then
                     task.delay(2,function()
