@@ -153,7 +153,7 @@ local function castAll()
             if spell.cooldown.Value then
                 for _,randombullshit in pairs(spell:GetChildren()) do
                     if randombullshit.Name == "abilityEvent" or randombullshit.Name == "spellEvent" then
-                        for i = 0,3 do
+                        for i = 0,4 do
                             humanoid.WalkSpeed = 35
                             randombullshit:FireServer() 
                         end
