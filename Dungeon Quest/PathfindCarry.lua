@@ -4,8 +4,8 @@ local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 
 local path = PathfindingService:CreatePath({
-    AgentRadius = 0,
-    WaypointSpacing=6,
+    AgentRadius = 2,
+    WaypointSpacing=16,
 	AgentHeight = 6,
 	AgentCanJump = false,
 	Costs = {
@@ -77,26 +77,30 @@ local function followPath(destination)
 		nextWaypointIndex = 2
 		humanoid:MoveTo(waypoints[nextWaypointIndex].Position)
 	else
-        if workspace.dungeonName.Value == "Northen Lands" then
+        if workspace.dungeonName.Value == "Northern Lands" then
             if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-646,21,362)).Magnitude < 50 then
                 humanoid:MoveTo(Vector3.new(-588,21,458))
             elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(223, 21, 223)).Magnitude < 50 then
                 humanoid:MoveTo(Vector3.new(479, -58, 226))
-            elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-573, 25, 468)).Magnitude < 50 then
-                humanoid:MoveTo(Vector3.new(-420, 27, 425))
+            elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-589, 21, 478)).Magnitude < 50 then
+                humanoid:MoveTo(Vector3.new(-402, 27, 421))
+            elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(234, 21, 226)).Magnitude < 50 then
+                humanoid:MoveTo(Vector3.new(412, -58, 185))
+            elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(407, -53, 21)).Magnitude < 50 then
+                humanoid:MoveTo(Vector3.new(473, -25, 1))
             end
         end
-		warn("Path not computed!", errorMessage)
+		warn("Path not computed!", errorMessage) 
 	end
 end
 local function moveToClosestEnemy()
     while true do task.wait()
         local closestEnemy = GetClosestEnemy(player)
-        
+
         if closestEnemy then
             followPath(closestEnemy:GetPivot().p)
         else
-            wait(2) 
+            task.wait(.5) 
         end
     end
 end
@@ -111,7 +115,9 @@ local function castAll()
             if spell.cooldown.Value then
                 for _,randombullshit in pairs(spell:GetChildren()) do
                     if randombullshit.Name == "abilityEvent" or randombullshit.Name == "spellEvent" then
-                        randombullshit:FireServer()
+                        for i = 0,3 do
+                            randombullshit:FireServer() 
+                        end
                     end
                 end
                 task.wait()
@@ -125,10 +131,7 @@ end
 task.spawn(function()
     while true do task.wait(1)
         local ohTable1 = {
-            [1] = {
-                [utf8.char(3)] = "vote",
-                ["vote"] = true
-            },
+            [1] = {[utf8.char(3)] = "vote",["vote"] = true},
             [2] = utf8.char(28)
         }
 
