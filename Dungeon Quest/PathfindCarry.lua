@@ -1,4 +1,5 @@
 getgenv().AutoRetry = true
+getgenv().SkillWait = 0
 
 local PathfindingService = game:GetService("PathfindingService")
 local Players = game:GetService("Players")
@@ -158,7 +159,7 @@ local function castAll()
                         end
                     end
                 end
-                task.wait(.15)
+                task.wait(getgenv().SkillWait)
             end
         end
 
