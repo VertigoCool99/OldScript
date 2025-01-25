@@ -51,12 +51,22 @@ function GetClosestEnemy(player)
     return closestEnemy
 end
 
-if workspace.dungeonName.Value == "Aquatic Temple" then
-    for i,v in pairs(workspace.Map:GetDescendants()) do
-        if v.Name == "Aqua tile" or v.Name == "Side tile" then
-            v:Destroy()
+--Destroy Map
+function DestroyMap()
+    if workspace.dungeonName.Value == "Aquatic Temple" then
+        for i,v in pairs(workspace.Map:GetDescendants()) do
+            if v.Name == "Aqua tile" or v.Name == "Side tile" then
+                v:Destroy()
+            end
         end
-    end
+    elseif workspace.dungeonName.Value == "Gilded Skies" then
+        local Ids = {"rbxassetid://9331223307","rbxassetid://9331222982","rbxassetid://9310249638","rbxassetid://9329425049","rbxassetid://9331222661","rbxassetid://9402307859","rbxassetid://6815156999",}
+        for i,v in pairs(workspace.Map:GetDescendants()) do
+            if v:IsA("MeshPart") and table.find(Ids,v.MeshId) then
+                v:Destroy()
+            end
+        end
+    end 
 end
 
 local function followPath(destination)
@@ -115,6 +125,10 @@ local function followPath(destination)
                 humanoid:MoveTo(Vector3.new(1187, 144, -688))
                 humanoid.MoveToFinished:Wait()
                 humanoid:MoveTo(Vector3.new(1174, 150, -734))
+            elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(757, 86, 275)).Magnitude < 70 then
+                humanoid:MoveTo(Vector3.new(661, 86, 106))
+            elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-125, 42, -3)).Magnitude < 200 then
+                humanoid:MoveTo(Vector3.new(71, 31, -4))
             end
         elseif workspace.dungeonName.Value == "Aquatic Temple" then
             if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-1754, 36, 2325)).Magnitude < 70 then
@@ -183,6 +197,7 @@ end
 
 task.spawn(function()
     while true do task.wait(1)
+        DestroyMap()
         local ohTable1 = {
             [1] = {[utf8.char(3)] = "vote",["vote"] = true},
             [2] = utf8.char(28)
