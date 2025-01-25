@@ -51,6 +51,18 @@ function GetClosestEnemy(player)
     return closestEnemy
 end
 
+if workspace.dungeonName.Value == "Aquatic Temple" then
+    for i,v in pairs(workspace.Map:GetChildren()) do
+        if v:FindFirstChild("Aqua tile") then
+            v["Aqua tile"]:Destroy()
+        end
+        if v.Name == "Aqua tile" then
+            v:Destroy()
+        end
+    end
+end
+
+
 local function followPath(destination)
 	local success, errorMessage = pcall(function()
 		path:ComputeAsync(character.PrimaryPart.Position, destination)
@@ -108,6 +120,10 @@ local function followPath(destination)
                 humanoid.MoveToFinished:Wait()
                 humanoid:MoveTo(Vector3.new(1174, 150, -734))
             end
+        elseif workspace.dungeonName.Value == "Aquatic Temple" then
+            if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-1754, 36, 2325)).Magnitude < 70 then
+                humanoid:MoveTo(Vector3.new(-1845, 35, 2307))
+            end
         elseif workspace.dungeonName.Value == "Orbital Outpost" then
             if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-35, 9, 158)).Magnitude < 200 then
                 humanoid:MoveTo(Vector3.new(61, 9, 152))
@@ -153,7 +169,7 @@ local function castAll()
             if spell.cooldown.Value then
                 for _,randombullshit in pairs(spell:GetChildren()) do
                     if randombullshit.Name == "abilityEvent" or randombullshit.Name == "spellEvent" then
-                        for i = 0,4 do
+                        for i = 0,3 do
                             humanoid.WalkSpeed = 35
                             randombullshit:FireServer() 
                         end
