@@ -1,57 +1,37 @@
 getgenv().AutoRetry = true
 getgenv().SkillWait = 0
 
-local PathfindingService = game:GetService("PathfindingService")
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local Workspace = game:GetService("Workspace")
+--Locals
+local Workspace,PathfindingService,Players = game:GetService("Workspace"),game:GetService("PathfindingService"),game:GetService("Players")
+local Path = PathfindingService:CreatePath({AgentRadius = 3,WaypointSpacing=15,AgentHeight = 6,AgentCanJump = false,Costs = {}})
 
-local path = PathfindingService:CreatePath({
-    AgentRadius = 3,
-    WaypointSpacing=15,
-	AgentHeight = 6,
-	AgentCanJump = false,
-	Costs = {
-	}
-})
+local waypoints,nextWaypointIndex,reachedConnection,blockedConnection = nil,nil,nil,nil
 
-local player = Players.LocalPlayer
-local character = player.Character
-local humanoid = character:WaitForChild("Humanoid")
-
-local waypoints
-local nextWaypointIndex
-local reachedConnection
-local blockedConnection
-
+--Functions
 function GetEnemys()
     for i, v in pairs(game:GetService("Workspace").dungeon:GetChildren()) do
         if v:FindFirstChild("enemyFolder") and v.enemyFolder:FindFirstChildOfClass("Model") then
             return v.enemyFolder:GetChildren()
         end
     end
+    return nil
 end
-
-function GetClosestEnemy(player)
+function GetClosestEnemy()
+    if GetEnemys() == nil then return end
     local closestEnemy = nil
     local shortestDistance = math.huge
-    local enemies = GetEnemys()
-    if enemies then
-        for _, enemy in pairs(enemies) do
-            local enemyPosition = enemy:FindFirstChild("HumanoidRootPart") and enemy.HumanoidRootPart.Position
-            if enemyPosition then
-                local distance = (player.Character.HumanoidRootPart.Position - enemyPosition).Magnitude
-                if distance < shortestDistance then
-                    shortestDistance = distance
-                    closestEnemy = enemy
-                end
+    for _, v in pairs(GetEnemys()) do
+        local enemyPosition = v:FindFirstChild("HumanoidRootPart") and v.HumanoidRootPart.Position
+        if enemyPosition then
+            local distance = (Players.LocalPlayer.Character.HumanoidRootPart.Position - enemyPosition).Magnitude
+            if distance < shortestDistance then
+                shortestDistance = distance
+                closestEnemy = v
             end
         end
     end
     return closestEnemy
 end
-
---Destroy Map
 function DestroyMap()
     if workspace.dungeonName.Value == "Aquatic Temple" then
         for i,v in pairs(workspace.Map:GetDescendants()) do
@@ -60,24 +40,36 @@ function DestroyMap()
             end
         end
     elseif workspace.dungeonName.Value == "Gilded Skies" then
-        local Ids = {"rbxassetid://9331223307","rbxassetid://9331222982","rbxassetid://9310249638","rbxassetid://9329425049","rbxassetid://9331222661","rbxassetid://9402307859","rbxassetid://6815156999",}
+        local Ids = {"rbxassetid://9331223307","rbxassetid://9331222982","rbxassetid://9310249638","rbxassetid://9329425049","rbxassetid://9331222661","rbxassetid://9402307859","rbxassetid://6815156999"}
         for i,v in pairs(workspace.Map:GetDescendants()) do
             if v:IsA("MeshPart") and table.find(Ids,v.MeshId) then
                 v:Destroy()
             end
         end
+    elseif workspace.dungeonName.Value == "Enchanted Forest" then
+        local Ids = {"rbxassetid://3733654217","rbxassetid://3733654077","rbxassetid://3751372367","rbxassetid://3751372241","rbxassetid://4704210195","rbxassetid://3733375373","rbxassetid://3733447987","rbxassetid://3733447856","rbxassetid://6416751229","rbxassetid://6416751071"}
+        for i,v in pairs(workspace.map:GetDescendants()) do
+            if v:IsA("MeshPart") and table.find(Ids,v.MeshId) then
+                v:Destroy()
+            elseif v.Name == "brick" then
+                v:Destroy()
+            end
+        end
+        for i,v in pairs(workspace.borders:GetChildren()) do
+            v:Destroy()
+        end
     end 
 end
 
-local function followPath(destination)
+function followPath(destination)
 	local success, errorMessage = pcall(function()
-		path:ComputeAsync(character.PrimaryPart.Position, destination)
+		Path:ComputeAsync(Players.LocalPlayer.Character:GetPivot().p, destination)
 	end)
 
-	if success and path.Status == Enum.PathStatus.Success then
-		waypoints = path:GetWaypoints()
+	if success and Path.Status == Enum.PathStatus.Success then
+		waypoints = Path:GetWaypoints()
 
-		blockedConnection = path.Blocked:Connect(function(blockedWaypointIndex)
+		blockedConnection = Path.Blocked:Connect(function(blockedWaypointIndex)
 			if blockedWaypointIndex >= nextWaypointIndex then
 				blockedConnection:Disconnect()
 				followPath(destination)
@@ -85,10 +77,10 @@ local function followPath(destination)
 		end)
 
 		if not reachedConnection then
-			reachedConnection = humanoid.MoveToFinished:Connect(function(reached)
+			reachedConnection = Players.LocalPlayer.Character.Humanoid.MoveToFinished:Connect(function(reached)
 				if reached and nextWaypointIndex < #waypoints then
 					nextWaypointIndex += 1
-					humanoid:MoveTo(waypoints[nextWaypointIndex].Position)
+					Players.LocalPlayer.Character.Humanoid:MoveTo(waypoints[nextWaypointIndex].Position)
 				else
 					reachedConnection:Disconnect()
 					blockedConnection:Disconnect()
@@ -96,78 +88,86 @@ local function followPath(destination)
 			end)
 		end
 		nextWaypointIndex = 2
-		humanoid:MoveTo(waypoints[nextWaypointIndex].Position)
+        Players.LocalPlayer.Character.Humanoid:MoveTo(waypoints[nextWaypointIndex].Position)
 	else
+        --Stuck Positions
         if workspace.dungeonName.Value == "Northern Lands" then
             if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-637, 21, 373)).Magnitude < 70 then
-                humanoid:MoveTo(Vector3.new(-567, 21, 451))
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(-567, 21, 451))
             elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(235, 21, 233)).Magnitude < 70 then
-                humanoid:MoveTo(Vector3.new(389, 14, 169))
-                humanoid.MoveToFinished:Wait()
-                humanoid:MoveTo(Vector3.new(419, -60, 163))
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(389, 14, 169))
+                Players.LocalPlayer.Character.Humanoid.MoveToFinished:Wait()
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(419, -60, 163))
             elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(406, -53, 21)).Magnitude < 70 then
-                humanoid:MoveTo(Vector3.new(485, -23, -17))
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(485, -23, -17))
+            end
+        elseif workspace.dungeonName.Value == "Enchanted Forest" then
+            if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-607, -24, 191)).Magnitude < 70 then
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(-651, -24, 266))
+                Players.LocalPlayer.Character.Humanoid.MoveToFinished:Wait()
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(-747, -24, 241))
+            elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-632, -24, 449)).Magnitude < 70 then
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(-728, -21, 365))
             end
         elseif workspace.dungeonName.Value == "Gilded Skies" then
             if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(1022, 51, -518)).Magnitude < 70 then
-                humanoid:MoveTo(Vector3.new(1013, 60, -560))
-                humanoid.MoveToFinished:Wait()
-                humanoid:MoveTo(Vector3.new(1023, 69, -584))
-                humanoid.MoveToFinished:Wait()
-                humanoid:MoveTo(Vector3.new(1051, 81, -602))
-                humanoid.MoveToFinished:Wait()
-                humanoid:MoveTo(Vector3.new(1126, 108, -608))
-                humanoid.MoveToFinished:Wait()
-                humanoid:MoveTo(Vector3.new(1163, 121, -622))
-                humanoid.MoveToFinished:Wait()
-                humanoid:MoveTo(Vector3.new(1181, 131, -648))
-                humanoid.MoveToFinished:Wait()
-                humanoid:MoveTo(Vector3.new(1187, 144, -688))
-                humanoid.MoveToFinished:Wait()
-                humanoid:MoveTo(Vector3.new(1174, 150, -734))
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(1013, 60, -560))
+                Players.LocalPlayer.Character.Humanoid.MoveToFinished:Wait()
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(1023, 69, -584))
+                Players.LocalPlayer.Character.Humanoid.MoveToFinished:Wait()
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(1051, 81, -602))
+                Players.LocalPlayer.Character.Humanoid.MoveToFinished:Wait()
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(1126, 108, -608))
+                Players.LocalPlayer.Character.Humanoid.MoveToFinished:Wait()
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(1163, 121, -622))
+                Players.LocalPlayer.Character.Humanoid.MoveToFinished:Wait()
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(1181, 131, -648))
+                Players.LocalPlayer.Character.Humanoid.MoveToFinished:Wait()
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(1187, 144, -688))
+                Players.LocalPlayer.Character.Humanoid.MoveToFinished:Wait()
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(1174, 150, -734))
             elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(757, 86, 275)).Magnitude < 70 then
-                humanoid:MoveTo(Vector3.new(661, 86, 106))
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(661, 86, 106))
             elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-125, 42, -3)).Magnitude < 200 then
-                humanoid:MoveTo(Vector3.new(71, 31, -4))
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(71, 31, -4))
             end
         elseif workspace.dungeonName.Value == "Aquatic Temple" then
             if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-1754, 36, 2325)).Magnitude < 70 then
-                humanoid:MoveTo(Vector3.new(-1845, 35, 2307))
-                humanoid.MoveToFinished:Wait()
-                humanoid:MoveTo(Vector3.new(-1855, 51, 2242))
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(-1845, 35, 2307))
+                Players.LocalPlayer.Character.Humanoid.MoveToFinished:Wait()
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(-1855, 51, 2242))
             end
         elseif workspace.dungeonName.Value == "Orbital Outpost" then
             if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-35, 9, 158)).Magnitude < 200 then
-                humanoid:MoveTo(Vector3.new(61, 9, 152))
-                humanoid.MoveToFinished:Wait()
-                humanoid:MoveTo(Vector3.new(60, 10, 119))
-                humanoid.MoveToFinished:Wait()
-                humanoid:MoveTo(Vector3.new(157, 19, 112))
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(61, 9, 152))
+                Players.LocalPlayer.Character.Humanoid.MoveToFinished:Wait()
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(60, 10, 119))
+                Players.LocalPlayer.Character.Humanoid.MoveToFinished:Wait()
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(157, 19, 112))
             elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(341, 17, -473)).Magnitude < 70 then
-                humanoid:MoveTo(Vector3.new(102, 18, -454))
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(102, 18, -454))
             elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(149, 18, -378)).Magnitude < 70 then
-                humanoid:MoveTo(Vector3.new(100, 19, -323))
-                humanoid.MoveToFinished:Wait()
-                humanoid:MoveTo(Vector3.new(16, 5, -323))
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(100, 19, -323))
+                Players.LocalPlayer.Character.Humanoid.MoveToFinished:Wait()
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(16, 5, -323))
             end
         elseif  workspace.dungeonName.Value == "Volcanic Chambers" then
             if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-1576, -20, 700)).Magnitude < 70 then
-                humanoid:MoveTo(Vector3.new(-1609, -15, 634))
-                humanoid.MoveToFinished:Wait()
-                humanoid:MoveTo(Vector3.new(-1713, -6, 611))
-                humanoid.MoveToFinished:Wait()
-                humanoid:MoveTo(Vector3.new(-1741, 1, 624))
-                humanoid.MoveToFinished:Wait()
-                humanoid:MoveTo(Vector3.new(-1747, 15, 685))
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(-1609, -15, 634))
+                Players.LocalPlayer.Character.Humanoid.MoveToFinished:Wait()
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(-1713, -6, 611))
+                Players.LocalPlayer.Character.Humanoid.MoveToFinished:Wait()
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(-1741, 1, 624))
+                Players.LocalPlayer.Character.Humanoid.MoveToFinished:Wait()
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(-1747, 15, 685))
             end
         end
 		warn("Path not computed!", errorMessage) 
 	end
 end
-local function moveToClosestEnemy()
+function moveToClosestEnemy()
     while true do task.wait()
-        local closestEnemy = GetClosestEnemy(player)
-
+        local closestEnemy = GetClosestEnemy()
         if closestEnemy then
             followPath(closestEnemy:GetPivot().p)
         else
@@ -175,15 +175,15 @@ local function moveToClosestEnemy()
         end
     end
 end
-local function castAll()
+function castAll()
     task.spawn(function()
-        for _,spell in pairs(game:GetService("Players").LocalPlayer.Backpack:GetChildren()) do
-            if spell.cooldown.Value then
-                for _,randombullshit in pairs(spell:GetChildren()) do
-                    if randombullshit.Name == "abilityEvent" or randombullshit.Name == "spellEvent" then
+        for _,v in pairs(game:GetService("Players").LocalPlayer.Backpack:GetChildren()) do
+            if v.cooldown.Value then
+                for _,v2 in pairs(v:GetChildren()) do
+                    if v2.Name == "abilityEvent" or v2.Name == "spellEvent" then
                         for i = 0,3 do
-                            humanoid.WalkSpeed = 35
-                            randombullshit:FireServer() 
+                            Players.LocalPlayer.Character.Humanoid.WalkSpeed = 33
+                            v2:FireServer() 
                         end
                     end
                 end
@@ -198,21 +198,10 @@ end
 task.spawn(function()
     while true do task.wait(1)
         DestroyMap()
-        local ohTable1 = {
-            [1] = {[utf8.char(3)] = "vote",["vote"] = true},
-            [2] = utf8.char(28)
-        }
-
-        game:GetService("ReplicatedStorage").dataRemoteEvent:FireServer(ohTable1)
+        game:GetService("ReplicatedStorage").dataRemoteEvent:FireServer({[1] = {[utf8.char(3)] = "vote",["vote"] = true},[2] = utf8.char(28)})
         game:GetService("ReplicatedStorage").remotes.changeStartValue:FireServer()
-        if getgenv().AutoRetry == true then
-            local args = {
-                [1] = {
-                    [1] = {["\3"] = "vote",["vote"] = true},[2] = "/"
-                }
-            }
-            
-            game:GetService("ReplicatedStorage").dataRemoteEvent:FireServer(unpack(args))         
+        if getgenv().AutoRetry == true then 
+            game:GetService("ReplicatedStorage").dataRemoteEvent:FireServer({[1] = {["\3"] = "vote",["vote"] = true},[2] = "/"})         
         end       
     end
 end)
