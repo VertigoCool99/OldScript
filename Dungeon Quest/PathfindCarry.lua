@@ -89,6 +89,20 @@ local function followPath(destination)
             elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(407, -53, 21)).Magnitude < 50 then
                 humanoid:MoveTo(Vector3.new(473, -25, 1))
             end
+        elseif workspace.dungeonName.Value == "Orbital Outpost" then
+            if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-35, 9, 158)).Magnitude < 200 then
+                humanoid:MoveTo(Vector3.new(61, 9, 152))
+                humanoid.MoveToFinished:Wait()
+                humanoid:MoveTo(Vector3.new(60, 10, 119))
+                humanoid.MoveToFinished:Wait()
+                humanoid:MoveTo(Vector3.new(157, 19, 112))
+            elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(341, 17, -473)).Magnitude < 70 then
+                humanoid:MoveTo(Vector3.new(102, 18, -454))
+            elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(149, 18, -378)).Magnitude < 70 then
+                humanoid:MoveTo(Vector3.new(100, 19, -323))
+                humanoid.MoveToFinished:Wait()
+                humanoid:MoveTo(Vector3.new(16, 5, -323))
+            end
         end
 		warn("Path not computed!", errorMessage) 
 	end
