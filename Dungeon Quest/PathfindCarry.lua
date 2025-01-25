@@ -1,3 +1,5 @@
+getgenv().AutoRetry = true
+
 local PathfindingService = game:GetService("PathfindingService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -5,7 +7,7 @@ local Workspace = game:GetService("Workspace")
 
 local path = PathfindingService:CreatePath({
     AgentRadius = 3,
-    WaypointSpacing=16,
+    WaypointSpacing=15,
 	AgentHeight = 6,
 	AgentCanJump = false,
 	Costs = {
@@ -78,16 +80,32 @@ local function followPath(destination)
 		humanoid:MoveTo(waypoints[nextWaypointIndex].Position)
 	else
         if workspace.dungeonName.Value == "Northern Lands" then
-            if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-646,21,362)).Magnitude < 50 then
-                humanoid:MoveTo(Vector3.new(-588,21,458))
-            elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(223, 21, 223)).Magnitude < 50 then
-                humanoid:MoveTo(Vector3.new(479, -58, 226))
-            elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-589, 21, 478)).Magnitude < 50 then
-                humanoid:MoveTo(Vector3.new(-402, 27, 421))
-            elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(234, 21, 226)).Magnitude < 50 then
-                humanoid:MoveTo(Vector3.new(412, -58, 185))
-            elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(407, -53, 21)).Magnitude < 50 then
-                humanoid:MoveTo(Vector3.new(473, -25, 1))
+            if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-637, 21, 373)).Magnitude < 70 then
+                humanoid:MoveTo(Vector3.new(-567, 21, 451))
+            elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(235, 21, 233)).Magnitude < 70 then
+                humanoid:MoveTo(Vector3.new(389, 14, 169))
+                humanoid.MoveToFinished:Wait()
+                humanoid:MoveTo(Vector3.new(419, -60, 163))
+            elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(406, -53, 21)).Magnitude < 70 then
+                humanoid:MoveTo(Vector3.new(485, -23, -17))
+            end
+        elseif workspace.dungeonName.Value == "Gilded Skies" then
+            if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(1022, 51, -518)).Magnitude < 70 then
+                humanoid:MoveTo(Vector3.new(1013, 60, -560))
+                humanoid.MoveToFinished:Wait()
+                humanoid:MoveTo(Vector3.new(1023, 69, -584))
+                humanoid.MoveToFinished:Wait()
+                humanoid:MoveTo(Vector3.new(1051, 81, -602))
+                humanoid.MoveToFinished:Wait()
+                humanoid:MoveTo(Vector3.new(1126, 108, -608))
+                humanoid.MoveToFinished:Wait()
+                humanoid:MoveTo(Vector3.new(1163, 121, -622))
+                humanoid.MoveToFinished:Wait()
+                humanoid:MoveTo(Vector3.new(1181, 131, -648))
+                humanoid.MoveToFinished:Wait()
+                humanoid:MoveTo(Vector3.new(1187, 144, -688))
+                humanoid.MoveToFinished:Wait()
+                humanoid:MoveTo(Vector3.new(1174, 150, -734))
             end
         elseif workspace.dungeonName.Value == "Orbital Outpost" then
             if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-35, 9, 158)).Magnitude < 200 then
@@ -140,7 +158,7 @@ local function castAll()
                         end
                     end
                 end
-                task.wait()
+                task.wait(.15)
             end
         end
 
@@ -157,6 +175,15 @@ task.spawn(function()
 
         game:GetService("ReplicatedStorage").dataRemoteEvent:FireServer(ohTable1)
         game:GetService("ReplicatedStorage").remotes.changeStartValue:FireServer()
+        if getgenv().AutoRetry == true then
+            local args = {
+                [1] = {
+                    [1] = {["\3"] = "vote",["vote"] = true},[2] = "/"
+                }
+            }
+            
+            game:GetService("ReplicatedStorage").dataRemoteEvent:FireServer(unpack(args))         
+        end       
     end
 end)
 
