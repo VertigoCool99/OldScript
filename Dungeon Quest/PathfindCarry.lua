@@ -52,16 +52,12 @@ function GetClosestEnemy(player)
 end
 
 if workspace.dungeonName.Value == "Aquatic Temple" then
-    for i,v in pairs(workspace.Map:GetChildren()) do
-        if v:FindFirstChild("Aqua tile") then
-            v["Aqua tile"]:Destroy()
-        end
-        if v.Name == "Aqua tile" then
+    for i,v in pairs(workspace.Map:GetDescendants()) do
+        if v.Name == "Aqua tile" or v.Name == "Side tile" then
             v:Destroy()
         end
     end
 end
-
 
 local function followPath(destination)
 	local success, errorMessage = pcall(function()
@@ -123,6 +119,8 @@ local function followPath(destination)
         elseif workspace.dungeonName.Value == "Aquatic Temple" then
             if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-1754, 36, 2325)).Magnitude < 70 then
                 humanoid:MoveTo(Vector3.new(-1845, 35, 2307))
+                humanoid.MoveToFinished:Wait()
+                humanoid:MoveTo(Vector3.new(-1855, 51, 2242))
             end
         elseif workspace.dungeonName.Value == "Orbital Outpost" then
             if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-35, 9, 158)).Magnitude < 200 then
