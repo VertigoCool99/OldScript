@@ -4,7 +4,7 @@ local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 
 local path = PathfindingService:CreatePath({
-    AgentRadius = 2,
+    AgentRadius = 3,
     WaypointSpacing=16,
 	AgentHeight = 6,
 	AgentCanJump = false,
@@ -103,6 +103,16 @@ local function followPath(destination)
                 humanoid.MoveToFinished:Wait()
                 humanoid:MoveTo(Vector3.new(16, 5, -323))
             end
+        elseif  workspace.dungeonName.Value == "Volcanic Chambers" then
+            if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-1576, -20, 700)).Magnitude < 70 then
+                humanoid:MoveTo(Vector3.new(-1609, -15, 634))
+                humanoid.MoveToFinished:Wait()
+                humanoid:MoveTo(Vector3.new(-1713, -6, 611))
+                humanoid.MoveToFinished:Wait()
+                humanoid:MoveTo(Vector3.new(-1741, 1, 624))
+                humanoid.MoveToFinished:Wait()
+                humanoid:MoveTo(Vector3.new(-1747, 15, 685))
+            end
         end
 		warn("Path not computed!", errorMessage) 
 	end
@@ -118,11 +128,6 @@ local function moveToClosestEnemy()
         end
     end
 end
-task.spawn(function()
-    while true do task.wait()
-        humanoid.WalkSpeed = 35
-    end
-end)
 local function castAll()
     task.spawn(function()
         for _,spell in pairs(game:GetService("Players").LocalPlayer.Backpack:GetChildren()) do
@@ -130,6 +135,7 @@ local function castAll()
                 for _,randombullshit in pairs(spell:GetChildren()) do
                     if randombullshit.Name == "abilityEvent" or randombullshit.Name == "spellEvent" then
                         for i = 0,3 do
+                            humanoid.WalkSpeed = 35
                             randombullshit:FireServer() 
                         end
                     end
