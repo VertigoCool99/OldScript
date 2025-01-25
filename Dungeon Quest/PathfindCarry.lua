@@ -46,6 +46,9 @@ function DestroyMap()
                 v:Destroy()
             end
         end
+        for i,v in pairs(workspace.borders:GetChildren()) do
+            v:Destroy()
+        end
     elseif workspace.dungeonName.Value == "Enchanted Forest" then
         local Ids = {"rbxassetid://3733654217","rbxassetid://3733654077","rbxassetid://3751372367","rbxassetid://3751372241","rbxassetid://4704210195","rbxassetid://3733375373","rbxassetid://3733447987","rbxassetid://3733447856","rbxassetid://6416751229","rbxassetid://6416751071"}
         for i,v in pairs(workspace.map:GetDescendants()) do
