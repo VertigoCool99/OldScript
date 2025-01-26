@@ -108,8 +108,8 @@ function followPath(destination)
             elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(406, -53, 21)).Magnitude < 70 then
                 Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(485, -23, -17))
             end
-        elseif workspace.dungeonName.Value == "Kings Castle" then
-            if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-17, 5, 273)).Magnitude < 200 then
+        elseif workspace.dungeonName.Value == "King's Castle" then
+            if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-7, 5, 218)).Magnitude < 100 then
                 Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(-7, 6, -103))
             end
         elseif workspace.dungeonName.Value == "Enchanted Forest" then
