@@ -3,9 +3,17 @@ getgenv().SkillWait = 0
 
 --Locals
 local Workspace,PathfindingService,Players = game:GetService("Workspace"),game:GetService("PathfindingService"),game:GetService("Players")
-local Path = PathfindingService:CreatePath({AgentRadius = 3,WaypointSpacing=15,AgentHeight = 6,AgentCanJump = false,Costs = {}})
+local Path = PathfindingService:CreatePath({AgentRadius = 0,WaypointSpacing=9,AgentHeight = 6,AgentCanJump = false,Costs = {Neon = 1}})
+local waypoints,nextWaypointIndex,reachedConnection,blockedConnection,Speed = {},1,nil,nil,65
 
-local waypoints,nextWaypointIndex,reachedConnection,blockedConnection = nil,nil,nil,nil
+function TweenPlayer(destination)
+    local distance = (destination - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+    local duration = distance / Speed
+    local tweenInfo = TweenInfo.new(duration, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
+    
+    local tween = game:GetService("TweenService"):Create(game.Players.LocalPlayer.Character.HumanoidRootPart, tweenInfo, {CFrame = CFrame.new(destination)})
+    return tween
+end
 
 --Functions
 function GetEnemys()
@@ -37,6 +45,8 @@ function DestroyMap()
         for i,v in pairs(workspace.Map:GetDescendants()) do
             if v.Name == "Aqua tile" or v.Name == "Side tile" then
                 v:Destroy()
+            elseif v:IsA("Part") and v.Size == Vector3.new(134.37998962402344, 1, 128.66000366210938) then
+                v:Destroy()
             end
         end
     elseif workspace.dungeonName.Value == "Gilded Skies" then
@@ -45,9 +55,6 @@ function DestroyMap()
             if v:IsA("MeshPart") and table.find(Ids,v.MeshId) then
                 v:Destroy()
             end
-        end
-        for i,v in pairs(workspace.borders:GetChildren()) do
-            v:Destroy()
         end
     elseif workspace.dungeonName.Value == "Enchanted Forest" then
         local Ids = {"rbxassetid://3733654217","rbxassetid://3733654077","rbxassetid://3751372367","rbxassetid://3751372241","rbxassetid://4704210195","rbxassetid://3733375373","rbxassetid://3733447987","rbxassetid://3733447856","rbxassetid://6416751229","rbxassetid://6416751071"}
@@ -64,34 +71,27 @@ function DestroyMap()
     end 
 end
 
+function MoveToPath()
+    if nextWaypointIndex <= #waypoints then
+        local tween = TweenPlayer(waypoints[nextWaypointIndex].Position+Vector3.new(0,2.5,0))
+        tween:Play()
+        tween.Completed:Connect(function()
+            nextWaypointIndex = nextWaypointIndex + 1
+            MoveToPath()
+        end)
+    else
+        nextWaypointIndex = 1
+    end
+end
+
 function followPath(destination)
 	local success, errorMessage = pcall(function()
 		Path:ComputeAsync(Players.LocalPlayer.Character:GetPivot().p, destination)
 	end)
 
 	if success and Path.Status == Enum.PathStatus.Success then
-		waypoints = Path:GetWaypoints()
-
-		blockedConnection = Path.Blocked:Connect(function(blockedWaypointIndex)
-			if blockedWaypointIndex >= nextWaypointIndex then
-				blockedConnection:Disconnect()
-				followPath(destination)
-			end
-		end)
-
-		if not reachedConnection then
-			reachedConnection = Players.LocalPlayer.Character.Humanoid.MoveToFinished:Connect(function(reached)
-				if reached and nextWaypointIndex < #waypoints then
-					nextWaypointIndex += 1
-					Players.LocalPlayer.Character.Humanoid:MoveTo(waypoints[nextWaypointIndex].Position)
-				else
-					reachedConnection:Disconnect()
-					blockedConnection:Disconnect()
-				end
-			end)
-		end
-		nextWaypointIndex = 2
-        Players.LocalPlayer.Character.Humanoid:MoveTo(waypoints[nextWaypointIndex].Position)
+        waypoints = Path:GetWaypoints()
+        MoveToPath()
 	else
         --Stuck Positions
         if workspace.dungeonName.Value == "Northern Lands" then
@@ -133,12 +133,21 @@ function followPath(destination)
                 Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(661, 86, 106))
             elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-125, 42, -3)).Magnitude < 200 then
                 Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(71, 31, -4))
+            elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(766, 86, -166)).Magnitude < 70 then
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(801, 74, -171))
+                Players.LocalPlayer.Character.Humanoid.MoveToFinished:Wait()
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(781, 60, -236))
+                Players.LocalPlayer.Character.Humanoid.MoveToFinished:Wait()
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(820, 52, -288))
+                Players.LocalPlayer.Character.Humanoid.MoveToFinished:Wait()
             end
         elseif workspace.dungeonName.Value == "Aquatic Temple" then
             if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-1754, 36, 2325)).Magnitude < 70 then
                 Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(-1845, 35, 2307))
                 Players.LocalPlayer.Character.Humanoid.MoveToFinished:Wait()
                 Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(-1855, 51, 2242))
+            elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-1237, 34, 2336)).Magnitude < 70 then
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(-1257, -23, 2121))
             end
         elseif workspace.dungeonName.Value == "Orbital Outpost" then
             if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-35, 9, 158)).Magnitude < 200 then
@@ -173,8 +182,6 @@ function moveToClosestEnemy()
         local closestEnemy = GetClosestEnemy()
         if closestEnemy then
             followPath(closestEnemy:GetPivot().p)
-        else
-            task.wait(.5) 
         end
     end
 end
