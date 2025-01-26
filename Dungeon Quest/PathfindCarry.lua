@@ -19,7 +19,11 @@ end
 
 --Functions
 function GetEnemys()
-    for i, v in pairs(game:GetService("Workspace").dungeon:GetChildren()) do
+    local Dungeon = nil
+    if not workspace:FindFirstChild("dungeon") then 
+        return workspace:FindFirstChild("enemies"):GetChildren()
+    end
+    for i, v in pairs(Dungeon:GetChildren()) do
         if v:FindFirstChild("enemyFolder") and v.enemyFolder:FindFirstChildOfClass("Model") then
             return v.enemyFolder:GetChildren()
         end
@@ -171,6 +175,14 @@ function followPath(destination)
                 Players.LocalPlayer.Character.Humanoid.MoveToFinished:Wait()
                 Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(16, 5, -323))
             end
+        elseif workspace.dungeonName.Value == "Winter Outpost" then
+            if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(61, 129, 451)).Magnitude < 70 then
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(142, 111, 439))
+            elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(252, 110, 386)).Magnitude < 70 then
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(288, 101, 341))
+            elseif (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(349, 104, -307)).Magnitude < 70 then
+                Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(438, 92, -331))
+            end
         elseif  workspace.dungeonName.Value == "Volcanic Chambers" then
             if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-1576, -20, 700)).Magnitude < 70 then
                 Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(-1609, -15, 634))
@@ -231,28 +243,31 @@ task.spawn(function()
     end
 end)
 
-workspace.dungeon.DescendantAdded:Connect(function(descendant)
-    if descendant.Name == "Gregg" then
-        OldSkillWait = getgenv().SkillWait
-        getgenv().SkillWait = 0
-        gregg = true
-    end
-end)
-
-workspace.dungeon.DescendantRemoving:Connect(function(descendant)
-    if descendant.Name == "Gregg" then
-        gregg = false
-        if getgenv().GreggFarmMode == true then
-            game.Players.LocalPlayer.Character.Humanoid.Health = 0 
+--Gregg
+if workspace:FindFirstChild("dungeon") then
+    workspace.dungeon.DescendantAdded:Connect(function(descendant)
+        if descendant.Name == "Gregg" then
+            OldSkillWait = getgenv().SkillWait
+            getgenv().SkillWait = 0
+            gregg = true
         end
-        getgenv().SkillWait = OldSkillWait
-    end
-end)
-if getgenv().GreggFarmMode == true then
-    task.spawn(function()
-        repeat task.wait() until not workspace.dungeon.room7:FindFirstChild("barrier")
-        game.Players.LocalPlayer.Character.Humanoid.Health = 0 
     end)
+    
+    workspace.dungeon.DescendantRemoving:Connect(function(descendant)
+        if descendant.Name == "Gregg" then
+            gregg = false
+            if getgenv().GreggFarmMode == true then
+                game.Players.LocalPlayer.Character.Humanoid.Health = 0 
+            end
+            getgenv().SkillWait = OldSkillWait
+        end
+    end)
+    if getgenv().GreggFarmMode == true then
+        task.spawn(function()
+            repeat task.wait() until not workspace.dungeon.room7:FindFirstChild("barrier")
+            game.Players.LocalPlayer.Character.Humanoid.Health = 0 
+        end)
+    end 
 end
 
 castAll()
