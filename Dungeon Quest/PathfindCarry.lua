@@ -1,6 +1,10 @@
 getgenv().AutoRetry = true
 getgenv().SkillWait = 0.3
 getgenv().GreggFarmMode = true
+getgenv().CarryMode = {
+    Enabled = false,
+    CarryHost = "",
+}
 
 --Locals
 local Workspace,PathfindingService,Players = game:GetService("Workspace"),game:GetService("PathfindingService"),game:GetService("Players")
@@ -257,4 +261,11 @@ end
 
 castAll()
 
-moveToClosestEnemy()
+if getgenv().CarryMode.Enabled == false then
+    moveToClosestEnemy()
+else
+    repeat task.wait()
+        local tween = TweenPlayer(game.Players[getgenv().CarryMode.CarryHost].Character:GetPivot())
+        tween:Play()
+    until getgenv().CarryMode.Enabled == false
+end
