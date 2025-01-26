@@ -1,5 +1,5 @@
 getgenv().Settings = {
-    AutoRetry = false,
+    AutoRetry = true,
     SkillWait = .3,
     GreggFarm = false,
     ResetAfterRoom = 7,--Only works if gregg farm is on
