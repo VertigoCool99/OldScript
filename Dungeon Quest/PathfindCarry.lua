@@ -1,10 +1,12 @@
 getgenv().AutoRetry = true
 getgenv().SkillWait = 0.3
+getgenv().GreggFarmMode = true
 
 --Locals
 local Workspace,PathfindingService,Players = game:GetService("Workspace"),game:GetService("PathfindingService"),game:GetService("Players")
 local Path = PathfindingService:CreatePath({AgentRadius = 3,WaypointSpacing=7,AgentHeight = 6,AgentCanJump = false,Costs = {Neon = 1}})
 local waypoints,nextWaypointIndex,reachedConnection,blockedConnection,Speed = {},1,nil,nil,60
+local gregg,OldSkillWait = false,0
 
 function TweenPlayer(destination)
     local distance = (destination - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
@@ -49,6 +51,9 @@ function DestroyMap()
                 v:Destroy()
             end
         end
+        for i,v in pairs(workspace.borders:GetChildren()) do
+            v:Destroy()
+        end
     elseif workspace.dungeonName.Value == "Gilded Skies" then
         local Ids = {"rbxassetid://9331223307","rbxassetid://9331222982","rbxassetid://9310249638","rbxassetid://9329425049","rbxassetid://9331222661","rbxassetid://9402307859","rbxassetid://6815156999"}
         for i,v in pairs(workspace.Map:GetDescendants()) do
@@ -77,7 +82,6 @@ function MoveToPath()
         tween:Play()
         tween.Completed:Connect(function()
             nextWaypointIndex = nextWaypointIndex + 1
-            MoveToPath()
         end)
     else
         nextWaypointIndex = 1
@@ -187,7 +191,7 @@ end)
 function moveToClosestEnemy()
     while true do task.wait()
         local closestEnemy = GetClosestEnemy()
-        if closestEnemy then
+        if closestEnemy and gregg == false then
             followPath(closestEnemy:GetPivot().p)
         end
     end
@@ -222,6 +226,30 @@ task.spawn(function()
         end       
     end
 end)
+
+workspace.dungeon.DescendantAdded:Connect(function(descendant)
+    if descendant.Name == "Gregg" then
+        OldSkillWait = getgenv().SkillWait
+        getgenv().SkillWait = 0
+        gregg = true
+    end
+end)
+
+workspace.dungeon.DescendantRemoving:Connect(function(descendant)
+    if descendant.Name == "Gregg" then
+        gregg = false
+        if getgenv().GreggFarmMode == true then
+            game.Players.LocalPlayer.Character.Humanoid.Health = 0 
+        end
+        getgenv().SkillWait = OldSkillWait
+    end
+end)
+if getgenv().GreggFarmMode == true then
+    task.spawn(function()
+        repeat task.wait() until not workspace.dungeon.room3:FindFirstChild("barrier")
+        game.Players.LocalPlayer.Character.Humanoid.Health = 0 
+    end)
+end
 
 castAll()
 
