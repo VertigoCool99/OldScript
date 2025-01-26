@@ -1,9 +1,12 @@
-getgenv().AutoRetry = true
-getgenv().SkillWait = 0.3
-getgenv().GreggFarmMode = true
+getgenv().Settings = {
+    AutoRetry = false,
+    SkillWait = .3,
+    GreggFarm = false,
+    ResetAfterRoom = 7,--Only works if gregg farm is on
+}
 
 --Locals
-local Workspace,PathfindingService,Players = game:GetService("Workspace"),game:GetService("PathfindingService"),game:GetService("Players")
+local PathfindingService,Players = game:GetService("PathfindingService"),game:GetService("Players")
 local Path = PathfindingService:CreatePath({AgentRadius = 3,WaypointSpacing=7,AgentHeight = 6,AgentCanJump = false,Costs = {Neon = 1}})
 local waypoints,nextWaypointIndex,reachedConnection,blockedConnection,Speed = {},1,nil,nil,60
 local gregg,OldSkillWait = false,0
@@ -80,18 +83,6 @@ function DestroyMap()
     end 
 end
 
-function MoveToPath()
-    if nextWaypointIndex <= #waypoints then
-        local tween = TweenPlayer(waypoints[nextWaypointIndex].Position+Vector3.new(0,2.5,0))
-        tween:Play()
-        tween.Completed:Connect(function()
-            nextWaypointIndex = nextWaypointIndex + 1
-        end)
-    else
-        nextWaypointIndex = 1
-    end
-end
-
 function followPath(destination)
 	local success, errorMessage = pcall(function()
 		Path:ComputeAsync(Players.LocalPlayer.Character:GetPivot().p, destination)
@@ -99,7 +90,15 @@ function followPath(destination)
 
 	if success and Path.Status == Enum.PathStatus.Success then
         waypoints = Path:GetWaypoints()
-        MoveToPath()
+        if nextWaypointIndex <= #waypoints then
+            local tween = TweenPlayer(waypoints[nextWaypointIndex].Position+Vector3.new(0,2.5,0))
+            tween:Play()
+            tween.Completed:Connect(function()
+                nextWaypointIndex = nextWaypointIndex + 1
+            end)
+        else
+            nextWaypointIndex = 1
+        end
 	else
         --Stuck Positions
         if workspace.dungeonName.Value == "Northern Lands" then
@@ -197,12 +196,6 @@ function followPath(destination)
 		warn("Path not computed!", errorMessage) 
 	end
 end
-workspace.ChildAdded:Connect(function(child)
-    if child.Name == "Coin" then
-        local t = TweenPlayer(child:GetPivot().p)
-        t:Play()t.Completed:Wait()
-    end
-end)
 
 function moveToClosestEnemy()
     while true do task.wait()
@@ -224,7 +217,7 @@ function castAll()
                         end
                     end
                 end
-                task.wait(getgenv().SkillWait)
+                task.wait(getgenv().Settings.SkillWait)
             end
         end
 
@@ -237,34 +230,40 @@ task.spawn(function()
         DestroyMap()
         game:GetService("ReplicatedStorage").dataRemoteEvent:FireServer({[1] = {[utf8.char(3)] = "vote",["vote"] = true},[2] = utf8.char(28)})
         game:GetService("ReplicatedStorage").remotes.changeStartValue:FireServer()
-        if getgenv().AutoRetry == true then 
+        if getgenv().Settings.AutoRetry == true then 
             game:GetService("ReplicatedStorage").dataRemoteEvent:FireServer({[1] = {["\3"] = "vote",["vote"] = true},[2] = "/"})         
         end       
     end
 end)
 
 --Gregg
+workspace.ChildAdded:Connect(function(child)
+    if child.Name == "Coin" then
+        local t = TweenPlayer(child:GetPivot().p)
+        t:Play()t.Completed:Wait()
+    end
+end)
+
 if workspace:FindFirstChild("dungeon") then
     workspace.dungeon.DescendantAdded:Connect(function(descendant)
         if descendant.Name == "Gregg" then
-            OldSkillWait = getgenv().SkillWait
-            getgenv().SkillWait = 0
+            OldSkillWait = getgenv().Settings.SkillWait
+            getgenv().Settings.SkillWait = 0
             gregg = true
         end
     end)
-    
     workspace.dungeon.DescendantRemoving:Connect(function(descendant)
         if descendant.Name == "Gregg" then
             gregg = false
-            if getgenv().GreggFarmMode == true then
+            if getgenv().Settings.GreggFarm == true then
                 game.Players.LocalPlayer.Character.Humanoid.Health = 0 
             end
-            getgenv().SkillWait = OldSkillWait
+            getgenv().Settings.SkillWait = OldSkillWait
         end
     end)
-    if getgenv().GreggFarmMode == true then
+    if getgenv().Settings.GreggFarm == true then
         task.spawn(function()
-            repeat task.wait() until not workspace.dungeon.room7:FindFirstChild("barrier")
+            repeat task.wait() until not workspace.dungeon["room"..tostring(getgenv().Settings.ResetAfterRoom)]:FindFirstChild("barrier")
             game.Players.LocalPlayer.Character.Humanoid.Health = 0 
         end)
     end 
