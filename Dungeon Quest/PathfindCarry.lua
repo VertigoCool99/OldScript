@@ -5,7 +5,7 @@ getgenv().GreggFarmMode = true
 --Locals
 local Workspace,PathfindingService,Players = game:GetService("Workspace"),game:GetService("PathfindingService"),game:GetService("Players")
 local Path = PathfindingService:CreatePath({AgentRadius = 3,WaypointSpacing=7,AgentHeight = 6,AgentCanJump = false,Costs = {Neon = 1}})
-local waypoints,nextWaypointIndex,reachedConnection,blockedConnection,Speed = {},1,nil,nil,35
+local waypoints,nextWaypointIndex,reachedConnection,blockedConnection,Speed = {},1,nil,nil,60
 local gregg,OldSkillWait = false,0
 
 function TweenPlayer(destination)
@@ -183,7 +183,7 @@ function followPath(destination)
 end
 workspace.ChildAdded:Connect(function(child)
     if child.Name == "Coin" then
-        local t = TweenPlayer(child.Position)
+        local t = TweenPlayer(child:GetPivot().p)
         t:Play()t.Completed:Wait()
     end
 end)
