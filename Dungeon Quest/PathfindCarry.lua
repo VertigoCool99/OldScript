@@ -246,7 +246,7 @@ workspace.dungeon.DescendantRemoving:Connect(function(descendant)
 end)
 if getgenv().GreggFarmMode == true then
     task.spawn(function()
-        repeat task.wait() until not workspace.dungeon.room3:FindFirstChild("barrier")
+        repeat task.wait() until not workspace.dungeon.room5:FindFirstChild("barrier")
         game.Players.LocalPlayer.Character.Humanoid.Health = 0 
     end)
 end
