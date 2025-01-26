@@ -1,10 +1,10 @@
 getgenv().AutoRetry = true
-getgenv().SkillWait = 0
+getgenv().SkillWait = 0.3
 
 --Locals
 local Workspace,PathfindingService,Players = game:GetService("Workspace"),game:GetService("PathfindingService"),game:GetService("Players")
 local Path = PathfindingService:CreatePath({AgentRadius = 3,WaypointSpacing=7,AgentHeight = 6,AgentCanJump = false,Costs = {Neon = 1}})
-local waypoints,nextWaypointIndex,reachedConnection,blockedConnection,Speed = {},1,nil,nil,55
+local waypoints,nextWaypointIndex,reachedConnection,blockedConnection,Speed = {},1,nil,nil,60
 
 function TweenPlayer(destination)
     local distance = (destination - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
@@ -177,6 +177,13 @@ function followPath(destination)
 		warn("Path not computed!", errorMessage) 
 	end
 end
+workspace.ChildAdded:Connect(function(child)
+    if child.Name == "Coin" then
+        local t = TweenPlayer(child.Position)
+        t:Play()t.Completed:Wait()
+    end
+end)
+
 function moveToClosestEnemy()
     while true do task.wait()
         local closestEnemy = GetClosestEnemy()
