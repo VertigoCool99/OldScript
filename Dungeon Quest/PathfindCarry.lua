@@ -5,7 +5,7 @@ getgenv().GreggFarmMode = true
 --Locals
 local Workspace,PathfindingService,Players = game:GetService("Workspace"),game:GetService("PathfindingService"),game:GetService("Players")
 local Path = PathfindingService:CreatePath({AgentRadius = 3,WaypointSpacing=7,AgentHeight = 6,AgentCanJump = false,Costs = {Neon = 1}})
-local waypoints,nextWaypointIndex,reachedConnection,blockedConnection,Speed = {},1,nil,nil,60
+local waypoints,nextWaypointIndex,reachedConnection,blockedConnection,Speed = {},1,nil,nil,35
 local gregg,OldSkillWait = false,0
 
 function TweenPlayer(destination)
