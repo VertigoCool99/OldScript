@@ -109,7 +109,7 @@ function followPath(destination)
                 Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(485, -23, -17))
             end
         elseif workspace.dungeonName.Value == "Kings Castle" then
-            if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-17, 5, 273)).Magnitude < 70 then
+            if (game.Players.LocalPlayer.Character:GetPivot().p-Vector3.new(-17, 5, 273)).Magnitude < 200 then
                 Players.LocalPlayer.Character.Humanoid:MoveTo(Vector3.new(-7, 6, -103))
             end
         elseif workspace.dungeonName.Value == "Enchanted Forest" then
@@ -250,7 +250,7 @@ workspace.dungeon.DescendantRemoving:Connect(function(descendant)
 end)
 if getgenv().GreggFarmMode == true then
     task.spawn(function()
-        repeat task.wait() until not workspace.dungeon.room5:FindFirstChild("barrier")
+        repeat task.wait() until not workspace.dungeon.room7:FindFirstChild("barrier")
         game.Players.LocalPlayer.Character.Humanoid.Health = 0 
     end)
 end
