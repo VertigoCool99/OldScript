@@ -28,7 +28,7 @@ Players.LocalPlayer.CharacterAdded:Connect(function(char)
         end
     end)
 end)
-Character.HumanoidRootPart.ChildAdded:Conenct(function(child)
+Players.LocalPlayer.Character.HumanoidRootPart.ChildAdded:Conenct(function(child)
     if child:IsA("PointLight") then
         child:Destroy()
     end
