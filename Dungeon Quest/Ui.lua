@@ -9,8 +9,6 @@ local GreggCoin,RealCoin = false,nil
 local oldTick = tick()
 local BestDungeon,BestDiffculty = "nil","Insane"
 
-repeat task.wait() until Character:FindFirstChild("HumanoidRootPart")
-
 --Tables
 local Settings = {
     AutoFarm={Enabled=false,Delay=2,Distance=6,UseSkills=false},
