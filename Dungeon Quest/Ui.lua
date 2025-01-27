@@ -72,15 +72,23 @@ function Functions:Teleport(Cframe)
     if not Character:FindFirstChild("HumanoidRootPart") then return end
     Character.HumanoidRootPart.Velocity = Vector3.zero
     if WaitingToTp == true then return end
-    if (Players.LocalPlayer.Character:GetPivot().p-Cframe.p).Magnitude < 15 then WaitingToTp = false end
+    if (Players.LocalPlayer.Character:GetPivot().p-Cframe.p).Magnitude < 30 then WaitingToTp = false end
+
     Character.HumanoidRootPart.Anchored = false
-    Character:PivotTo(Character:GetPivot()*CFrame.Angles(math.rad(90),0,0))
-    local oldTime = os.time()
-    WaitingToTp = true
-    repeat task.wait()
-        Character:PivotTo(Cframe*CFrame.Angles(math.rad(-90),0,0)+Vector3.new(0,Settings.AutoFarm.Distance*2,0))
-    until tick() - oldTime >= Settings.AutoFarm.Delay
-    WaitingToTp = false
+    if (Players.LocalPlayer.Character:GetPivot().p-Cframe.p).Magnitude > 50 then
+        Character:PivotTo(Character:GetPivot()*CFrame.Angles(math.rad(90),0,0))
+        local oldTime = os.time()
+        WaitingToTp = true
+        repeat task.wait()
+            Character:PivotTo(Cframe*CFrame.Angles(math.rad(-90),0,0)+Vector3.new(0,Settings.AutoFarm.Distance*2,0))
+        until tick() - oldTime >= Settings.AutoFarm.Delay
+        WaitingToTp = false
+    elseif (Character:GetPivot().p-Cframe.p).Magnitude < 30 then 
+        local distance = (Cframe.p - Character.HumanoidRootPart.Position).Magnitude
+        local tweenInfo = TweenInfo.new((distance/50),Enum.EasingStyle.Linear,Enum.EasingDirection.Out)
+        local tween = game:GetService("TweenService"):Create(Character.HumanoidRootPart, tweenInfo, {CFrame = Cframe})
+        tween:Play();tween.Completed:Wait()
+    end
     if Character:FindFirstChild("HumanoidRootPart") then
         Character.HumanoidRootPart.Anchored = true 
     end
