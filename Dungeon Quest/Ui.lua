@@ -13,20 +13,44 @@ local BestDungeon,BestDiffculty = "nil","nil"
 
 --Tables
 local Settings = {
-    AutoFarm={Enabled=false,Delay=2,Distance=6,UseSkills=false,},
+    AutoFarm={Enabled=false,Delay=2,Distance=6,UseSkills=false},
     Dungeon={Enabled=false,Name="",Diffculty="",Mode="Normal",RaidEnabled=false,RaidName="",Tier="1"},
     Misc={AutoRetry=false,GetGreggCoin=false},
+}
+local DungeonLevels = {
+    ["0"] = {["Dungeon"] = "Desert Temple", ["Easy"] = 1, ["Medium"] = 5, ["Hard"] = 15},
+    ["30"] = {["Dungeon"] = "Winter Outpost", ["Easy"] = 30, ["Medium"] = 40, ["Hard"] = 50},
+    ["60"] = {["Dungeon"] = "Pirate Island", ["Insane"] = 60, ["Nightmare"] = 65},
+    ["70"] = {["Dungeon"] = "King's Castle", ["Insane"] = 70, ["Nightmare"] = 75},
+    ["80"] = {["Dungeon"] = "The Underworld", ["Insane"] = 80, ["Nightmare"] = 85},
+    ["90"] = {["Dungeon"] = "Samurai Palace", ["Insane"] = 90, ["Nightmare"] = 95},
+    ["100"] = {["Dungeon"] = "The Canals", ["Insane"] = 100, ["Nightmare"] = 105},
+    ["110"] = {["Dungeon"] = "Ghastly Harbor", ["Insane"] = 110, ["Nightmare"] = 115},
+    ["120"] = {["Dungeon"] = "Steampunk Sewers", ["Insane"] = 120, ["Nightmare"] = 125},
+    ["135"] = {["Dungeon"] = "Orbital Outpost", ["Insane"] = 135, ["Nightmare"] = 140},
+    ["150"] = {["Dungeon"] = "Volcanic Chambers", ["Insane"] = 150, ["Nightmare"] = 155},   
+    ["160"] = {["Dungeon"] = "Aquatic Temple", ["Insane"] = 160, ["Nightmare"] = 165},
+    ["170"] = {["Dungeon"] = "Enchanted Forest", ["Insane"] = 170, ["Nightmare"] = 175},
+    ["180"] = {["Dungeon"] = "Northern Lands", ["Insane"] = 180, ["Nightmare"] = 185},
+    ["190"] = {["Dungeon"] = "Gilded Skies", ["Insane"] = 190, ["Nightmare"] = 195},
+    ["200"] = {["Dungeon"] = "Yokai Peak", ["Insane"] = 200, ["Nightmare"] = 205},
+    ["210"] = {["Dungeon"] = "Abyssal Void", ["Insane"] = 210, ["Nightmare"] = 215},
 }
 local Functions = {}
 
 --Functions
 Players.LocalPlayer.CharacterAdded:Connect(function(char)
     Character = char
-    Character:WaitForChild("HumanoidRootPart").ChildAdded:Connect(function(child)
+    Character.HumanoidRootPart.ChildAdded:Conenct(function(child)
         if child:IsA("PointLight") then
             child:Destroy()
         end
     end)
+end)
+Players.LocalPlayer.Character.HumanoidRootPart.ChildAdded:Conenct(function(child)
+    if child:IsA("PointLight") then
+        child:Destroy()
+    end
 end)
 function Functions:DoSkills(RepeatCount)
     for i,v in pairs(game:GetService("Players").LocalPlayer.Backpack:GetChildren()) do
@@ -48,6 +72,7 @@ function Functions:Teleport(Cframe)
     if not Character:FindFirstChild("HumanoidRootPart") then return end
     Character.HumanoidRootPart.Velocity = Vector3.zero
     if WaitingToTp == true then return end
+    if (Players.LocalPlayer.Character:GetPivot().p-Cframe.p).Magnitude < 15 then WaitingToTp = false end
     Character.HumanoidRootPart.Anchored = false
     Character:PivotTo(Character:GetPivot()*CFrame.Angles(math.rad(90),0,0))
     local oldTime = os.time()
@@ -95,9 +120,27 @@ function Functions:GetClosestEnemy()
     return closestEnemy
 end
 function Functions:GetBestDungeon()
-    --Do Later
+    local highestLevelDungeon = 0
+    for i, v in pairs(DungeonLevels) do
+        if Players.LocalPlayer.leaderstats.Level.Value >= tonumber(i) then
+            if tonumber(i) > highestLevelDungeon then
+                highestLevelDungeon = tonumber(i)
+                if v["Nightmare"] and Players.LocalPlayer.leaderstats.Level.Value >= v["Nightmare"] then
+                    BestDungeon = v["Dungeon"];BestDifficulty = "Nightmare"
+                elseif v["Insane"] and Players.LocalPlayer.leaderstats.Level.Value >= v["Insane"] then
+                    BestDungeon = v["Dungeon"];BestDifficulty = "Insane"
+                elseif v["Hard"] and Players.LocalPlayer.leaderstats.Level.Value >= v["Hard"] then
+                    BestDungeon = v["Dungeon"];BestDifficulty = "Hard"
+                elseif v["Medium"] and Players.LocalPlayer.leaderstats.Level.Value >= v["Medium"] then
+                    BestDungeon = v["Dungeon"];BestDifficulty = "Medium"
+                elseif v["Easy"] and Players.LocalPlayer.leaderstats.Level.Value >= v["Easy"] then
+                    BestDungeon = v["Dungeon"];BestDifficulty = "Easy"
+                end
+            end
+        end
+    end
 end
-
+Functions:GetBestDungeon()
 --Librarys
 local Library = loadstring(game:HttpGet("https://gist.githubusercontent.com/VertigoCool99/282c9e98325f6b79299c800df74b2849/raw/d9efe72dc43a11b5237a43e2de71b7038e8bb37b/library.lua"))()
 
