@@ -22,6 +22,16 @@ local Functions = {}
 --Functions
 Players.LocalPlayer.CharacterAdded:Connect(function(char)
     Character = char
+    Character.HumanoidRootPart.ChildAdded:Conenct(function(child)
+        if child:IsA("PointLight") then
+            child:Destroy()
+        end
+    end)
+end)
+Character.HumanoidRootPart.ChildAdded:Conenct(function(child)
+    if child:IsA("PointLight") then
+        child:Destroy()
+    end
 end)
 function Functions:DoSkills(RepeatCount)
     for i,v in pairs(game:GetService("Players").LocalPlayer.Backpack:GetChildren()) do
@@ -216,6 +226,15 @@ task.spawn(function()
             end
         end
     end 
+end)
+workspace.ChildAdded:Connect(function(child)
+    if child:IsA("Part") and child.Name == "pulseWavesWave" then
+        child:Destroy()
+    elseif child:IsA("MeshPart") and child.Name == "groundAura" then
+        child:Destroy()
+    elseif child:IsA("Model") and child.Name == "pulseWavesHitbox" then
+        child:Destroy()
+    end
 end)
 
 --Settings Start
