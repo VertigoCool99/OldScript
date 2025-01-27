@@ -2,14 +2,12 @@ repeat task.wait() until game:IsLoaded()
 
 --Locals
 local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local Character = Players.LocalPlayer.Character
-local CurrentCamera = workspace:FindFirstChild("Camera")
 local WaitingToTp = false
 local GreggCoin,RealCoin = false,nil
 local oldTick = tick()
-local BestDungeon,BestDiffculty = "nil","nil"
+local BestDungeon,BestDiffculty = "nil","Insane"
 
 repeat task.wait() until Character:FindFirstChild("HumanoidRootPart")
 
@@ -43,17 +41,8 @@ local Functions = {}
 --Functions
 Players.LocalPlayer.CharacterAdded:Connect(function(char)
     Character = char
-    Character:WaitForChild("HumanoidRootPart").ChildAdded:Connect(function(child)
-        if child:IsA("PointLight") then
-            child:Destroy()
-        end
-    end)
 end)
-Character:WaitForChild("HumanoidRootPart").ChildAdded:Connect(function(child)
-    if child:IsA("PointLight") then
-        child:Destroy()
-    end
-end)
+
 function Functions:DoSkills(RepeatCount)
     for i,v in pairs(game:GetService("Players").LocalPlayer.Backpack:GetChildren()) do
         if v.cooldown.Value then
