@@ -14,7 +14,7 @@ local BestDungeon,BestDiffculty = "nil","nil"
 --Tables
 local Settings = {
     AutoFarm={Enabled=false,Delay=2,Distance=6,UseSkills=false},
-    Dungeon={Enabled=false,Name="",Diffculty="",Mode="Normal",RaidEnabled=false,RaidName="",Tier="1"},
+    Dungeon={Enabled=false,EnabledBest=false,Name="",Diffculty="",Mode="Normal",RaidEnabled=false,RaidName="",Tier="1"},
     Misc={AutoRetry=false,GetGreggCoin=false},
 }
 local DungeonLevels = {
@@ -41,13 +41,13 @@ local Functions = {}
 --Functions
 Players.LocalPlayer.CharacterAdded:Connect(function(char)
     Character = char
-    Character.HumanoidRootPart.ChildAdded:Connect(function(child)
+    Character:WaitForChild("HumanoidRootPart").ChildAdded:Connect(function(child)
         if child:IsA("PointLight") then
             child:Destroy()
         end
     end)
 end)
-Character.HumanoidRootPart.ChildAdded:Connect(function(child)
+Character:WaitForChild("HumanoidRootPart").ChildAdded:Connect(function(child)
     if child:IsA("PointLight") then
         child:Destroy()
     end
@@ -182,6 +182,10 @@ DistanceSlider:OnChanged(function(Value)
 end)
 --Farming End
 --DungeonCreateGroup Start
+local AutoCreateBestToggle = DungeonCreateGroup:AddToggle("AutoCreateBestToggle",{Text = "Auto Create Best",Default = false,Risky = false})
+AutoCreateBestToggle:OnChanged(function(value)
+    Settings.Dungeon.EnabledBest = value
+end)
 local AutoCreateToggle = DungeonCreateGroup:AddToggle("AutoCreateToggle",{Text = "Auto Create",Default = false,Risky = false})
 AutoCreateToggle:OnChanged(function(value)
     Settings.Dungeon.Enabled = value
@@ -239,7 +243,7 @@ task.spawn(function()
                                 ["difficulty"] = Settings.Dungeon.Diffculty,
                                 ["mode"] = Settings.Dungeon.Mode,
                                 ["dungeonName"] = Settings.Dungeon.Name,
-                                ["tier"] = tonumber(Settings.Dungeon.Tier),
+                                ["tier"] = 1,
                             }}},[2] = "d"}}
             game:GetService("ReplicatedStorage"):WaitForChild("dataRemoteEvent"):FireServer(unpack(DunArgs))
         elseif workspace:FindFirstChild("CharacterSelectScene") and Settings.Dungeon.RaidEnabled == true then
@@ -253,6 +257,14 @@ task.spawn(function()
                                 ["maxPlayers"] = 40
                             }}},[2] = "d"}}
             game:GetService("ReplicatedStorage"):WaitForChild("dataRemoteEvent"):FireServer(unpack(RaidArgs))
+        elseif Settings.Dungeon.EnabledBest == true then
+            local DunArgs = {[1] = {[1] = {[1] = "\1",[2] = {["\3"] = "PlaySolo",["partyData"] = {
+                ["difficulty"] = BestDiffculty,
+                ["mode"] = "Normal",
+                ["dungeonName"] = BestDungeon,
+                ["tier"] = 1,
+            }}},[2] = "d"}}
+            game:GetService("ReplicatedStorage"):WaitForChild("dataRemoteEvent"):FireServer(unpack(DunArgs))
         end
         if not workspace:FindFirstChild("CharacterSelectScene") and Settings.AutoFarm.Enabled == true and Character == Players.LocalPlayer.Character and Character:FindFirstChild("HumanoidRootPart") then
             if Players.LocalPlayer.PlayerGui.HUD.Main.StartButton.Visible == true or Players.LocalPlayer.PlayerGui.RaidReadyCheck.Enabled == true then
@@ -273,7 +285,7 @@ task.spawn(function()
         end
     end 
 end)
---[[
+
 workspace.ChildAdded:Connect(function(child)
     if child:IsA("Part") and child.Name == "pulseWavesWave" then
         child:Destroy()
@@ -283,7 +295,6 @@ workspace.ChildAdded:Connect(function(child)
         child:Destroy()
     end
 end)
-]]
 
 --Settings Start
 local Settings = Window:AddTab("Settings")
