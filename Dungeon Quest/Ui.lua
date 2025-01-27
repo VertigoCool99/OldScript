@@ -41,13 +41,13 @@ local Functions = {}
 --Functions
 Players.LocalPlayer.CharacterAdded:Connect(function(char)
     Character = char
-    Character.HumanoidRootPart.ChildAdded:Conenct(function(child)
+    Character.HumanoidRootPart.ChildAdded:Connect(function(child)
         if child:IsA("PointLight") then
             child:Destroy()
         end
     end)
 end)
-Players.LocalPlayer.Character.HumanoidRootPart.ChildAdded:Conenct(function(child)
+Character.HumanoidRootPart.ChildAdded:Connect(function(child)
     if child:IsA("PointLight") then
         child:Destroy()
     end
@@ -71,23 +71,25 @@ end
 function Functions:Teleport(Cframe)
     if not Character:FindFirstChild("HumanoidRootPart") then return end
     Character.HumanoidRootPart.Velocity = Vector3.zero
+    if (Players.LocalPlayer.Character:GetPivot().p-Cframe.p).Magnitude < 50 then WaitingToTp = false end
     if WaitingToTp == true then return end
-    if (Players.LocalPlayer.Character:GetPivot().p-Cframe.p).Magnitude < 30 then WaitingToTp = false end
-
     Character.HumanoidRootPart.Anchored = false
-    if (Players.LocalPlayer.Character:GetPivot().p-Cframe.p).Magnitude > 50 then
+    local oldTime = os.time()
+    if (Players.LocalPlayer.Character:GetPivot().p-Cframe.p).Magnitude > 51 then
         Character:PivotTo(Character:GetPivot()*CFrame.Angles(math.rad(90),0,0))
-        local oldTime = os.time()
         WaitingToTp = true
         repeat task.wait()
             Character:PivotTo(Cframe*CFrame.Angles(math.rad(-90),0,0)+Vector3.new(0,Settings.AutoFarm.Distance*2,0))
         until tick() - oldTime >= Settings.AutoFarm.Delay
         WaitingToTp = false
-    elseif (Character:GetPivot().p-Cframe.p).Magnitude < 30 then 
+    elseif (Character:GetPivot().p-Cframe.p).Magnitude < 50 then
+        WaitingToTp = true
+        Character:PivotTo(Character:GetPivot()*CFrame.Angles(math.rad(90),0,0))
         local distance = (Cframe.p - Character.HumanoidRootPart.Position).Magnitude
-        local tweenInfo = TweenInfo.new((distance/50),Enum.EasingStyle.Linear,Enum.EasingDirection.Out)
-        local tween = game:GetService("TweenService"):Create(Character.HumanoidRootPart, tweenInfo, {CFrame = Cframe})
+        local tweenInfo = TweenInfo.new((distance/60),Enum.EasingStyle.Linear,Enum.EasingDirection.Out)
+        local tween = game:GetService("TweenService"):Create(Character.HumanoidRootPart, tweenInfo, {CFrame = Cframe*CFrame.Angles(math.rad(-90),0,0)+Vector3.new(0,Settings.AutoFarm.Distance*2,0)})
         tween:Play();tween.Completed:Wait()
+        WaitingToTp = false
     end
     if Character:FindFirstChild("HumanoidRootPart") then
         Character.HumanoidRootPart.Anchored = true 
@@ -231,7 +233,7 @@ end)
 
 --Connections
 task.spawn(function()
-    while true do task.wait(.1)
+    while true do task.wait(.05)
         if workspace:FindFirstChild("CharacterSelectScene") and Settings.Dungeon.Enabled == true then
             local DunArgs = {[1] = {[1] = {[1] = "\1",[2] = {["\3"] = "PlaySolo",["partyData"] = {
                                 ["difficulty"] = Settings.Dungeon.Diffculty,
@@ -265,14 +267,13 @@ task.spawn(function()
                 GreggCoin = false;RealCoin=nil
             end
             local Enemy = Functions:GetClosestEnemy()
-            if GreggCoin == false and Enemy ~= nil and (Character:GetPivot().p - Enemy:GetPivot().p).Magnitude > 50 then
-                Functions:Teleport(Functions:GetClosestEnemy():GetPivot())
-            elseif Enemy ~= nil then
+            if GreggCoin == false and Enemy ~= nil then
                 Functions:Teleport(Functions:GetClosestEnemy():GetPivot())
             end
         end
     end 
 end)
+--[[
 workspace.ChildAdded:Connect(function(child)
     if child:IsA("Part") and child.Name == "pulseWavesWave" then
         child:Destroy()
@@ -282,6 +283,7 @@ workspace.ChildAdded:Connect(function(child)
         child:Destroy()
     end
 end)
+]]
 
 --Settings Start
 local Settings = Window:AddTab("Settings")
