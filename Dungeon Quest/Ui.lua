@@ -28,11 +28,6 @@ Players.LocalPlayer.CharacterAdded:Connect(function(char)
         end
     end)
 end)
-Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").ChildAdded:Connect(function(child)
-    if child:IsA("PointLight") then
-        child:Destroy()
-    end
-end)
 function Functions:DoSkills(RepeatCount)
     for i,v in pairs(game:GetService("Players").LocalPlayer.Backpack:GetChildren()) do
         if v.cooldown.Value then
