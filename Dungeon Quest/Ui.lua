@@ -22,13 +22,13 @@ local Functions = {}
 --Functions
 Players.LocalPlayer.CharacterAdded:Connect(function(char)
     Character = char
-    Character.HumanoidRootPart.ChildAdded:Conenct(function(child)
+    Character.HumanoidRootPart.ChildAdded:Connect(function(child)
         if child:IsA("PointLight") then
             child:Destroy()
         end
     end)
 end)
-Players.LocalPlayer.Character.HumanoidRootPart.ChildAdded:Conenct(function(child)
+Players.LocalPlayer.Character.HumanoidRootPart.ChildAdded:Connect(function(child)
     if child:IsA("PointLight") then
         child:Destroy()
     end
