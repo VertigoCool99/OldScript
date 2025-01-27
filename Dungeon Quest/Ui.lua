@@ -60,26 +60,15 @@ end
 function Functions:Teleport(Cframe)
     if not Character:FindFirstChild("HumanoidRootPart") then return end
     Character.HumanoidRootPart.Velocity = Vector3.zero
-    if (Players.LocalPlayer.Character:GetPivot().p-Cframe.p).Magnitude < 50 then WaitingToTp = false end
     if WaitingToTp == true then return end
     Character.HumanoidRootPart.Anchored = false
     local oldTime = os.time()
-    if (Players.LocalPlayer.Character:GetPivot().p-Cframe.p).Magnitude > 51 then
-        Character:PivotTo(Character:GetPivot()*CFrame.Angles(math.rad(90),0,0))
-        WaitingToTp = true
-        repeat task.wait()
-            Character:PivotTo(Cframe*CFrame.Angles(math.rad(-90),0,0)+Vector3.new(0,Settings.AutoFarm.Distance*2,0))
-        until tick() - oldTime >= Settings.AutoFarm.Delay
-        WaitingToTp = false
-    elseif (Character:GetPivot().p-Cframe.p).Magnitude < 50 then
-        WaitingToTp = true
-        Character:PivotTo(Character:GetPivot()*CFrame.Angles(math.rad(90),0,0))
-        local distance = (Cframe.p - Character.HumanoidRootPart.Position).Magnitude
-        local tweenInfo = TweenInfo.new((distance/60),Enum.EasingStyle.Linear,Enum.EasingDirection.Out)
-        local tween = game:GetService("TweenService"):Create(Character.HumanoidRootPart, tweenInfo, {CFrame = Cframe*CFrame.Angles(math.rad(-90),0,0)+Vector3.new(0,Settings.AutoFarm.Distance*2,0)})
-        tween:Play();tween.Completed:Wait()
-        WaitingToTp = false
-    end
+    Character:PivotTo(Character:GetPivot()*CFrame.Angles(math.rad(90),0,0))
+    WaitingToTp = true
+    repeat task.wait()
+        Character:PivotTo(Cframe*CFrame.Angles(math.rad(-90),0,0)+Vector3.new(0,Settings.AutoFarm.Distance*2,0))
+    until tick() - oldTime >= Settings.AutoFarm.Delay
+    WaitingToTp = false
     if Character:FindFirstChild("HumanoidRootPart") then
         Character.HumanoidRootPart.Anchored = true 
     end
@@ -329,7 +318,7 @@ workspace.ChildAdded:Connect(function(child)
 end)
 
 game:GetService("GuiService").ErrorMessageChanged:Connect(function()
-    game:GetService("TeleportService"):Teleport(game.PlaceId,game.Players.LocalPlayer)
+    game:GetService("TeleportService"):Teleport(2414851778,game.Players.LocalPlayer)
 end)
 
 Library:Notify({Title="Loaded";Text=string.format('Loaded In '..(tick()-oldTick));Duration=5})
