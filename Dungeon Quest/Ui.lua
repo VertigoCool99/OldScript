@@ -266,4 +266,4 @@ end)
 
 Library:Notify({Title="Loaded";Text=string.format('Loaded In '..(tick()-oldTick));Duration=5})
 
-queue_on_teleport('game:HttpGet("https://gist.githubusercontent.com/VertigoCool99/0499f9349517ed498b7e08ff2f2498ee/raw/bb09ce71a52b466887143506bbb9c67dcc5027d3/DQ.lua"))()')
+queue_on_teleport('game:HttpGet("https://raw.githubusercontent.com/VertigoCool99/Script/refs/heads/main/Dungeon%20Quest/Ui.lua"))()')
