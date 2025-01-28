@@ -148,7 +148,7 @@ function Functions:GetClosestEnemy()
     return closestEnemy
 end
 function Functions:GetBestDungeon()
-    repeat task.wait() until Players.LocalPlayer:FindFirstChild("leaderstats"):FindFirstChild("Level")
+    repeat task.wait() until Players.LocalPlayer and Players.LocalPlayer:FindFirstChild("leaderstats") and Players.LocalPlayer.leaderstats:FindFirstChild("Level")
     local highestLevelDungeon = 0
     for i, v in pairs(DungeonLevels) do
         if Players.LocalPlayer.leaderstats.Level.Value >= tonumber(i) then
