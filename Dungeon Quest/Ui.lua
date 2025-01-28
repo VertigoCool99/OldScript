@@ -95,10 +95,13 @@ function Functions:Teleport(Cframe)
         bodyPosition = Instance.new("BodyPosition")
         bodyPosition.MaxForce = Vector3.new(400000, 400000, 400000);bodyPosition.Position = Cframe.Position;bodyPosition.D = 300;bodyPosition.Parent = Character.HumanoidRootPart;Character.HumanoidRootPart.Velocity = Vector3.zero
     end
-    local oldTime = os.time()
+    local oldTime = tick()
     WaitingToTp = true
     Character.HumanoidRootPart.Anchored = false
     repeat task.wait()
+        if Settings.DebugMode == true then
+            print("Elapsed Time During Loop",tick() - oldTime)
+        end
         if Character:FindFirstChild("HumanoidRootPart") and bodyPosition ~= nil and bodyGyro ~= nil then
             Character:PivotTo(Cframe + Vector3.new(0, Settings.AutoFarm.Distance * 2, 0))
             bodyPosition.Position = Cframe.Position + Vector3.new(0, Settings.AutoFarm.Distance * 2, 0)
@@ -111,7 +114,6 @@ function Functions:Teleport(Cframe)
         bodyPosition:Destroy();bodyGyro:Destroy()
     end
 end
-
 
 
 function Functions:GetEnemys()
