@@ -16,7 +16,7 @@ local Settings = {
     Dungeon={Enabled=false,EnabledBest=false,Name="",Diffculty="",Mode="Normal",RaidEnabled=false,RaidName="",Tier="1"},
     AutoSell = {Enabled = false,Raritys = {},ItemTypes = {}};
     Misc={AutoRetry=false,GetGreggCoin=false,NameHide=false},
-    DebugMode=false,
+    DebugMode=true,
 }
 local DungeonLevels = {
     ["0"] = {["Dungeon"] = "Desert Temple", ["Easy"] = 1, ["Medium"] = 5, ["Hard"] = 15},
@@ -167,6 +167,14 @@ function Functions:GetBestDungeon()
         end
     end
 end
+repeat task.wait() until Players.LocalPlayer and Players.LocalPlayer.PlayerGui
+for i=0,5 do task.wait(.2)
+    if Players.LocalPlayer.PlayerGui:FindFirstChild("CharacterSelection") then
+        game:GetService("ReplicatedStorage"):WaitForChild("dataRemoteEvent"):FireServer({[1] = {[1] = "\1",[2] = {["\3"] = "select",["characterIndex"] = 1}},[2] = "M"})
+        game:GetService("ReplicatedStorage"):WaitForChild("dataRemoteEvent"):FireServer({[1] = {[1] = "\1"},[2] = "5"})
+    end
+end
+
 --Librarys
 local Library = loadstring(game:HttpGet("https://gist.githubusercontent.com/VertigoCool99/282c9e98325f6b79299c800df74b2849/raw/d9efe72dc43a11b5237a43e2de71b7038e8bb37b/library.lua"))()
 
@@ -256,6 +264,7 @@ GetGreggCoinToggle:OnChanged(function(value)
     Settings.Misc.GetGreggCoin = value
 end)
 --Settings Group End
+
 --Auto Sell Start
 local AutoSellEnabledToggle = AutoSellGroup:AddToggle("AutoSellEnabledToggle",{Text = "Auto Sell",Default = false,Risky = false})
 AutoSellEnabledToggle:AddTooltip("This Will Sell All Selected Raritys!")
@@ -305,7 +314,7 @@ local PlayerGui = Players.LocalPlayer.PlayerGui
 local OldName,OldTitle
 task.spawn(function()
     while true do task.wait(.05)
-        if Character and Character:FindFirstChild("Head") and Character:FindFirstChild("playerNameplate") and Players.LocalPlayer and Players.LocalPlayer.PlayerGui and Players.LocalPlayer.PlayerGui:FindFirstChild("HUD") and Players.LocalPlayer.PlayerGui.HUD:FindFirstChild("Main") then
+        if Character and Character:FindFirstChild("Head") and Character.Head:FindFirstChild("playerNameplate") and Players.LocalPlayer and Players.LocalPlayer.PlayerGui and Players.LocalPlayer.PlayerGui:FindFirstChild("HUD") and Players.LocalPlayer.PlayerGui.HUD:FindFirstChild("Main") then
             if Settings.Misc.NameHide == true then
                 Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.Portrait.Frame.ImageLabel.Visible = false
                 Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.PlayerName.Text = NameHideName
