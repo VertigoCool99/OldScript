@@ -305,7 +305,7 @@ local PlayerGui = Players.LocalPlayer.PlayerGui
 local OldName,OldTitle
 task.spawn(function()
     while true do task.wait(.05)
-        if Character and Character:FindFirstChild("Head") and Players.LocalPlayer and Players.LocalPlayer.PlayerGui and Players.LocalPlayer.PlayerGui:FindFirstChild("HUD") and Players.LocalPlayer.PlayerGui.HUD:FindFirstChild("Main") then
+        if Character and Character:FindFirstChild("Head") and Character:FindFirstChild("playerNameplate") and Players.LocalPlayer and Players.LocalPlayer.PlayerGui and Players.LocalPlayer.PlayerGui:FindFirstChild("HUD") and Players.LocalPlayer.PlayerGui.HUD:FindFirstChild("Main") then
             if Settings.Misc.NameHide == true then
                 Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.Portrait.Frame.ImageLabel.Visible = false
                 Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.PlayerName.Text = NameHideName
