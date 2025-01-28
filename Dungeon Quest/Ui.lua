@@ -15,6 +15,7 @@ local Settings = {
     Dungeon={Enabled=false,EnabledBest=false,Name="",Diffculty="",Mode="Normal",RaidEnabled=false,RaidName="",Tier="1"},
     AutoSell = {Enabled = false,Raritys = {},ItemTypes = {}};
     Misc={AutoRetry=false,GetGreggCoin=false},
+    DebugMode=true,
 }
 local DungeonLevels = {
     ["0"] = {["Dungeon"] = "Desert Temple", ["Easy"] = 1, ["Medium"] = 5, ["Hard"] = 15},
@@ -83,20 +84,34 @@ function Functions:DoSkills(RepeatCount)
 end
 function Functions:Teleport(Cframe)
     if not Character:FindFirstChild("HumanoidRootPart") then return end
-    Character.HumanoidRootPart.Velocity = Vector3.zero
     if WaitingToTp == true then return end
-    Character.HumanoidRootPart.Anchored = false
+    local bodyPosition = Character.HumanoidRootPart:FindFirstAncestorOfClass("BodyPosition")
+    local bodyGyro = Character.HumanoidRootPart:FindFirstAncestorOfClass("BodyGyro")
+    if not Character.HumanoidRootPart:FindFirstAncestorOfClass("BodyGyro") then
+        bodyGyro = Instance.new("BodyGyro")
+        bodyGyro.MaxTorque = Vector3.new(400000, 400000, 400000);bodyGyro.CFrame = Character.HumanoidRootPart.CFrame;bodyGyro.D = 250;bodyGyro.Parent = Character.HumanoidRootPart
+    end
+    if not Character.HumanoidRootPart:FindFirstAncestorOfClass("BodyPosition") then
+        bodyPosition = Instance.new("BodyPosition")
+        bodyPosition.MaxForce = Vector3.new(400000, 400000, 400000);bodyPosition.Position = Cframe.Position;bodyPosition.D = 300;bodyPosition.Parent = Character.HumanoidRootPart;Character.HumanoidRootPart.Velocity = Vector3.zero
+    end
     local oldTime = os.time()
-    Character:PivotTo(Character:GetPivot()*CFrame.Angles(math.rad(90),0,0))
     WaitingToTp = true
+    Character.HumanoidRootPart.Anchored = false
     repeat task.wait()
-        Character:PivotTo(Cframe*CFrame.Angles(math.rad(-90),0,0)+Vector3.new(0,Settings.AutoFarm.Distance*2,0))
-    until tick() - oldTime >= Settings.AutoFarm.Delay
+        if Character:FindFirstChild("HumanoidRootPart") and bodyPosition ~= nil and bodyGyro ~= nil then
+            Character:PivotTo(Cframe + Vector3.new(0, Settings.AutoFarm.Distance * 2, 0))
+            bodyPosition.Position = Cframe.Position + Vector3.new(0, Settings.AutoFarm.Distance * 2, 0)
+            bodyGyro.CFrame = CFrame.new(Character:GetPivot().p, Cframe.Position) * CFrame.Angles(math.rad(90), 0, 0)
+        end
+    until tick() - oldTime >= Settings.AutoFarm.Delay or not Character:FindFirstChild("HumanoidRootPart")
     WaitingToTp = false
     if Character:FindFirstChild("HumanoidRootPart") then
-        Character.HumanoidRootPart.Anchored = true 
+        Character.HumanoidRootPart.Anchored = true
+        bodyPosition:Destroy();bodyGyro:Destroy()
     end
 end
+
 
 
 function Functions:GetEnemys()
@@ -330,12 +345,14 @@ task.spawn(function()
 end)
 
 workspace.ChildAdded:Connect(function(child)
-    if child:IsA("Part") and child.Name == "pulseWavesWave" then
-        child:Destroy()
-    elseif child:IsA("MeshPart") and child.Name == "groundAura" then
-        child:Destroy()
-    elseif child:IsA("Model") and child.Name == "pulseWavesHitbox" then
-        child:Destroy()
+    if Settings.DebugMode == false then
+        if child:IsA("Part") and child.Name == "pulseWavesWave" then
+            child:Destroy()
+        elseif child:IsA("MeshPart") and child.Name == "groundAura" then
+            child:Destroy()
+        elseif child:IsA("Model") and child.Name == "pulseWavesHitbox" then
+            child:Destroy()
+        end 
     end
 end)
 
@@ -361,7 +378,7 @@ Library.SaveManager:SetLibrary(Library)
 Library.ThemeManager:ApplyToTab(Settings)
 Library.SaveManager:IgnoreThemeSettings()
 Library.SaveManager:SetIgnoreIndexes({"MenuKeybind","BackgroundColor", "ActiveColor", "ItemBorderColor", "ItemBackgroundColor", "TextColor" , "DisabledTextColor", "RiskyColor"})
-Library.SaveManager:SetFolder('Test')
+Library.SaveManager:SetFolder('DungeonQuest')
 Library.SaveManager:BuildConfigSection(Settings)
 Library.KeybindContainer.Visible = false
 Library.SaveManager:LoadAutoloadConfig()
