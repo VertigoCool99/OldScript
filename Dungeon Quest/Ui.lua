@@ -15,7 +15,7 @@ local Settings = {
     Dungeon={Enabled=false,EnabledBest=false,Name="",Diffculty="",Mode="Normal",RaidEnabled=false,RaidName="",Tier="1"},
     AutoSell = {Enabled = false,Raritys = {},ItemTypes = {}};
     Misc={AutoRetry=false,GetGreggCoin=false},
-    DebugMode=false,
+    DebugMode=true,
 }
 local DungeonLevels = {
     ["0"] = {["Dungeon"] = "Desert Temple", ["Easy"] = 1, ["Medium"] = 5, ["Hard"] = 15},
