@@ -1,6 +1,6 @@
 getgenv().Settings = {
     AutoRetry = true,
-    SkillWait = .3,
+    SkillWait = .05,
     GreggFarm = false,
     ResetAfterRoom = 7,--Only works if gregg farm is on
 }
@@ -211,10 +211,8 @@ function castAll()
             if v.cooldown.Value then
                 for _,v2 in pairs(v:GetChildren()) do
                     if v2.Name == "abilityEvent" or v2.Name == "spellEvent" then
-                        for i = 0,3 do
-                            Players.LocalPlayer.Character.Humanoid.WalkSpeed = 33
-                            v2:FireServer() 
-                        end
+                        Players.LocalPlayer.Character.Humanoid.WalkSpeed = 33
+                        v2:FireServer() 
                     end
                 end
                 task.wait(getgenv().Settings.SkillWait)
