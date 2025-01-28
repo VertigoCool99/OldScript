@@ -169,7 +169,7 @@ function Functions:GetBestDungeon()
 end
 repeat task.wait() until Players.LocalPlayer and Players.LocalPlayer.PlayerGui
 for i=0,3 do task.wait(.2)
-    if Players.LocalPlayer.PlayerGui:FindFirstChild("CharacterSelection") and not Character:FindFirstChild("HumanoidRootPart") then
+    if Players.LocalPlayer.PlayerGui:FindFirstChild("CharacterSelection") and not Character then
         game:GetService("ReplicatedStorage"):WaitForChild("dataRemoteEvent"):FireServer({[1] = {[1] = "\1",[2] = {["\3"] = "select",["characterIndex"] = 1}},[2] = "M"})
         game:GetService("ReplicatedStorage"):WaitForChild("dataRemoteEvent"):FireServer({[1] = {[1] = "\1"},[2] = "5"})
     end
