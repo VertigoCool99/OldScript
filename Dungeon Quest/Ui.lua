@@ -11,7 +11,7 @@ local BestDungeon,BestDiffculty = "nil","Insane"
 
 --Tables
 local Settings = {
-    AutoFarm={Enabled=false,Delay=2,Distance=6,UseSkills=false},
+    AutoFarm={Enabled=false,Delay=2,Distance=6,UseSkills=false,RaidFarm=false},
     Dungeon={Enabled=false,EnabledBest=false,Name="",Diffculty="",Mode="Normal",RaidEnabled=false,RaidName="",Tier="1"},
     AutoSell = {Enabled = false,Raritys = {},ItemTypes = {}};
     Misc={AutoRetry=false,GetGreggCoin=false},
@@ -242,6 +242,10 @@ local AutoRetryToggle = SettingsGroup:AddToggle("AutoRetryToggle",{Text = "Auto 
 AutoRetryToggle:OnChanged(function(value)
     Settings.Misc.AutoRetry = value
 end)
+local RaidFarmToggle = SettingsGroup:AddToggle("RaidFarmToggle",{Text = "Raid Farm",Default = false,Risky = false})
+RaidFarmToggle:OnChanged(function(value)
+    Settings.AutoFarm.RaidFarm = value
+end)
 Players.LocalPlayer.PlayerGui:WaitForChild("RetryVote").Changed:Connect(function(change)
     if change == "Enabled" and Settings.Misc.AutoRetry == true then
         game:GetService("ReplicatedStorage").dataRemoteEvent:FireServer({[1] = {["\3"] = "vote",["vote"] = true},[2] = "/"})    
@@ -383,6 +387,11 @@ Library.SaveManager:LoadAutoloadConfig()
 --Settings End
 
 --Init
+Players.LocalPlayer.PlayerGui.rewardGuiHolder.holder.ChildAdded:Connect(function(child)
+    if Settings.AutoFarm.RaidFarm == true then
+        game:GetService("TeleportService"):Teleport(2414851778,game.Players.LocalPlayer)
+    end
+end)
 Players.LocalPlayer.PlayerGui.cutscene.Changed:Connect(function(change)
     if change == "Enabled" then
         game:GetService("ReplicatedStorage").dataRemoteEvent:FireServer({[1] = {["\3"] = "skip"},[2] = "\184"})        
