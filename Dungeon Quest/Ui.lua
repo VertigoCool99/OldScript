@@ -50,8 +50,6 @@ local Functions = {}
 Players.LocalPlayer.CharacterAdded:Connect(function(char)
     Character = char
     repeat task.wait() until Character:FindFirstChild("HumanoidRootPart")
-    Players.LocalPlayer.Character.Head.playerNameplate.PlayerName.Text = "Float.balls"
-    Players.LocalPlayer.Character.Head.playerNameplate.Title.Text="🤖"
 end)
 
 function Functions:GetInventoryItems()
