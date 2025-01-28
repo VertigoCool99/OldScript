@@ -228,8 +228,8 @@ local AutoCreateRaidToggle = DungeonCreateGroup:AddToggle("AutoCreateRaidToggle"
 AutoCreateRaidToggle:OnChanged(function(value)
     Settings.Dungeon.RaidEnabled = value
 end)
-local AutoCreateDungeonNameDrop = DungeonCreateGroup:AddDropdown("AutoCreateDungeonNameDrop",{Text = "Dungeon", AllowNull = false,Values = {"Hela Raid","Goliath Raid"},Default=BestDungeon,Multi = false,})
-AutoCreateDungeonNameDrop:OnChanged(function(Value)
+local AutoCreateDungeonNameRaidDrop = DungeonCreateGroup:AddDropdown("AutoCreateDungeonNameRaidDrop",{Text = "Raid Dungeon", AllowNull = false,Values = {"Hela Raid","Goliath Raid"},Default=BestDungeon,Multi = false,})
+AutoCreateDungeonNameRaidDrop:OnChanged(function(Value)
     Settings.Dungeon.RaidName = Value
 end)
 local AutoCreateDungeonTierDrop = DungeonCreateGroup:AddDropdown("AutoCreateDungeonTierDrop",{Text = "Tier", AllowNull = false,Values = {"1","2","3","4","5"},Default="1",Multi = false,})
@@ -390,7 +390,7 @@ Library.SaveManager:LoadAutoloadConfig()
 --Settings End
 
 --Init
-Players.LocalPlayer.PlayerGui.rewardGuiHolder.holder.ChildAdded:Connect(function(child)
+Players.LocalPlayer.PlayerGui.rewardGuiHolder.holder.ChildAdded:Connect(function()
     if Settings.AutoFarm.RaidFarm == true then
         game:GetService("TeleportService"):Teleport(2414851778,game.Players.LocalPlayer)
     end
