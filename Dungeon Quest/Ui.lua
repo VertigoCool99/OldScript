@@ -8,13 +8,14 @@ local WaitingToTp = false
 local GreggCoin,RealCoin = false,nil
 local oldTick = tick()
 local BestDungeon,BestDiffculty = "nil","Insane"
+local NameHideName,NameHideTitle = "",""
 
 --Tables
 local Settings = {
     AutoFarm={Enabled=false,Delay=2,Distance=6,UseSkills=false,RaidFarm=false},
     Dungeon={Enabled=false,EnabledBest=false,Name="",Diffculty="",Mode="Normal",RaidEnabled=false,RaidName="",Tier="1"},
     AutoSell = {Enabled = false,Raritys = {},ItemTypes = {}};
-    Misc={AutoRetry=false,GetGreggCoin=false},
+    Misc={AutoRetry=false,GetGreggCoin=false,NameHide=false},
     DebugMode=false,
 }
 local DungeonLevels = {
@@ -113,8 +114,6 @@ function Functions:Teleport(Cframe)
         bodyPosition:Destroy();bodyGyro:Destroy()
     end
 end
-
-
 function Functions:GetEnemys()
     if not workspace:FindFirstChild("dungeon") then 
         return workspace:FindFirstChild("enemies"):GetChildren()
@@ -182,6 +181,7 @@ local NormalFarm = FarmingTab:AddLeftGroupbox("Auto Farm")
 local DungeonCreateGroup = FarmingTab:AddRightGroupbox("Dungeon Creation")
 local SettingsGroup = FarmingTab:AddLeftGroupbox("Settings")
 local AutoSellGroup = MiscTab:AddLeftGroupbox("Auto Sell")
+local NameHideGroup = MiscTab:AddRightGroupbox("Name Hider")
 
 --Farming Start
 local NormalFarmToggle = NormalFarm:AddToggle("NormalFarmToggle",{Text = "Enabled",Default = false,Risky = false})
@@ -282,12 +282,60 @@ AutoSellRarirtyDrop:OnChanged(function(Value)
         end
     end
 end)
-
 --Auto Sell End
+--Name Hide Start
+local NameHideEnabledToggle = NameHideGroup:AddToggle("NameHideEnabledToggle",{Text = "Enabled",Default = false,Risky = false})
+NameHideEnabledToggle:OnChanged(function(value)
+    Settings.Misc.NameHide = value
+end)
+local NameHideNameTextbox = NameHideGroup:AddInput("NameHideNameTextbox",{Text = "Name";Default = "Float.Balls",Numeric = false,Finished = true})
+NameHideNameTextbox:OnChanged(function(Value)
+    NameHideName = Value
+end)
+local NameHideTitleTextbox = NameHideGroup:AddInput("NameHideTitleTextbox",{Text = "Title";Default = "🤖",Numeric = false,Finished = true})
+NameHideTitleTextbox:OnChanged(function(Value)
+    NameHideTitle = Value
+end)
+
+
+--Name Hide End
 
 --Connections
+local Players = game:GetService("Players")
+local PlayerGui = Players.LocalPlayer.PlayerGui
+
+local OldName,OldTitle
 task.spawn(function()
     while true do task.wait(.05)
+        if Character and Character:FindFirstChild("Head") and Players.LocalPlayer and Players.LocalPlayer.PlayerGui and Players.LocalPlayer.PlayerGui:FindFirstChild("HUD") and Players.LocalPlayer.PlayerGui.HUD:FindFirstChild("Main") then
+            if Settings.Misc.NameHide == true then
+                Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.Portrait.Frame.ImageLabel.Visible = false
+                Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.PlayerName.Text = NameHideName
+                Character.Head.playerNameplate.PlayerName.Text = NameHideName
+                Character.Head.playerNameplate.Title.Text=NameHideTitle
+                PlayerGui.PartyUi.Frame.PartyScreen.InfoFrame.PartyData.Owner.Text = "by ["..NameHideName.."]"
+                PlayerGui.PartyUi.Frame.PartyScreen.InfoFrame.PartyData.PartyName.Text = NameHideName.." Party"
+                PlayerGui.PartyUi.Frame.CreateScreen.DungeonInfo.Owner.Text = NameHideName
+                PlayerGui.PartyUi.Frame.CreateScreen.DungeonInfo.PartyName.Text = NameHideName.." Party"
+                if PlayerGui.PartyUi.Frame.PartyScreen.MainFrame.Members.Content:FindFirstChild(tostring(Players.LocalPlayer.UserId)) then
+                    PlayerGui.PartyUi.Frame.PartyScreen.MainFrame.Members.Content[Players.LocalPlayer.UserId].MemberImage.Visible = false
+                    PlayerGui.PartyUi.Frame.PartyScreen.MainFrame.Members.Content[Players.LocalPlayer.UserId].MemberData.DisplayName.Text = NameHideName
+                    PlayerGui.PartyUi.Frame.PartyScreen.MainFrame.Members.Content[Players.LocalPlayer.UserId].MemberData.Username.Text = "@"..NameHideName
+                end
+            else
+                if PlayerGui.PartyUi.Frame.PartyScreen.MainFrame.Members.Content:FindFirstChild(tostring(Players.LocalPlayer.UserId)) then
+                    PlayerGui.PartyUi.Frame.PartyScreen.MainFrame.Members.Content[Players.LocalPlayer.UserId].MemberImage.Visible = true
+                    PlayerGui.PartyUi.Frame.PartyScreen.MainFrame.Members.Content[Players.LocalPlayer.UserId].MemberData.DisplayName.Text = OldName
+                    PlayerGui.PartyUi.Frame.PartyScreen.MainFrame.Members.Content[Players.LocalPlayer.UserId].MemberData.Username.Text = "@"..OldName
+                end
+                Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.Portrait.Frame.ImageLabel.Visible = true
+                Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.PlayerName.Text = OldName
+                Character.Head.playerNameplate.PlayerName.Text = OldName
+                Character.Head.playerNameplate.Title.Text=OldTitle
+                PlayerGui.PartyUi.Frame.CreateScreen.DungeonInfo.Owner.Text = OldName
+                PlayerGui.PartyUi.Frame.CreateScreen.DungeonInfo.PartyName.Text = OldName.." Party"
+            end
+        end
         if Settings.AutoSell.Enabled == true then
             local args = {["chest"] = {},["helmet"] = {},["ability"] = {},["ring"] = {},["weapon"] = {}}
             local counters = {["chest"] = 0, ["helmet"] = 0, ["ability"] = 0, ["ring"] = 1, ["weapon"] = 0}
@@ -365,6 +413,17 @@ end)
 local Settings = Window:AddTab("Settings")
 local SettingsUI = Settings:AddLeftGroupbox("UI")
 local SettingsUnloadButton = SettingsUI:AddButton({Text="Unload",Func=function()
+    if PlayerGui.PartyUi.Frame.PartyScreen.MainFrame.Members.Content:FindFirstChild(tostring(Players.LocalPlayer.UserId)) then
+        PlayerGui.PartyUi.Frame.PartyScreen.MainFrame.Members.Content[Players.LocalPlayer.UserId].MemberImage.Visible = true
+        PlayerGui.PartyUi.Frame.PartyScreen.MainFrame.Members.Content[Players.LocalPlayer.UserId].MemberData.DisplayName.Text = OldName
+        PlayerGui.PartyUi.Frame.PartyScreen.MainFrame.Members.Content[Players.LocalPlayer.UserId].MemberData.Username.Text = "@"..OldName
+    end
+    Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.Portrait.Frame.ImageLabel.Visible = true
+    Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.PlayerName.Text = OldName
+    Character.Head.playerNameplate.PlayerName.Text = OldName
+    Character.Head.playerNameplate.Title.Text=OldTitle
+    PlayerGui.PartyUi.Frame.CreateScreen.DungeonInfo.Owner.Text = OldName
+    PlayerGui.PartyUi.Frame.CreateScreen.DungeonInfo.PartyName.Text = OldName.." Party"
     Library:Unload()
 end})
 local SettingsMenuLabel = SettingsUI:AddLabel("SettingsMenuKeybindLabel","Menu Keybind")
@@ -416,10 +475,6 @@ if queue_on_teleport ~= nil then
     queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/VertigoCool99/Script/refs/heads/main/Dungeon%20Quest/Ui.lua"))()')
 end
 
-Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.Portrait.Frame.ImageLabel.Visible = false
-Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.PlayerName.Text = "Float.balls"
-Players.LocalPlayer.Character.Head.playerNameplate.PlayerName.Text = "Float.balls"
-Players.LocalPlayer.Character.Head.playerNameplate.Title.Text="🤖"
-
 repeat task.wait() until Character:FindFirstChild("HumanoidRootPart")
 Functions:GetBestDungeon()
+OldName,OldTitle = Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.PlayerName.Text,Character.Head.playerNameplate.Title.Text
