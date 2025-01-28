@@ -1,4 +1,4 @@
-repeat task.wait() until game:IsLoaded()
+repeat task.wait() until game:IsLoaded() and game.Players.LocalPlayer:FindFirstChild("dataLoaded").Value == true
 
 --Locals
 local Players = game:GetService("Players")
@@ -13,6 +13,7 @@ local BestDungeon,BestDiffculty = "nil","Insane"
 local Settings = {
     AutoFarm={Enabled=false,Delay=2,Distance=6,UseSkills=false},
     Dungeon={Enabled=false,EnabledBest=false,Name="",Diffculty="",Mode="Normal",RaidEnabled=false,RaidName="",Tier="1"},
+    AutoSell = {Enabled = false,Raritys = {},ItemTypes = {}};
     Misc={AutoRetry=false,GetGreggCoin=false},
 }
 local DungeonLevels = {
@@ -34,13 +35,36 @@ local DungeonLevels = {
     ["200"] = {["Dungeon"] = "Yokai Peak", ["Insane"] = 200, ["Nightmare"] = 205},
     ["210"] = {["Dungeon"] = "Abyssal Void", ["Insane"] = 210, ["Nightmare"] = 215},
 }
+local Raritys = {
+    ["Legendary"]=Color3.fromRGB(244, 154, 9);
+    ["Epic"]=Color3.fromRGB(146, 70, 159);
+    ["Rare"]=Color3.fromRGB(75, 77, 195);
+    ["Uncommon"]=Color3.fromRGB(91, 194, 80);
+    ["Common"]=Color3.fromRGB(152, 152, 152);
+}
 local Functions = {}
 
 --Functions
 Players.LocalPlayer.CharacterAdded:Connect(function(char)
     Character = char
+    repeat task.wait() until Character:FindFirstChild("HumanoidRootPart")
 end)
 
+function Functions:GetInventoryItems()
+    local tbl = {}
+    for i,v in pairs(Players.LocalPlayer.PlayerGui.sellShop.Frame.innerFrame.rightSideFrame.ScrollingFrame:GetChildren()) do
+        if v:IsA("ImageLabel") and v:FindFirstChild("itemType") and v.itemType:FindFirstChild("uniqueItemNum") then
+            local Item = {["index"]=v:FindFirstChild("itemType"):FindFirstChild("uniqueItemNum").Value,["rarity"]="";["itemType"]=v:FindFirstChild("itemType").Value}
+            for i2,v2 in pairs(Raritys) do
+                if v.ImageColor3 == v2 then
+                    Item["rarity"] = i2
+                end
+            end
+            table.insert(tbl,Item)
+        end
+    end
+    return tbl
+end
 function Functions:DoSkills(RepeatCount)
     for i,v in pairs(game:GetService("Players").LocalPlayer.Backpack:GetChildren()) do
         if v.cooldown.Value then
@@ -73,6 +97,8 @@ function Functions:Teleport(Cframe)
         Character.HumanoidRootPart.Anchored = true 
     end
 end
+
+
 function Functions:GetEnemys()
     if not workspace:FindFirstChild("dungeon") then 
         return workspace:FindFirstChild("enemies"):GetChildren()
@@ -136,10 +162,12 @@ local Library = loadstring(game:HttpGet("https://gist.githubusercontent.com/Vert
 local Window = Library:CreateWindow({Title=" Dungeon Quest",TweenTime=.15,Center=true})
    
 local FarmingTab = Window:AddTab("Farming")
+local MiscTab = Window:AddTab("Misc")
 
 local NormalFarm = FarmingTab:AddLeftGroupbox("Auto Farm")
 local DungeonCreateGroup = FarmingTab:AddRightGroupbox("Dungeon Creation")
 local SettingsGroup = FarmingTab:AddLeftGroupbox("Settings")
+local AutoSellGroup = MiscTab:AddLeftGroupbox("Auto Sell")
 
 --Farming Start
 local NormalFarmToggle = NormalFarm:AddToggle("NormalFarmToggle",{Text = "Enabled",Default = false,Risky = false})
@@ -212,11 +240,47 @@ GetGreggCoinToggle:OnChanged(function(value)
     Settings.Misc.GetGreggCoin = value
 end)
 --Settings Group End
+--Auto Sell Start
+local AutoSellEnabledToggle = AutoSellGroup:AddToggle("AutoSellEnabledToggle",{Text = "Auto Sell",Default = false,Risky = false})
+AutoSellEnabledToggle:AddTooltip("This Will Sell All Selected Raritys!")
+AutoSellEnabledToggle:OnChanged(function(value)
+    Settings.AutoSell.Enabled = value
+end)
+local AutoSellItemTypeDrop = AutoSellGroup:AddDropdown("AutoCreateDungeonTierDrop",{Text = "Item Type", AllowNull = false,Values = {"weapon","ability","ring","helmet","chest"},Default={""},Multi = true,})
+AutoSellItemTypeDrop:OnChanged(function(Value)
+    table.clear(Settings.AutoSell.ItemTypes)
+    for i, v in pairs(Value) do
+        if v == true then
+            table.insert(Settings.AutoSell.ItemTypes,i)
+        end
+    end
+end)
+local AutoSellRarirtyDrop = AutoSellGroup:AddDropdown("AutoCreateDungeonTierDrop",{Text = "Raritys", AllowNull = false,Values = {"Ultimate","Legendary","Epic","Rare","Uncommon","Common"},Default={""},Multi = true,})
+AutoSellRarirtyDrop:OnChanged(function(Value)
+    table.clear(Settings.AutoSell.Raritys)
+    for i, v in pairs(Value) do
+        if v == true then
+            table.insert(Settings.AutoSell.Raritys,i)
+        end
+    end
+end)
 
+--Auto Sell End
 
 --Connections
 task.spawn(function()
     while true do task.wait(.05)
+        if Settings.AutoSell.Enabled == true then
+            local args = {["chest"] = {},["helmet"] = {},["ability"] = {},["ring"] = {},["weapon"] = {}}
+            local counters = {["chest"] = 0, ["helmet"] = 0, ["ability"] = 0, ["ring"] = 1, ["weapon"] = 0}
+            for i,v in pairs(Functions:GetInventoryItems()) do
+                if table.find(Settings.AutoSell.ItemTypes,v["itemType"]) and table.find(Settings.AutoSell.Raritys,v["rarity"]) then
+                    counters[v["itemType"]] = counters[v["itemType"]] + 1
+                    args[v["itemType"]][counters[v["itemType"]]] = tonumber(v["index"])
+                end
+            end 
+            game:GetService("ReplicatedStorage"):WaitForChild("remotes"):WaitForChild("sellItemEvent"):FireServer(args)
+        end
         if workspace:FindFirstChild("CharacterSelectScene") and Settings.Dungeon.Enabled == true then
             local DunArgs = {[1] = {[1] = {[1] = "\1",[2] = {["\3"] = "PlaySolo",["partyData"] = {
                                 ["difficulty"] = Settings.Dungeon.Diffculty,
@@ -326,3 +390,5 @@ Library:Notify({Title="Loaded";Text=string.format('Loaded In '..(tick()-oldTick)
 if queue_on_teleport ~= nil then
     queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/VertigoCool99/Script/refs/heads/main/Dungeon%20Quest/Ui.lua"))()')
 end
+
+repeat task.wait() until Character:FindFirstChild("HumanoidRootPart")
