@@ -1,4 +1,4 @@
-repeat task.wait() until game:IsLoaded() and game.Players.LocalPlayer:FindFirstChild("dataLoaded").Value == true
+repeat task.wait() until game:IsLoaded() and game.Players.LocalPlayer:FindFirstChild("dataLoaded")
 
 --Locals
 local Players = game:GetService("Players")
