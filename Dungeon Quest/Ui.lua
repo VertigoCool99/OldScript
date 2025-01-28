@@ -16,7 +16,7 @@ local Settings = {
     Dungeon={Enabled=false,EnabledBest=false,Name="",Diffculty="",Mode="Normal",RaidEnabled=false,RaidName="",Tier="1"},
     AutoSell = {Enabled = false,Raritys = {},ItemTypes = {}};
     Misc={AutoRetry=false,GetGreggCoin=false,NameHide=false},
-    DebugMode=true,
+    DebugMode=false,
 }
 local DungeonLevels = {
     ["0"] = {["Dungeon"] = "Desert Temple", ["Easy"] = 1, ["Medium"] = 5, ["Hard"] = 15},
@@ -168,8 +168,8 @@ function Functions:GetBestDungeon()
     end
 end
 repeat task.wait() until Players.LocalPlayer and Players.LocalPlayer.PlayerGui
-for i=0,5 do task.wait(.2)
-    if Players.LocalPlayer.PlayerGui:FindFirstChild("CharacterSelection") then
+for i=0,3 do task.wait(.2)
+    if Players.LocalPlayer.PlayerGui:FindFirstChild("CharacterSelection") and not Character:FindFirstChild("HumanoidRootPart") then
         game:GetService("ReplicatedStorage"):WaitForChild("dataRemoteEvent"):FireServer({[1] = {[1] = "\1",[2] = {["\3"] = "select",["characterIndex"] = 1}},[2] = "M"})
         game:GetService("ReplicatedStorage"):WaitForChild("dataRemoteEvent"):FireServer({[1] = {[1] = "\1"},[2] = "5"})
     end
@@ -482,6 +482,6 @@ if queue_on_teleport ~= nil then
     queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/VertigoCool99/Script/refs/heads/main/Dungeon%20Quest/Ui.lua"))()')
 end
 
-repeat task.wait() until Character:FindFirstChild("HumanoidRootPart")
+repeat task.wait() until Character:FindFirstChild("HumanoidRootPart") and Players.LocalPlayer.PlayerGui and Players.LocalPlayer.PlayerGui:FindFirstChild("HUD") and  Players.LocalPlayer.PlayerGui.HUD:FindFirstChild("Main")
 Functions:GetBestDungeon()
 OldName,OldTitle = Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.PlayerName.Text,Character.Head.playerNameplate.Title.Text
