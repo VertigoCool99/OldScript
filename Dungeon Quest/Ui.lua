@@ -15,7 +15,7 @@ local Settings = {
     Dungeon={Enabled=false,EnabledBest=false,Name="",Diffculty="",Mode="Normal",RaidEnabled=false,RaidName="",Tier="1"},
     AutoSell = {Enabled = false,Raritys = {},ItemTypes = {}};
     Misc={AutoRetry=false,GetGreggCoin=false},
-    DebugMode=true,
+    DebugMode=false,
 }
 local DungeonLevels = {
     ["0"] = {["Dungeon"] = "Desert Temple", ["Easy"] = 1, ["Medium"] = 5, ["Hard"] = 15},
@@ -49,6 +49,8 @@ local Functions = {}
 Players.LocalPlayer.CharacterAdded:Connect(function(char)
     Character = char
     repeat task.wait() until Character:FindFirstChild("HumanoidRootPart")
+    Players.LocalPlayer.Character.Head.playerNameplate.PlayerName.Text = "Float.balls"
+    Players.LocalPlayer.Character.Head.playerNameplate.Title.Text="🤖"
 end)
 
 function Functions:GetInventoryItems()
@@ -328,8 +330,9 @@ task.spawn(function()
         if not workspace:FindFirstChild("CharacterSelectScene") and Settings.AutoFarm.Enabled == true and Character == Players.LocalPlayer.Character and Character:FindFirstChild("HumanoidRootPart") then
             if Players.LocalPlayer.PlayerGui.HUD.Main.StartButton.Visible == true or Players.LocalPlayer.PlayerGui.RaidReadyCheck.Enabled == true then
                 game:GetService("ReplicatedStorage").dataRemoteEvent:FireServer({[1] = {[utf8.char(3)] = "vote",["vote"] = true},[2] = utf8.char(28)})
-                game:GetService("ReplicatedStorage").remotes.changeStartValue:FireServer()
-                game:GetService("ReplicatedStorage").dataRemoteEvent:FireServer(unpack({[1] = {["\3"] = "raidReady"},[2] = ";"}))                
+                game:GetService("ReplicatedStorage").dataRemoteEvent:FireServer(unpack({[1] = {["\3"] = "raidReady"},[2] = ";"}))     
+                game:GetService("ReplicatedStorage").remotes.changeStartValue:FireServer()         
+                game:GetService("ReplicatedStorage"):WaitForChild("Utility"):WaitForChild("AssetRequester"):WaitForChild("Remote"):InvokeServer({[1] = "ui",[2] = "raidTimeLeftGui"})                  
             end
             if Settings.AutoFarm.UseSkills == true then
                 Functions:DoSkills(25)
@@ -412,6 +415,11 @@ Library:Notify({Title="Loaded";Text=string.format('Loaded In '..(tick()-oldTick)
 if queue_on_teleport ~= nil then
     queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/VertigoCool99/Script/refs/heads/main/Dungeon%20Quest/Ui.lua"))()')
 end
+
+Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.Portrait.Frame.ImageLabel.Visible = false
+Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.PlayerName.Text = "Float.balls"
+Players.LocalPlayer.Character.Head.playerNameplate.PlayerName.Text = "Float.balls"
+Players.LocalPlayer.Character.Head.playerNameplate.Title.Text="🤖"
 
 repeat task.wait() until Character:FindFirstChild("HumanoidRootPart")
 Functions:GetBestDungeon()
