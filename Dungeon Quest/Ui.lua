@@ -148,7 +148,6 @@ function Functions:GetClosestEnemy()
     return closestEnemy
 end
 function Functions:GetBestDungeon()
-    repeat task.wait() until Players.LocalPlayer and Players.LocalPlayer:FindFirstChild("leaderstats") and Players.LocalPlayer.leaderstats:FindFirstChild("Level")
     local highestLevelDungeon = 0
     for i, v in pairs(DungeonLevels) do
         if Players.LocalPlayer.leaderstats.Level.Value >= tonumber(i) then
@@ -169,7 +168,6 @@ function Functions:GetBestDungeon()
         end
     end
 end
-Functions:GetBestDungeon()
 --Librarys
 local Library = loadstring(game:HttpGet("https://gist.githubusercontent.com/VertigoCool99/282c9e98325f6b79299c800df74b2849/raw/d9efe72dc43a11b5237a43e2de71b7038e8bb37b/library.lua"))()
 
@@ -385,8 +383,6 @@ Library.SaveManager:LoadAutoloadConfig()
 --Settings End
 
 --Init
-local ui = Players.LocalPlayer.PlayerGui.cutscene
-
 Players.LocalPlayer.PlayerGui.cutscene.Changed:Connect(function(change)
     if change == "Enabled" then
         game:GetService("ReplicatedStorage").dataRemoteEvent:FireServer({[1] = {["\3"] = "skip"},[2] = "\184"})        
@@ -409,3 +405,4 @@ if queue_on_teleport ~= nil then
 end
 
 repeat task.wait() until Character:FindFirstChild("HumanoidRootPart")
+Functions:GetBestDungeon()
