@@ -484,4 +484,4 @@ end
 
 repeat task.wait() until Character:FindFirstChild("HumanoidRootPart") and Players.LocalPlayer.PlayerGui and Players.LocalPlayer.PlayerGui:FindFirstChild("HUD") and  Players.LocalPlayer.PlayerGui.HUD:FindFirstChild("Main") and  Players.LocalPlayer.PlayerGui.HUD.Main:FindFirstChild("PlayerStatus")
 Functions:GetBestDungeon()
-OldName,OldTitle = Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.PlayerName.Text,Character.Head.playerNameplate.Title.Text
+OldName,OldTitle = Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerName.Text,Character.Head.playerNameplate.Title.Text
