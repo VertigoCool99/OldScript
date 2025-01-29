@@ -12,6 +12,7 @@ local NameHideName,NameHideTitle = "",""
 local RemoteModule
 local LastplayerPos,StuckTime = 0
 local PlayerGui = Players.LocalPlayer.PlayerGui
+local OldName,OldTitle
 
 --Tables
 local Settings = {
@@ -333,12 +334,10 @@ end)
 
 --Connections
 
-local OldName,OldTitle
 task.spawn(function()
     while true do task.wait(1)
         if Settings.Misc.RejoinIfStuck == true then
-            print((LastplayerPos - Character:GetPivot().p).Magnitude)
-            if (LastplayerPos - Character:GetPivot().p).Magnitude < 1 then
+            if LastplayerPos ~= nil and Character and (LastplayerPos - Character:GetPivot().p).Magnitude < 1 then
                 StuckTime = StuckTime + 1
             elseif StuckTime == Settings.Misc.RejoinStuckDelay then
                 game:GetService("TeleportService"):Teleport(2414851778,game.Players.LocalPlayer)
@@ -369,15 +368,15 @@ task.spawn(function()
             else
                 if PlayerGui.PartyUi.Frame.PartyScreen.MainFrame.Members.Content:FindFirstChild(tostring(Players.LocalPlayer.UserId)) then
                     PlayerGui.PartyUi.Frame.PartyScreen.MainFrame.Members.Content[Players.LocalPlayer.UserId].MemberImage.Visible = true
-                    PlayerGui.PartyUi.Frame.PartyScreen.MainFrame.Members.Content[Players.LocalPlayer.UserId].MemberData.DisplayName.Text = OldName
-                    PlayerGui.PartyUi.Frame.PartyScreen.MainFrame.Members.Content[Players.LocalPlayer.UserId].MemberData.Username.Text = "@"..OldName
+                    PlayerGui.PartyUi.Frame.PartyScreen.MainFrame.Members.Content[Players.LocalPlayer.UserId].MemberData.DisplayName.Text = OldName or "Nil"
+                    PlayerGui.PartyUi.Frame.PartyScreen.MainFrame.Members.Content[Players.LocalPlayer.UserId].MemberData.Username.Text = "@"..OldName or "@Nil"
                 end
                 Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.Portrait.Frame.ImageLabel.Visible = true
-                Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.PlayerName.Text = OldName
-                Character.Head.playerNameplate.PlayerName.Text = OldName
-                Character.Head.playerNameplate.Title.Text=OldTitle
-                PlayerGui.PartyUi.Frame.CreateScreen.DungeonInfo.Owner.Text = OldName
-                PlayerGui.PartyUi.Frame.CreateScreen.DungeonInfo.PartyName.Text = OldName.." Party"
+                Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.PlayerName.Text = OldName or "Nil"
+                Character.Head.playerNameplate.PlayerName.Text = OldName or "Nil"
+                Character.Head.playerNameplate.Title.Text=OldTitle or "Nil"
+                PlayerGui.PartyUi.Frame.CreateScreen.DungeonInfo.Owner.Text = OldName or "Nil"
+                PlayerGui.PartyUi.Frame.CreateScreen.DungeonInfo.PartyName.Text = OldName.." Party" or "Nil Party"
             end
         end
         if Settings.AutoSell.Enabled == true then
@@ -463,11 +462,11 @@ local SettingsUnloadButton = SettingsUI:AddButton({Text="Unload",Func=function()
         PlayerGui.PartyUi.Frame.PartyScreen.MainFrame.Members.Content[Players.LocalPlayer.UserId].MemberData.Username.Text = "@"..OldName
     end
     Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.Portrait.Frame.ImageLabel.Visible = true
-    Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.PlayerName.Text = OldName
-    Character.Head.playerNameplate.PlayerName.Text = OldName
-    Character.Head.playerNameplate.Title.Text=OldTitle
-    PlayerGui.PartyUi.Frame.CreateScreen.DungeonInfo.Owner.Text = OldName
-    PlayerGui.PartyUi.Frame.CreateScreen.DungeonInfo.PartyName.Text = OldName.." Party"
+    Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.PlayerName.Text = OldName or "Nil"
+    Character.Head.playerNameplate.PlayerName.Text = OldName or "Nil"
+    Character.Head.playerNameplate.Title.Text=OldTitle or "Nil"
+    PlayerGui.PartyUi.Frame.CreateScreen.DungeonInfo.Owner.Text = OldName or "Nil"
+    PlayerGui.PartyUi.Frame.CreateScreen.DungeonInfo.PartyName.Text = OldName.." Party" or "Nil Party"
     Library:Unload()
 end})
 local SettingsMenuLabel = SettingsUI:AddLabel("SettingsMenuKeybindLabel","Menu Keybind")
