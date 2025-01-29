@@ -10,7 +10,8 @@ local oldTick = tick()
 local BestDungeon,BestDifficulty = "nil","Insane"
 local NameHideName,NameHideTitle = "",""
 local RemoteModule
-local StuckTime = 0
+local LastplayerPos,StuckTime = 0
+local PlayerGui = Players.LocalPlayer.PlayerGui
 
 --Tables
 local Settings = {
@@ -18,7 +19,7 @@ local Settings = {
     Dungeon={Enabled=false,EnabledBest=false,Name="",Diffculty="",Mode="Normal",RaidEnabled=false,RaidName="",Tier="1"},
     AutoSell = {Enabled = false,Raritys = {},ItemTypes = {}};
     Misc={AutoRetry=false,GetGreggCoin=false,NameHide=false,RejoinIfStuck=false,RejoinStuckDelay=120},
-    DebugMode=false,
+    DebugMode=true,
 }
 local DungeonLevels = {
     ["0"] = {["Dungeon"] = "Desert Temple", ["Easy"] = 0, ["Medium"] = 5, ["Hard"] = 15},
@@ -88,6 +89,7 @@ function Functions:DoSkills(RepeatCount)
 end
 function Functions:Teleport(Cframe)
     if not Character:FindFirstChild("HumanoidRootPart") then return end
+    LastplayerPos = Character:GetPivot().p
     if WaitingToTp == true then return end
     local bodyPosition = Character.HumanoidRootPart:FindFirstAncestorOfClass("BodyPosition")
     local bodyGyro = Character.HumanoidRootPart:FindFirstAncestorOfClass("BodyGyro")
@@ -323,22 +325,30 @@ RejoinStuckEnabledToggle:OnChanged(function(value)
     Settings.Misc.RejoinIfStuck = value
 end)
 local RejoinStuckDelaySlider = RejoinStuckGroup:AddSlider("RejoinStuckDelaySlider",{Text = "Time",Default = 120,Min = 30,Max = 300,Rounding = 0})
-RejoinStuckDelaySlider:AddTooltip("Time is in seconds")
+RejoinStuckDelaySlider:AddTooltip("Time Is In Seconds")
 RejoinStuckDelaySlider:OnChanged(function(Value)
     Settings.Misc.RejoinStuckDelay = Value
 end)
 --Rejoin Stuck End
 
 --Connections
-local Players = game:GetService("Players")
-local PlayerGui = Players.LocalPlayer.PlayerGui
 
 local OldName,OldTitle
-local HeartbeatCon = game:GetService("RunService").Heartbeat:Connect(function()
-    if Settings.Misc.RejoinIfStuck == true then
-        --So Stuck Logic
+task.spawn(function()
+    while true do task.wait(1)
+        if Settings.Misc.RejoinIfStuck == true then
+            print((LastplayerPos - Character:GetPivot().p).Magnitude)
+            if (LastplayerPos - Character:GetPivot().p).Magnitude < 1 then
+                StuckTime = StuckTime + 1
+            elseif StuckTime == Settings.Misc.RejoinStuckDelay then
+                game:GetService("TeleportService"):Teleport(2414851778,game.Players.LocalPlayer)
+            else
+                StuckTime = 0
+            end
+        end
     end
 end)
+
 task.spawn(function()
     while true do task.wait(.05)
         if Character and Character:FindFirstChild("Head") and Character.Head:FindFirstChild("playerNameplate") and Players.LocalPlayer and Players.LocalPlayer.PlayerGui and Players.LocalPlayer.PlayerGui:FindFirstChild("HUD") and Players.LocalPlayer.PlayerGui.HUD:FindFirstChild("Main") and Players.LocalPlayer.PlayerGui.HUD.Main:FindFirstChild("PlayerStatus") and Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus:FindFirstChild("PlayerStatus") and Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus:FindFirstChild("PlayerName") then
@@ -458,7 +468,6 @@ local SettingsUnloadButton = SettingsUI:AddButton({Text="Unload",Func=function()
     Character.Head.playerNameplate.Title.Text=OldTitle
     PlayerGui.PartyUi.Frame.CreateScreen.DungeonInfo.Owner.Text = OldName
     PlayerGui.PartyUi.Frame.CreateScreen.DungeonInfo.PartyName.Text = OldName.." Party"
-    HeartbeatCon:Disconnect()
     Library:Unload()
 end})
 local SettingsMenuLabel = SettingsUI:AddLabel("SettingsMenuKeybindLabel","Menu Keybind")
