@@ -10,7 +10,7 @@ local oldTick = tick()
 local BestDungeon,BestDifficulty = "nil","Insane"
 local NameHideName,NameHideTitle = "",""
 local RemoteModule
-local LastplayerPos,StuckTime = 0
+local LastplayerPos,StuckTime = Vector3.zero,0
 local PlayerGui = Players.LocalPlayer.PlayerGui
 local OldName,OldTitle
 
