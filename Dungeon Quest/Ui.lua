@@ -182,7 +182,7 @@ if getupvalue ~= nil then
         RemoteCodes[v] = i
     end
 else
-    RemoteCodes={["DungeonRetryBridge"]="/",["CharacterSelection"]="M",["PartySystem"]="d",["Cutscene"]="\184",["Intro"]="5"}
+    RemoteCodes={["DungeonRetryBridge"]="/",["CharacterSelection"]="M",["PartySystem"]="d",["Cutscene"]="\184",["Intro"]="5",["DungeonHandler"]=";"}
 end
 
 repeat task.wait() until Players.LocalPlayer and Players.LocalPlayer.PlayerGui
@@ -338,7 +338,7 @@ end)
 task.spawn(function()
     while true do task.wait(1)
         if Settings.Misc.RejoinIfStuck == true then
-            if LastplayerPos ~= nil and Character and (LastplayerPos - Character:GetPivot().p).Magnitude < 1 then
+            if LastplayerPos and Character and (LastplayerPos - Character:GetPivot().p).Magnitude < 1 then
                 StuckTime = StuckTime + 1
             elseif StuckTime == Settings.Misc.RejoinStuckDelay then
                 game:GetService("TeleportService"):Teleport(2414851778,game.Players.LocalPlayer)
@@ -428,7 +428,7 @@ task.spawn(function()
         if not workspace:FindFirstChild("CharacterSelectScene") and Settings.AutoFarm.Enabled == true and Character == Players.LocalPlayer.Character and Character:FindFirstChild("HumanoidRootPart") then
             if Players.LocalPlayer.PlayerGui.HUD.Main.StartButton.Visible == true or Players.LocalPlayer.PlayerGui.RaidReadyCheck.Enabled == true then
                 game:GetService("ReplicatedStorage").dataRemoteEvent:FireServer({[1] = {[utf8.char(3)] = "vote",["vote"] = true},[2] = utf8.char(28)}) --UPDATE CODE
-                game:GetService("ReplicatedStorage").dataRemoteEvent:FireServer(unpack({[1] = {["\3"] = "raidReady"},[2] = ";"}))     --UPDATE CODE
+                game:GetService("ReplicatedStorage").dataRemoteEvent:FireServer(unpack({[1] = {["\3"] = "raidReady"},[2] = RemoteCodes["DungeonHandler"]}))
                 game:GetService("ReplicatedStorage").remotes.changeStartValue:FireServer()         
                 game:GetService("ReplicatedStorage"):WaitForChild("Utility"):WaitForChild("AssetRequester"):WaitForChild("Remote"):InvokeServer({[1] = "ui",[2] = "raidTimeLeftGui"})                  
             end
