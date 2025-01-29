@@ -7,7 +7,7 @@ local Character = Players.LocalPlayer.Character
 local WaitingToTp = false
 local GreggCoin,RealCoin = false,nil
 local oldTick = tick()
-local BestDungeon,BestDiffculty = "nil","Insane"
+local BestDungeon,BestDifficulty = "nil","Insane"
 local NameHideName,NameHideTitle = "",""
 
 --Tables
@@ -221,7 +221,7 @@ local AutoCreateDungeonNameDrop = DungeonCreateGroup:AddDropdown("AutoCreateDung
 AutoCreateDungeonNameDrop:OnChanged(function(Value)
     Settings.Dungeon.Name = Value
 end)
-local AutoCreateDungeonDiffcultyDrop = DungeonCreateGroup:AddDropdown("AutoCreateDungeonDiffcultyDrop",{Text = "Diffculty", AllowNull = false,Values = {"Insane","Nightmare"},Default=BestDiffculty,Multi = false,})
+local AutoCreateDungeonDiffcultyDrop = DungeonCreateGroup:AddDropdown("AutoCreateDungeonDiffcultyDrop",{Text = "Diffculty", AllowNull = false,Values = {"Insane","Nightmare"},Default=BestDifficulty,Multi = false,})
 AutoCreateDungeonDiffcultyDrop:OnChanged(function(Value)
     Settings.Dungeon.Diffculty = Value
 end)
@@ -314,7 +314,7 @@ local PlayerGui = Players.LocalPlayer.PlayerGui
 local OldName,OldTitle
 task.spawn(function()
     while true do task.wait(.05)
-        if Character and Character:FindFirstChild("Head") and Character.Head:FindFirstChild("playerNameplate") and Players.LocalPlayer and Players.LocalPlayer.PlayerGui and Players.LocalPlayer.PlayerGui:FindFirstChild("HUD") and Players.LocalPlayer.PlayerGui.HUD:FindFirstChild("Main") then
+        if Character and Character:FindFirstChild("Head") and Character.Head:FindFirstChild("playerNameplate") and Players.LocalPlayer and Players.LocalPlayer.PlayerGui and Players.LocalPlayer.PlayerGui:FindFirstChild("HUD") and Players.LocalPlayer.PlayerGui.HUD:FindFirstChild("Main") and Players.LocalPlayer.PlayerGui.HUD.Main:FindFirstChild("PlayerStatus") and Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus:FindFirstChild("PlayerStatus") and Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus:FindFirstChild("PlayerName") then
             if Settings.Misc.NameHide == true then
                 Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.Portrait.Frame.ImageLabel.Visible = false
                 Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.PlayerName.Text = NameHideName
@@ -375,7 +375,7 @@ task.spawn(function()
             game:GetService("ReplicatedStorage"):WaitForChild("dataRemoteEvent"):FireServer(unpack(RaidArgs))
         elseif Settings.Dungeon.EnabledBest == true then
             local DunArgs = {[1] = {[1] = {[1] = "\1",[2] = {["\3"] = "PlaySolo",["partyData"] = {
-                ["difficulty"] = BestDiffculty,
+                ["difficulty"] = BestDifficulty,
                 ["mode"] = "Normal",
                 ["dungeonName"] = BestDungeon,
                 ["tier"] = 1,
@@ -482,6 +482,8 @@ if queue_on_teleport ~= nil then
     queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/VertigoCool99/Script/refs/heads/main/Dungeon%20Quest/Ui.lua"))()')
 end
 
-repeat task.wait() until Character:FindFirstChild("HumanoidRootPart") and Players.LocalPlayer.PlayerGui and Players.LocalPlayer.PlayerGui:FindFirstChild("HUD") and  Players.LocalPlayer.PlayerGui.HUD:FindFirstChild("Main") and  Players.LocalPlayer.PlayerGui.HUD.Main:FindFirstChild("PlayerStatus")
+repeat task.wait() until Character:FindFirstChild("HumanoidRootPart") and Players.LocalPlayer.PlayerGui and Players.LocalPlayer.PlayerGui:FindFirstChild("HUD") and Players.LocalPlayer.PlayerGui.HUD:FindFirstChild("Main") and Players.LocalPlayer.PlayerGui.HUD.Main:FindFirstChild("PlayerStatus") and Players.LocalPlayer.PlayerGui and Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus:FindFirstChild("PlayerStatus") and Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus:FindFirstChild("PlayerName")
 Functions:GetBestDungeon()
-OldName,OldTitle = Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerName.Text,Character.Head.playerNameplate.Title.Text
+AutoCreateDungeonNameDrop:SetValue(BestDungeon)
+AutoCreateDungeonDiffcultyDrop:SetValue(BestDifficulty)
+OldName,OldTitle = Players.LocalPlayer.PlayerGui.HUD.Main.PlayerStatus.PlayerStatus.PlayerName.Text,Character.Head.playerNameplate.Title.Text
