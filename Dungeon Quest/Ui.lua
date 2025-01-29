@@ -20,7 +20,7 @@ local Settings = {
     Dungeon={Enabled=false,EnabledBest=false,Name="",Diffculty="",Mode="Normal",RaidEnabled=false,RaidName="",Tier="1"},
     AutoSell = {Enabled = false,Raritys = {},ItemTypes = {}};
     Misc={AutoRetry=false,GetGreggCoin=false,NameHide=false,RejoinIfStuck=false,RejoinStuckDelay=120},
-    DebugMode=false,
+    DebugMode=true,
 }
 local DungeonLevels = {
     ["0"] = {["Dungeon"] = "Desert Temple", ["Easy"] = 0, ["Medium"] = 5, ["Hard"] = 15},
@@ -173,13 +173,6 @@ function Functions:GetBestDungeon()
         end
     end
 end
-repeat task.wait() until Players.LocalPlayer and Players.LocalPlayer.PlayerGui
-for i=0,5 do task.wait(.2)
-    if Players.LocalPlayer.PlayerGui:FindFirstChild("CharacterSelection") and not Character then
-        game:GetService("ReplicatedStorage"):WaitForChild("dataRemoteEvent"):FireServer({[1] = {[1] = "\1",[2] = {["\3"] = "select",["characterIndex"] = 1}},[2] = RemoteCodes["CharacterSelection"]})
-        game:GetService("ReplicatedStorage"):WaitForChild("dataRemoteEvent"):FireServer({[1] = {[1] = "\1"},[2] = "5"})
-    end
-end
 
 --Grab Codes
 if getupvalue ~= nil then
@@ -189,7 +182,15 @@ if getupvalue ~= nil then
         RemoteCodes[v] = i
     end
 else
-    RemoteCodes={["DungeonRetryBridge"]="/",["CharacterSelection"]="M",["PartySystem"]="d",["Cutscene"]="\184"}
+    RemoteCodes={["DungeonRetryBridge"]="/",["CharacterSelection"]="M",["PartySystem"]="d",["Cutscene"]="\184",["Intro"]="5"}
+end
+
+repeat task.wait() until Players.LocalPlayer and Players.LocalPlayer.PlayerGui
+for i=0,5 do task.wait(.2)
+    if Players.LocalPlayer.PlayerGui:FindFirstChild("CharacterSelection") and not Character then
+        game:GetService("ReplicatedStorage"):WaitForChild("dataRemoteEvent"):FireServer({[1] = {[1] = "\1",[2] = {["\3"] = "select",["characterIndex"] = 1}},[2] = RemoteCodes["CharacterSelection"]})
+        game:GetService("ReplicatedStorage"):WaitForChild("dataRemoteEvent"):FireServer({[1] = {[1] = "\1"},[2] = RemoteCodes["Intro"]})
+    end
 end
 
 --Librarys
