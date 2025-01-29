@@ -20,7 +20,7 @@ local Settings = {
     Dungeon={Enabled=false,EnabledBest=false,Name="",Diffculty="",Mode="Normal",RaidEnabled=false,RaidName="",Tier="1"},
     AutoSell = {Enabled = false,Raritys = {},ItemTypes = {}};
     Misc={AutoRetry=false,GetGreggCoin=false,NameHide=false,RejoinIfStuck=false,RejoinStuckDelay=120},
-    DebugMode=false,
+    DebugMode=true,
 }
 local DungeonLevels = {
     ["0"] = {["Dungeon"] = "Desert Temple", ["Easy"] = 0, ["Medium"] = 5, ["Hard"] = 15},
@@ -433,7 +433,7 @@ task.spawn(function()
                 game:GetService("ReplicatedStorage"):WaitForChild("Utility"):WaitForChild("AssetRequester"):WaitForChild("Remote"):InvokeServer({[1] = "ui",[2] = "raidTimeLeftGui"})                  
             end
             if Settings.AutoFarm.UseSkills == true then
-                Functions:DoSkills(25)
+                Functions:DoSkills(20)
             end
             if Settings.Misc.GetGreggCoin == true and GreggCoin == true and RealCoin ~= nil then
                 Functions:Teleport(RealCoin:GetPivot()-Vector3.new(0,Settings.AutoFarm.Distance*2,0))
