@@ -168,25 +168,8 @@ local FpsTab = FpsTabbox:AddTab('FPS')
 
 FpsTab:AddToggle('RenderingToggle', {Text = 'Rendering',Default = true})
 
-EventTab:AddButton('Do Santa', function()
-    task.spawn(function()
-        if workspace:FindFirstChild("CreatedPresent") and (workspace:FindFirstChild("CreatedPresent"):GetPivot().p -humanoidRootPart:GetPivot().p).Magnitude > 10 then
-            humanoidRootPart:PivotTo(workspace.CreatedPresent:GetPivot() + Vector3.new(0,2,0))
-            task.wait(.2)
-            fireproximityprompt(workspace.CreatedPresent.ProximityPrompt)
-        end
-        task.wait(.3)
-        humanoidRootPart:PivotTo(workspace.Map.SantaModel.Santa.CamPos:GetPivot())
-        game:GetService("Players").LocalPlayer.PlayerGui.GUI.GiftExchange.Visible = true
-        task.wait(.35)
-        firesignal(game:GetService("Players").LocalPlayer.PlayerGui.GUI.GiftExchange.ExchangeButton.MouseButton1Down)
-        task.wait(.4)
-        game:GetService("Players").LocalPlayer.PlayerGui.GUI.GiftExchange.Visible = false
-
-        humanoidRootPart.Velocity = Vector3.zero
-        humanoidRootPart.CFrame = TycoonBase:GetPivot()+Vector3.new(0,TycoonBase.Size.Y+2.5,0)
-    end)
-end)
+EventTab:AddToggle('AutoClover', {Text = 'Collect Clovers',Default = false})
+EventTab:AddToggle('CloverGui', {Text = 'Open Clover Gui',Default = false})
 
 OresTab:AddInput('SelectedUpgrader', {Default = 'Upgrader',Numeric = false,Finished = false,Text = 'Upgrader',Placeholder = 'Upgrader Name',})
 OresTab:AddToggle('LoopUpgrader', {Text = 'Loop Upgrader',Default = false})
@@ -234,6 +217,9 @@ WebhookTab:AddToggle('ItemTracker', {Text = 'Item Tracker',Default = false})
 Toggles.RenderingToggle:OnChanged(function()
     game:GetService("RunService"):Set3dRenderingEnabled(Toggles.RenderingToggle.Value)
 end)
+Toggles.CloverGui:OnChanged(function()
+    game:GetService("Players").LocalPlayer.PlayerGui.GUI.Patrick.Visible = Toggles.CloverGui.Value
+end)
 Toggles.AutoSellOre:OnChanged(function()
     task.spawn(function()
         while Toggles.AutoSellOre.Value do task.wait()
@@ -246,6 +232,24 @@ Toggles.AutoSellOre:OnChanged(function()
                     end
                 end)
             end
+        end
+    end)
+end)
+
+Toggles.AutoClover:OnChanged(function()
+    task.spawn(function()
+        while Toggles.AutoClover.Value do task.wait(.2)
+            if humanoidRootPart then
+                for i,v in pairs(workspace.Clovers:GetChildren()) do
+                    if v:FindFirstChild("ProximityPrompt") then
+                        game.Players.LocalPlayer.Character:PivotTo(v:GetPivot())
+                        task.wait(.2)
+                        fireproximityprompt(v.ProximityPrompt)
+                    end 
+                end
+                humanoidRootPart.Velocity = Vector3.zero
+                humanoidRootPart:PivotTo(TycoonBase:GetPivot()+Vector3.new(0,TycoonBase.Size.Y+2.5,0))
+            end 
         end
     end)
 end)
