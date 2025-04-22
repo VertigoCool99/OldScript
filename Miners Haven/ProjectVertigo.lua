@@ -1,21 +1,3 @@
-local repo = 'https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/'
-
-local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
-local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
-local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
-
-local Window = Library:CreateWindow({
-    Title = 'Project Vertigo | Miners Haven',
-    Center = true, 
-    AutoShow = true,
-})
-
-Library.KeybindFrame.Visible = false; -- todo: add a function for this
-
-Library:OnUnload(function()
-    Library.Unloaded = true
-end)
-
 --Locals
 local FetchItemModule = require(game:GetService("ReplicatedStorage").FetchItem)
 local TycoonBase = game.Players.LocalPlayer.PlayerTycoon.Value.Base
@@ -106,213 +88,54 @@ function GetMissingItems()
     return MissingString
 end
 
-local Tabs = {Main = Window:AddTab('Main'),Layouts=Window:AddTab('Layouts'),['UI Settings'] = Window:AddTab('UI Settings'),}
+local Library = loadstring(game:HttpGet("https://gist.githubusercontent.com/VertigoCool99/282c9e98325f6b79299c800df74b2849/raw/d9efe72dc43a11b5237a43e2de71b7038e8bb37b/library.lua"))()
 
-local LayoutsTabbox = Tabs.Layouts:AddLeftTabbox()
-local LayoutsTab = LayoutsTabbox:AddTab('Copier')
-local LayoutsTabbox2 = Tabs.Layouts:AddRightTabbox()
-local LayoutsTabInfo = LayoutsTabbox2:AddTab('Missing Items')
+local Window = Library:CreateWindow({Title=" Miners Haven",TweenTime=.15,Center=true})
+   
+local MainTab = Window:AddTab("Main")
+local LayoutsTab = Window:AddTab("Layouts")
 
-local Label = LayoutsTabInfo:AddLabel('No Layout Selected',true)
-LayoutsTabInfo:AddButton("Get Missing Items!",function()
-    Label:SetText("Getting Items, Please Wait!")
-    if Settings.LayoutPlayerSelected == nil and Settings.LayoutCopierSelected == nil then return end
-    Label:SetText(GetMissingItems())
+--Ores
+local OresTabbox = MainTab:AddLeftGroupbox("Ores")
+
+local SelectedUpgraderTextbox = OresTabbox:AddInput("SelectedUpgraderTextbox",{Text = "Selected Upgrader";Default = "Upgrader",Numeric = false,Finished = true})
+SelectedUpgraderTextbox:OnChanged(function(Value)
+    Settings.SelectedUpgrader = Value
 end)
-
-LayoutsTab:AddDropdown('LayoutPlayerSelected',{Values = PlayersList,Default = 2,Multi = false,Text = 'Player',})
-LayoutsTab:AddDropdown('LayoutCopierSelected', {Values = {1,2,3},Default = 1,Multi = false,Text = 'Layout',})
-LayoutsTab:AddButton('Build Layout', function()
-    if Settings.LayoutPlayerSelected == nil and Settings.LayoutCopierSelected == nil then return end
-    for i,v in pairs(game:GetService("HttpService"):JSONDecode(game:GetService("Players")[Settings.LayoutPlayerSelected].Layouts["Layout"..Settings.LayoutCopierSelected].Value)) do
-        task.spawn(function()
-            if HasItem(v["ItemId"]) == true then
-                local TopLeft = TycoonBase.CFrame * CFrame.new(Vector3.new(TycoonBase.Size.X/2, 0, TycoonBase.Size.Z/2))
-                local Position = TopLeft * Vector3.new(tonumber(v.Position[1]), tonumber(v.Position[2]), tonumber(v.Position[3]))
-                local Rotation = Vector3.new(tonumber(v.Position[4]),tonumber(v.Position[5]),tonumber(v.Position[6]))
-                local NewCf = CFrame.new(Position, Position + (Rotation * 5))
-                game:GetService("ReplicatedStorage").PlaceItem:InvokeServer(FetchItemModule.Get(nil,v["ItemId"]).Name,NewCf,{TycoonBase})
-                task.wait()
-            elseif HasItem(v["ItemId"]) == false and IsShopItem(v["ItemId"]) == true and game:GetService("Players").LocalPlayer.PlayerGui.GUI.Money.Value >= game:GetService("ReplicatedStorage").Items[FetchItemModule.Get(nil,v["ItemId"]).Name].Cost.Value then
-                game:GetService("ReplicatedStorage").BuyItem:InvokeServer(FetchItemModule.Get(nil,v["ItemId"]).Name,1)
-                task.wait()
-                local TopLeft = TycoonBase.CFrame * CFrame.new(Vector3.new(TycoonBase.Size.X/2, 0, TycoonBase.Size.Z/2))
-                local Position = TopLeft * Vector3.new(tonumber(v.Position[1]), tonumber(v.Position[2]), tonumber(v.Position[3]))
-                local Rotation = Vector3.new(tonumber(v.Position[4]),tonumber(v.Position[5]),tonumber(v.Position[6]))
-                local NewCf = CFrame.new(Position, Position + (Rotation * 5))
-                game:GetService("ReplicatedStorage").PlaceItem:InvokeServer(FetchItemModule.Get(nil,v["ItemId"]).Name,NewCf,{TycoonBase})
-                task.wait()
-            else
-                if IsShopItem(v["ItemId"]) == true then
-                    print("Cant Afford Item, "..FetchItemModule.Get(nil,v["ItemId"]).Name)
-                else
-                    print("Cant Find, "..FetchItemModule.Get(nil,v["ItemId"]).Name)
+local LoopUpgraderToggle = OresTabbox:AddToggle("LoopUpgrader",{Text = "Loop Upgrader",Default = false,Risky = false})
+LoopUpgraderToggle:OnChanged(function(value)
+    Settings.LoopUpgrader = value
+    task.spawn(function()
+        while Settings.LoopUpgrader do task.wait()
+            if Settings.LoopUpgrader then
+                for i,v in pairs(GetDropped()) do
+                    task.spawn(function()
+                        if MyTycoon:FindFirstChild(Settings.SelectedUpgrader) and MyTycoon[Settings.SelectedUpgrader].Model:FindFirstChild("Upgrade") then
+                            firetouchinterest(v,MyTycoon[Settings.SelectedUpgrader].Model.Upgrade,0)
+                            task.wait()
+                            firetouchinterest(v,MyTycoon[Settings.SelectedUpgrader].Model.Upgrade,1)
+                        elseif MyTycoon:FindFirstChild(Settings.SelectedUpgrader) and MyTycoon[Settings.SelectedUpgrader].Model:FindFirstChild("Upgrader") then
+                            firetouchinterest(v,MyTycoon[Settings.SelectedUpgrader].Model.Upgrader,0)
+                            task.wait()
+                            firetouchinterest(v,MyTycoon[Settings.SelectedUpgrader].Model.Upgrader,1)
+                        elseif MyTycoon:FindFirstChild(Settings.SelectedUpgrader) and MyTycoon[Settings.SelectedUpgrader].Model:FindFirstChild("Cannon") then
+                            firetouchinterest(v,MyTycoon[Settings.SelectedUpgrader].Model.Cannon,0)
+                            task.wait()
+                            firetouchinterest(v,MyTycoon[Settings.SelectedUpgrader].Model.Cannon,1)
+                        elseif MyTycoon:FindFirstChild(Settings.SelectedUpgrader) and MyTycoon[Settings.SelectedUpgrader].Model:FindFirstChild("Copy") then
+                            firetouchinterest(v,MyTycoon[Settings.SelectedUpgrader].Model.Copy,0)
+                            task.wait()
+                            firetouchinterest(v,MyTycoon[Settings.SelectedUpgrader].Model.Copy,1)
+                        end
+                    end)
                 end
             end
-        end)
-    end
-end)
-
-local OresTabbox = Tabs.Main:AddLeftTabbox()
-local OresTab = OresTabbox:AddTab('Ores')
-local RebirthTabbox = Tabs.Main:AddRightTabbox()
-local RebirthTab = RebirthTabbox:AddTab('Rebirthing')
-local MiscTabbox = Tabs.Main:AddLeftTabbox()
-local MiscTab = MiscTabbox:AddTab('Misc')
-local WebhookTabbox = Tabs.Main:AddRightTabbox()
-local WebhookTab = WebhookTabbox:AddTab('Webhook')
-local EventTabbox = Tabs.Main:AddRightTabbox()
-local EventTab = EventTabbox:AddTab('Event')
-local FpsTabbox = Tabs.Main:AddRightTabbox()
-local FpsTab = FpsTabbox:AddTab('FPS')
-
-FpsTab:AddToggle('RenderingToggle', {Text = 'Rendering',Default = true})
-
-EventTab:AddToggle('AutoClover', {Text = 'Collect Clovers',Default = false})
-EventTab:AddToggle('CloverGui', {Text = 'Open Clover Gui',Default = false})
-
-OresTab:AddInput('SelectedUpgrader', {Default = 'Upgrader',Numeric = false,Finished = false,Text = 'Upgrader',Placeholder = 'Upgrader Name',})
-OresTab:AddToggle('LoopUpgrader', {Text = 'Loop Upgrader',Default = false})
-OresTab:AddToggle('AutoLoopUpgraders', {Text = 'Loop All Upgraders',Default = false})
-OresTab:AddDivider()
-OresTab:AddInput('SelectedFurnace', {Default = 'Furnace',Numeric = false,Finished = false,Text = 'Furnace',Placeholder = 'Furnace',})
-OresTab:AddToggle('AutoSellOre', {Text = 'Auto Sell Ore',Default = false})
-OresTab:AddButton('Sell Ores', function()
-    for i,v in pairs(GetDropped()) do
-        task.spawn(function()
-            if MyTycoon:FindFirstChild(Settings.SelectedFurnace) then
-                firetouchinterest(v,MyTycoon[Settings.SelectedFurnace].Model.Lava,0)
-                task.wait()
-                firetouchinterest(v,MyTycoon[Settings.SelectedFurnace].Model.Lava,1)
-            end
-        end)
-    end
-end)
-
-RebirthTab:AddToggle('AutoRebirth', {Text = 'Auto Rebirth',Default = false})
-RebirthTab:AddToggle('DelayRebirth', {Text = 'Delay Rebirth',Default = false})
-RebirthTab:AddToggle('AutoLoadSetup', {Text = 'Load Layout',Default = false})
-RebirthTab:AddDropdown('LayoutSelected', {Values = {1,2,3},Default = 1,Multi = false,Text = 'Layout',})
-RebirthTab:AddToggle('ShouldReload', {Text = 'Reload Layout',Default = false})
-RebirthTab:AddSlider('LoadAfter', {Text = 'Reload After (s)',Default = 5,Min = 1,Max = 60,Rounding = 0,Compact = false,})
-
-MiscTab:AddToggle('LoopProximtyPrompt', {Text = 'Auto Excavator',Default = false})
-MiscTab:AddToggle('LoopRemoteDrop', {Text = 'Auto Remote',Default = false})
-MiscTab:AddToggle('LoopPulse', {Text = 'Auto Pulse',Default = false})
-MiscTab:AddButton('Get Free Daily Crate', function()
-    firesignal(game:GetService("Players").LocalPlayer.PlayerGui.GUI.SpookMcDookShop.RedeemFrame.MouseButton1Click)
-end)
-MiscTab:AddDivider()
-MiscTab:AddToggle('ToggleCraftsMan', {Text = 'Craftman Gui',Default = false})
-MiscTab:AddToggle('ToggleAutoBoxes', {Text = 'Auto Collect Boxes',Default = false})
-MiscTab:AddButton('Goto Base!', function()
-    humanoidRootPart.Velocity = Vector3.zero
-    humanoidRootPart.CFrame = TycoonBase:GetPivot()+Vector3.new(0,TycoonBase.Size.Y+2.5,0)
-end)
-
-WebhookTab:AddInput('WebhookLink', {Default = 'Link',Numeric = false,Finished = false,Text = 'Link',Placeholder = 'Link',})
-WebhookTab:AddToggle('ItemTracker', {Text = 'Item Tracker',Default = false})
-
---Toggles
-Toggles.RenderingToggle:OnChanged(function()
-    game:GetService("RunService"):Set3dRenderingEnabled(Toggles.RenderingToggle.Value)
-end)
-Toggles.CloverGui:OnChanged(function()
-    game:GetService("Players").LocalPlayer.PlayerGui.GUI.Patrick.Visible = Toggles.CloverGui.Value
-end)
-Toggles.AutoSellOre:OnChanged(function()
-    task.spawn(function()
-        while Toggles.AutoSellOre.Value do task.wait()
-            for i,v in pairs(GetDropped()) do
-                task.spawn(function()
-                    if MyTycoon:FindFirstChild(Settings.SelectedFurnace) then
-                        firetouchinterest(v,MyTycoon[Settings.SelectedFurnace].Model.Lava,0)
-                        task.wait()
-                        firetouchinterest(v,MyTycoon[Settings.SelectedFurnace].Model.Lava,1)
-                    end
-                end)
-            end
         end
     end)
 end)
-
-Toggles.AutoClover:OnChanged(function()
-    task.spawn(function()
-        while Toggles.AutoClover.Value do task.wait(.2)
-            if humanoidRootPart then
-                for i,v in pairs(workspace.Clovers:GetChildren()) do
-                    if v:FindFirstChild("ProximityPrompt") then
-                        game.Players.LocalPlayer.Character:PivotTo(v:GetPivot())
-                        task.wait(.2)
-                        if v:FindFirstChild("ProximityPrompt") ~= nil then 
-                            fireproximityprompt(v.ProximityPrompt)
-                        end
-                    end 
-                end
-                humanoidRootPart.Velocity = Vector3.zero
-                humanoidRootPart:PivotTo(TycoonBase:GetPivot()+Vector3.new(0,TycoonBase.Size.Y+2.5,0))
-            end 
-        end
-    end)
-end)
-Toggles.ToggleAutoBoxes:OnChanged(function()
-    task.spawn(function()
-        while Toggles.ToggleAutoBoxes.Value do task.wait(.2)
-            if humanoidRootPart then
-                for i, v in pairs(game:GetService("Workspace").Boxes:GetChildren()) do
-                    local boxNames = {"Shadow", "Research", "Goldpot", "Golden", "Crystal", "Diamond", "Present","Lucky"}
-                    if table.find(boxNames,v.Name) and not collectedBoxes[v] and v:FindFirstChild("TouchInterest") then
-                        humanoidRootPart.Velocity = Vector3.zero
-                        humanoidRootPart:PivotTo(v:GetPivot()*CFrame.new(0,-1,0))
-                        firetouchinterest(humanoidRootPart,v,0)
-                        if v:FindFirstChild("TouchInterest") then
-                            firetouchinterest(humanoidRootPart,v,1)
-                        end
-                        if v.Transparency ~= 0.2 then
-                            collectedBoxes[v] = nil
-                        else
-                            collectedBoxes[v] = true
-                        end
-                        task.wait(.2)
-                        humanoidRootPart.Velocity = Vector3.zero
-                        humanoidRootPart:PivotTo(v:GetPivot()*CFrame.new(0,-30,0))
-                    end
-                end
-                humanoidRootPart.Velocity = Vector3.zero
-                humanoidRootPart:PivotTo(TycoonBase:GetPivot()+Vector3.new(0,TycoonBase.Size.Y+2.5,0))
-            end 
-        end
-    end)
-end)
-
-Toggles.ItemTracker:OnChanged(function()
-    Settings.ItemTracker = Toggles.ItemTracker.Value
-end)
-Toggles.ToggleCraftsMan:OnChanged(function()
-    game:GetService("Players").LocalPlayer.PlayerGui.GUI.Craftsman.Visible = Toggles.ToggleCraftsMan.Value
-end)
-Toggles.LoopPulse:OnChanged(function()
-    Settings.LoopPulse = Toggles.LoopPulse.Value
-    task.spawn(function()
-        while Settings.LoopPulse == true do task.wait()
-            if Settings.LoopPulse == true then
-                game:GetService("ReplicatedStorage").Pulse:FireServer()
-            end
-        end
-    end)
-end)
-Toggles.LoopRemoteDrop:OnChanged(function()
-    Settings.LoopRemoteDrop = Toggles.LoopRemoteDrop.Value
-    task.spawn(function()
-        while Settings.LoopRemoteDrop == true do task.wait()
-            if Settings.LoopRemoteDrop == true then
-                game:GetService("ReplicatedStorage").RemoteDrop:FireServer()
-            end
-        end
-    end)
-end)
-Toggles.AutoLoopUpgraders:OnChanged(function()
-    Settings.AutoLoopUpgraders = Toggles.AutoLoopUpgraders.Value
+local AutoLoopUpgraderToggle = OresTabbox:AddToggle("AutoLoopUpgraders",{Text = "Auto Loop Upgraders",Default = false,Risky = false})
+AutoLoopUpgraderToggle:OnChanged(function(value)
+    Settings.AutoLoopUpgraders = value
     task.spawn(function()
         while Settings.AutoLoopUpgraders do task.wait()
             if Settings.AutoLoopUpgraders then
@@ -343,52 +166,45 @@ Toggles.AutoLoopUpgraders:OnChanged(function()
         end
     end)
 end)
-Toggles.LoopUpgrader:OnChanged(function()
-    Settings.LoopUpgrader = Toggles.LoopUpgrader.Value
-    task.spawn(function()
-        while Settings.LoopUpgrader do task.wait()
-            if Settings.LoopUpgrader then
-                for i,v in pairs(GetDropped()) do
-                    task.spawn(function()
-                        if MyTycoon:FindFirstChild(Settings.SelectedUpgrader) and MyTycoon[Settings.SelectedUpgrader].Model:FindFirstChild("Upgrade") then
-                            firetouchinterest(v,MyTycoon[Settings.SelectedUpgrader].Model.Upgrade,0)
-                            task.wait()
-                            firetouchinterest(v,MyTycoon[Settings.SelectedUpgrader].Model.Upgrade,1)
-                        elseif MyTycoon:FindFirstChild(Settings.SelectedUpgrader) and MyTycoon[Settings.SelectedUpgrader].Model:FindFirstChild("Upgrader") then
-                            firetouchinterest(v,MyTycoon[Settings.SelectedUpgrader].Model.Upgrader,0)
-                            task.wait()
-                            firetouchinterest(v,MyTycoon[Settings.SelectedUpgrader].Model.Upgrader,1)
-                        elseif MyTycoon:FindFirstChild(Settings.SelectedUpgrader) and MyTycoon[Settings.SelectedUpgrader].Model:FindFirstChild("Cannon") then
-                            firetouchinterest(v,MyTycoon[Settings.SelectedUpgrader].Model.Cannon,0)
-                            task.wait()
-                            firetouchinterest(v,MyTycoon[Settings.SelectedUpgrader].Model.Cannon,1)
-                        elseif MyTycoon:FindFirstChild(Settings.SelectedUpgrader) and MyTycoon[Settings.SelectedUpgrader].Model:FindFirstChild("Copy") then
-                            firetouchinterest(v,MyTycoon[Settings.SelectedUpgrader].Model.Copy,0)
-                            task.wait()
-                            firetouchinterest(v,MyTycoon[Settings.SelectedUpgrader].Model.Copy,1)
-                        end
-                    end)
-                end
-            end
-        end
-    end)
+OresTabbox:AddDivider()
+local SelectedFurnaceTextbox = OresTabbox:AddInput("SelectedFurnaceTextbox",{Text = "Selected Furnace";Default = "Furnace",Numeric = false,Finished = true})
+SelectedFurnaceTextbox:OnChanged(function(Value)
+    Settings.SelectedFurnace = Value
 end)
-Toggles.LoopProximtyPrompt:OnChanged(function()
-    Settings.LoopProximtyPrompt = Toggles.LoopProximtyPrompt.Value
+local AutoSellOresToggle = OresTabbox:AddToggle("AutoLoopUpgraders",{Text = "Auto Sell Ore",Default = false,Risky = false})
+AutoSellOresToggle:OnChanged(function(value)
     task.spawn(function()
-        while Settings.LoopProximtyPrompt do task.wait()
-            if Settings.LoopProximtyPrompt then
-                for i,v in pairs(MyTycoon:GetChildren()) do
-                    if string.find(v.Name,"Excavator") then
-                       fireproximityprompt(v.Model.Internal.ProximityPrompt)
+        while value do task.wait()
+            for i,v in pairs(GetDropped()) do
+                task.spawn(function()
+                    if MyTycoon:FindFirstChild(Settings.SelectedFurnace) then
+                        firetouchinterest(v,MyTycoon[Settings.SelectedFurnace].Model.Lava,0)
+                        task.wait()
+                        firetouchinterest(v,MyTycoon[Settings.SelectedFurnace].Model.Lava,1)
                     end
-                end
+                end)
             end
         end
     end)
 end)
-Toggles.AutoRebirth:OnChanged(function()
-    Settings.AutoRebirth = Toggles.AutoRebirth.Value
+local SellOresButton = OresTabbox:AddButton({Text = "Sell Ores",Func = function()
+    for i,v in pairs(GetDropped()) do
+        task.spawn(function()
+            if MyTycoon:FindFirstChild(Settings.SelectedFurnace) then
+                firetouchinterest(v,MyTycoon[Settings.SelectedFurnace].Model.Lava,0)
+                task.wait()
+                firetouchinterest(v,MyTycoon[Settings.SelectedFurnace].Model.Lava,1)
+            end
+        end)
+    end
+end,})
+
+--Rebirths
+local RebirthTabbox = MainTab:AddRightGroupbox("Rebirths")
+
+local AutoRebirthToggle = RebirthTabbox:AddToggle("AutoRebirth",{Text = "Auto Rebirth",Default = false,Risky = false})
+AutoRebirthToggle:OnChanged(function(value)
+    Settings.AutoRebirth = value
     task.spawn(function()
         while Settings.AutoRebirth do task.wait()
             if game:GetService("Players").LocalPlayer.PlayerGui.GUI.Money.Value >= MoneyLibary.RebornPrice(game:GetService("Players").LocalPlayer) and Settings.AutoRebirth  == true then
@@ -415,14 +231,207 @@ Toggles.AutoRebirth:OnChanged(function()
         end
     end)
 end)
-Toggles.AutoLoadSetup:OnChanged(function()
-    Settings.AutoLoadSetup = Toggles.AutoLoadSetup.Value
+local DelayRebirthToggle = RebirthTabbox:AddToggle("DelayRebirth",{Text = "Delay Rebirth",Default = false,Risky = false})
+DelayRebirthToggle:OnChanged(function(value)
+    Settings.DelayRebirth = value
 end)
-Toggles.ShouldReload:OnChanged(function()
-    Settings.ShouldReload = Toggles.ShouldReload.Value
+local AutoLoadSetupToggle = RebirthTabbox:AddToggle("AutoLoadSetup",{Text = "Auto Load Setup",Default = false,Risky = false})
+AutoLoadSetupToggle:OnChanged(function(value)
+    Settings.AutoLoadSetup = value
+end)
+local RebirthLayoutSelectedDrop = RebirthTabbox:AddDropdown("LayoutSelected",{Text = "Layout", AllowNull = false,Values = {1,2,3},Multi = false,Default=1})
+RebirthLayoutSelectedDrop:OnChanged(function(Value)
+    Settings.LayoutSelected = Value
+end)
+local AutoReloadLoadSetupToggle = RebirthTabbox:AddToggle("ShouldReload",{Text = "Reload Slot",Default = false,Risky = false})
+AutoReloadLoadSetupToggle:OnChanged(function(value)
+    Settings.ShouldReload = value
+end)
+local LoadAfterSlider = RebirthTabbox:AddSlider("LoadAfterSlider",{Text = "Reload Slot After (s)",Default = 5,Min = 1,Max = 60,Rounding = 0})
+LoadAfterSlider:OnChanged(function(Value)
+    Settings.LoadAfter = Value
 end)
 
 
+--Misc
+local MiscTabbox = MainTab:AddLeftGroupbox("Misc")
+
+local LoopProximtyPromptToggle = MiscTabbox:AddToggle("LoopProximtyPrompt",{Text = "Auto Proximity",Default = false,Risky = false})
+LoopProximtyPromptToggle:OnChanged(function(value)
+    Settings.LoopProximtyPrompt = value
+    task.spawn(function()
+        while Settings.LoopProximtyPrompt do task.wait()
+            if Settings.LoopProximtyPrompt then
+                for i,v in pairs(MyTycoon:GetChildren()) do
+                    if string.find(v.Name,"Excavator") then
+                       fireproximityprompt(v.Model.Internal.ProximityPrompt)
+                    elseif v:FindFirstChild("Model"):FindFirstChild("Internal"):FindFirstChild("ProximityPrompt") then
+                        fireproximityprompt(v.Model.Internal.ProximityPrompt)
+                    end
+                end
+            end
+        end
+    end)
+end)
+local LoopRemoteDropToggle = MiscTabbox:AddToggle("LoopRemoteDrop",{Text = "Auto Remote",Default = false,Risky = false})
+LoopRemoteDropToggle:OnChanged(function(value)
+    Settings.LoopRemoteDrop = value
+    task.spawn(function()
+        while Settings.LoopRemoteDrop == true do task.wait()
+            if Settings.LoopRemoteDrop == true then
+                game:GetService("ReplicatedStorage").RemoteDrop:FireServer()
+            end
+        end
+    end)
+end)
+local LoopPulseToggle = MiscTabbox:AddToggle("LoopPulse",{Text = "Auto Pulse",Default = false,Risky = false})
+LoopPulseToggle:OnChanged(function(value)
+    Settings.LoopPulse = value
+    task.spawn(function()
+        while Settings.LoopPulse == true do task.wait()
+            if Settings.LoopPulse == true then
+                game:GetService("ReplicatedStorage").Pulse:FireServer()
+            end
+        end
+    end)
+end)
+local GetFreeDailyCrateButton = MiscTabbox:AddButton({Text = "Get Free Daily Crate",Func = function()
+    firesignal(game:GetService("Players").LocalPlayer.PlayerGui.GUI.SpookMcDookShop.RedeemFrame.MouseButton1Click)
+end,})
+MiscTabbox:AddDivider()
+local ToggleCraftsManToggle = MiscTabbox:AddToggle("ToggleCraftsManToggle",{Text = "Craftman Gui",Default = false,Risky = false})
+ToggleCraftsManToggle:OnChanged(function(value)
+    game:GetService("Players").LocalPlayer.PlayerGui.GUI.Craftsman.Visible = value
+end)
+local ToggleAutoBoxesToggle = MiscTabbox:AddToggle("ToggleAutoBoxes",{Text = "Auto Collect Boxes",Default = false,Risky = false})
+ToggleAutoBoxesToggle:OnChanged(function(value)
+    task.spawn(function()
+        while value do task.wait(.2)
+            if humanoidRootPart then
+                for i, v in pairs(game:GetService("Workspace").Boxes:GetChildren()) do
+                    local boxNames = {"Shadow", "Research", "Goldpot", "Golden", "Crystal", "Diamond", "Present","Lucky"}
+                    if table.find(boxNames,v.Name) and not collectedBoxes[v] and v:FindFirstChild("TouchInterest") then
+                        humanoidRootPart.Velocity = Vector3.zero
+                        humanoidRootPart:PivotTo(v:GetPivot()*CFrame.new(0,-1,0))
+                        firetouchinterest(humanoidRootPart,v,0)
+                        if v:FindFirstChild("TouchInterest") then
+                            firetouchinterest(humanoidRootPart,v,1)
+                        end
+                        if v.Transparency ~= 0.2 then
+                            collectedBoxes[v] = nil
+                        else
+                            collectedBoxes[v] = true
+                        end
+                        task.wait(.2)
+                        humanoidRootPart.Velocity = Vector3.zero
+                        humanoidRootPart:PivotTo(v:GetPivot()*CFrame.new(0,-30,0))
+                    end
+                end
+                humanoidRootPart.Velocity = Vector3.zero
+                humanoidRootPart:PivotTo(TycoonBase:GetPivot()+Vector3.new(0,TycoonBase.Size.Y+2.5,0))
+            end 
+        end
+    end)
+end)
+local GotoBaseButton = MiscTabbox:AddButton({Text = "Goto Base!",Func = function()
+    humanoidRootPart.Velocity = Vector3.zero
+    humanoidRootPart.CFrame = TycoonBase:GetPivot()+Vector3.new(0,TycoonBase.Size.Y+2.5,0)
+end,})
+
+--Webhook
+local WebhookTabbox = MainTab:AddRightGroupbox("Webhook")
+
+local WebhookLinkTextbox = WebhookTabbox:AddInput("WebhookLinkTextbox",{Text = "Link";Default = "Link",Numeric = false,Finished = true})
+WebhookLinkTextbox:OnChanged(function(Value)
+    Settings.WebhookLink = Value
+end)
+local ItemTrackerToggle = WebhookTabbox:AddToggle("ItemTrackerToggle",{Text = "Item Tracker",Default = false,Risky = false})
+ItemTrackerToggle:OnChanged(function(value)
+    Settings.ItemTracker = value
+end)
+
+--Event
+local EventTabbox = MainTab:AddRightGroupbox("Event")
+local AutoCloverToggle = EventTabbox:AddToggle("AutoCloverToggle",{Text = "Auto Clover",Default = false,Risky = false})
+AutoCloverToggle:OnChanged(function(value)
+    task.spawn(function()
+        while value do task.wait(.2)
+            if humanoidRootPart then
+                for i,v in pairs(workspace.Clovers:GetChildren()) do
+                    if v:FindFirstChild("ProximityPrompt") then
+                        game.Players.LocalPlayer.Character:PivotTo(v:GetPivot())
+                        task.wait(.2)
+                        if v:FindFirstChild("ProximityPrompt") ~= nil then 
+                            fireproximityprompt(v.ProximityPrompt)
+                        end
+                    end 
+                end
+                humanoidRootPart.Velocity = Vector3.zero
+                humanoidRootPart:PivotTo(TycoonBase:GetPivot()+Vector3.new(0,TycoonBase.Size.Y+2.5,0))
+            end 
+        end
+    end)
+end)
+local CloverGuiToggle = EventTabbox:AddToggle("CloverGuiToggle",{Text = "Clover Gui",Default = false,Risky = false})
+CloverGuiToggle:OnChanged(function(value)
+    game:GetService("Players").LocalPlayer.PlayerGui.GUI.Patrick.Visible = value
+end)
+
+--Fps
+local FpsTabbox = MainTab:AddRightGroupbox("FPS")
+local RenderingToggle = FpsTabbox:AddToggle("RenderingToggle",{Text = "Rendering",Default = true,Risky = false})
+RenderingToggle:OnChanged(function(value)
+    game:GetService("RunService"):Set3dRenderingEnabled(value)
+end)
+
+--Layouts           
+local LayoutsGroup = LayoutsTab:AddLeftGroupbox("Layout Copier")
+local LayoutsInfoGroup = LayoutsTab:AddRightGroupbox("Missing Items")
+local LayoutPlayerSelectedDrop = LayoutsGroup:AddDropdown("LayoutPlayerSelected",{Text = "Player", AllowNull = false,Values = PlayersList,Multi = false,Default=PlayersList[1]})
+LayoutPlayerSelectedDrop:OnChanged(function(Value)
+    Settings.LayoutPlayerSelected = Value
+end)
+local LayoutCopierSelectedDrop = LayoutsGroup:AddDropdown("LayoutCopierSelected",{Text = "Layout", AllowNull = false,Values = {1,2,3},Multi = false,Default=1})
+LayoutCopierSelectedDrop:OnChanged(function(Value)
+    Settings.LayoutCopierSelected = Value
+end)
+local LayoutCopierLoadButton = LayoutsGroup:AddButton({Text = "Build Layout!",Func = function()
+    if Settings.LayoutPlayerSelected == nil and Settings.LayoutCopierSelected == nil then return end
+    for i,v in pairs(game:GetService("HttpService"):JSONDecode(game:GetService("Players")[Settings.LayoutPlayerSelected].Layouts["Layout"..Settings.LayoutCopierSelected].Value)) do
+        task.spawn(function()
+            if HasItem(v["ItemId"]) == true then
+                local TopLeft = TycoonBase.CFrame * CFrame.new(Vector3.new(TycoonBase.Size.X/2, 0, TycoonBase.Size.Z/2))
+                local Position = TopLeft * Vector3.new(tonumber(v.Position[1]), tonumber(v.Position[2]), tonumber(v.Position[3]))
+                local Rotation = Vector3.new(tonumber(v.Position[4]),tonumber(v.Position[5]),tonumber(v.Position[6]))
+                local NewCf = CFrame.new(Position, Position + (Rotation * 5))
+                game:GetService("ReplicatedStorage").PlaceItem:InvokeServer(FetchItemModule.Get(nil,v["ItemId"]).Name,NewCf,{TycoonBase})
+                task.wait()
+            elseif HasItem(v["ItemId"]) == false and IsShopItem(v["ItemId"]) == true and game:GetService("Players").LocalPlayer.PlayerGui.GUI.Money.Value >= game:GetService("ReplicatedStorage").Items[FetchItemModule.Get(nil,v["ItemId"]).Name].Cost.Value then
+                game:GetService("ReplicatedStorage").BuyItem:InvokeServer(FetchItemModule.Get(nil,v["ItemId"]).Name,1)
+                task.wait()
+                local TopLeft = TycoonBase.CFrame * CFrame.new(Vector3.new(TycoonBase.Size.X/2, 0, TycoonBase.Size.Z/2))
+                local Position = TopLeft * Vector3.new(tonumber(v.Position[1]), tonumber(v.Position[2]), tonumber(v.Position[3]))
+                local Rotation = Vector3.new(tonumber(v.Position[4]),tonumber(v.Position[5]),tonumber(v.Position[6]))
+                local NewCf = CFrame.new(Position, Position + (Rotation * 5))
+                game:GetService("ReplicatedStorage").PlaceItem:InvokeServer(FetchItemModule.Get(nil,v["ItemId"]).Name,NewCf,{TycoonBase})
+                task.wait()
+            else
+                if IsShopItem(v["ItemId"]) == true then
+                    print("Cant Afford Item, "..FetchItemModule.Get(nil,v["ItemId"]).Name)
+                else
+                    print("Cant Find, "..FetchItemModule.Get(nil,v["ItemId"]).Name)
+                end
+            end
+        end)
+    end
+end,})
+local Label = LayoutsInfoGroup:AddLabel("LayoutInfoLabel",'No Layout Selected')
+LayoutsInfoGroup:AddButton({Text = "Get Missing Items!",Func = function()
+    if Settings.LayoutPlayerSelected == nil and Settings.LayoutCopierSelected == nil then return end
+    Label:SetText(GetMissingItems())
+end})
+
+--Webhook Function
 game.ReplicatedStorage.ItemObtained.OnClientEvent:Connect(function(Item,Amt)
     if Item and Amt and Settings.ItemTracker == true then
         
@@ -476,49 +485,34 @@ game.ReplicatedStorage.ItemObtained.OnClientEvent:Connect(function(Item,Amt)
 end)
 
 
---Options
-Options.WebhookLink:OnChanged(function()
-    Settings.WebhookLink = Options.WebhookLink.Value
-end)
-Options.SelectedUpgrader:OnChanged(function()
-    Settings.SelectedUpgrader = Options.SelectedUpgrader.Value
-end)
-Options.SelectedFurnace:OnChanged(function()
-    Settings.SelectedFurnace = Options.SelectedFurnace.Value
-end)
-Options.LayoutSelected:OnChanged(function()
-    Settings.LayoutSelected = Options.LayoutSelected.Value
-end)
-Options.LoadAfter:OnChanged(function()
-    Settings.LoadAfter = Options.LoadAfter.Value
-end)
-Options.LayoutCopierSelected:OnChanged(function()
-    Settings.LayoutCopierSelected = Options.LayoutCopierSelected.Value
-end)
-Options.LayoutPlayerSelected:OnChanged(function()
-    Settings.LayoutPlayerSelected = Options.LayoutPlayerSelected.Value
-end)
 
-game.Players.LocalPlayer.CharacterAdded:Connect(function(char)
-    humanoidRootPart = char:WaitForChild("HumanoidRootPart")
-end)
 
-local MenuGroup = Tabs['UI Settings']:AddLeftGroupbox('Menu')
-MenuGroup:AddButton('Unload', function() 
-    Library:Unload() 
-    for i,v in pairs(Toggles) do
-        v:SetValue(false)
-    end
+Library:SetWatermark("Float.Balls [Miners Haven]")
+
+--Settings Start
+local Settings = Window:AddTab("Settings")
+local SettingsUI = Settings:AddLeftGroupbox("UI")
+
+local SettingsUnloadButton = SettingsUI:AddButton({Text="Unload",Func=function()
+    Library:Unload()
+end})
+
+local SettingsMenuLabel = SettingsUI:AddLabel("SettingsMenuKeybindLabel","Menu Keybind")
+local SettingsMenuKeyPicker = SettingsMenuLabel:AddKeyPicker("SettingsMenuKeyBind",{Default="Insert",IgnoreKeybindFrame=true})
+Library.Options["SettingsMenuKeyBind"]:OnClick(function()
+    Library:Toggle()
     game:GetService("RunService"):Set3dRenderingEnabled(true)
 end)
-MenuGroup:AddLabel('Menu bind'):AddKeyPicker('MenuKeybind', { Default = 'End', NoUI = true, Text = 'Menu keybind' }) 
-Library.ToggleKeybind = Options.MenuKeybind -- Allows you to have a custom keybind for the menu
-ThemeManager:SetLibrary(Library)
-SaveManager:SetLibrary(Library)
-SaveManager:IgnoreThemeSettings() 
-SaveManager:SetIgnoreIndexes({ 'MenuKeybind' }) 
-ThemeManager:SetFolder('ProjectVertigo')
-SaveManager:SetFolder('ProjectVertigo/MinersHaven')
-SaveManager:BuildConfigSection(Tabs['UI Settings']) 
-ThemeManager:ApplyToTab(Tabs['UI Settings'])
-SaveManager:LoadAutoloadConfig()
+local SettingsNotiPositionDropdown = SettingsUI:AddDropdown("SettingsNotiPositionDropdown",{Text="Notification Position",Values={"Top_Left","Top_Right","Bottom_Left","Bottom_Right"},Default="Top_Left"})
+SettingsNotiPositionDropdown:OnChanged(function(Value)
+    Library.NotificationPosition = Value
+end)
+
+Library.ThemeManager:SetLibrary(Library)
+Library.SaveManager:SetLibrary(Library)
+Library.ThemeManager:ApplyToTab(Settings)
+Library.SaveManager:IgnoreThemeSettings()
+Library.SaveManager:SetIgnoreIndexes({"MenuKeybind","BackgroundColor", "ActiveColor", "ItemBorderColor", "ItemBackgroundColor", "TextColor" , "DisabledTextColor", "RiskyColor"})
+Library.SaveManager:SetFolder('Test')
+Library.SaveManager:BuildConfigSection(Settings)
+--Settings End
