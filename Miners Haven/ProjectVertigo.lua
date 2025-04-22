@@ -244,7 +244,7 @@ Toggles.AutoClover:OnChanged(function()
                     if v:FindFirstChild("ProximityPrompt") then
                         game.Players.LocalPlayer.Character:PivotTo(v:GetPivot())
                         task.wait(.2)
-                        fireproximityprompt(v.ProximityPrompt)
+                        fireproximityprompt(v:FindFirstChild("ProximityPrompt"))
                     end 
                 end
                 humanoidRootPart.Velocity = Vector3.zero
